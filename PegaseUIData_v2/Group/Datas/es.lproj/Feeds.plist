@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+    <dict>
+        <key>name</key>
+        <string>Seguimiento de Tesorería</string>
+        <key>icon</key>
+        <string>note</string>
+        <key>id</key>
+        <string>A4A1BF73-28F7-438C-BDB1-E528C8A8EB3F</string>
+        <key>children</key>
+        <array>
+            <dict>
+                <key>nameView</key>
+                <string>Liste des transactions</string>
+                <key>icon</key>
+                <string>list.bullet</string>
+                <key>name</key>
+                <string>Lista de Transacciones</string>
+                <key>id</key>
+                <string>9AB34384-4EC0-4C09-A612-E404E6F869AA</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Courbe de trésorerie</string>
+                <key>icon</key>
+                <string>chart.xyaxis.line</string>
+                <key>name</key>
+                <string>Curva de Tesorería</string>
+                <key>id</key>
+                <string>7505E942-D67B-4283-86FB-FFB4296A1C2E</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Site Web de la banque</string>
+                <key>icon</key>
+                <string>checkmark.seal.fill</string>
+                <key>name</key>
+                <string>Sitio Web del Banco</string>
+                <key>id</key>
+                <string>178EB508-A5C6-4392-8E45-EB6964F8C830</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Rapprochement internet</string>
+                <key>icon</key>
+                <string>checkmark.seal.fill</string>
+                <key>name</key>
+                <string>Conciliación en Línea</string>
+                <key>id</key>
+                <string>E18C4A6F-4534-4DB2-B189-97F9A529C015</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Relevé bancaire</string>
+                <key>icon</key>
+                <string>note.text</string>
+                <key>name</key>
+                <string>Extracto Bancario</string>
+                <key>id</key>
+                <string>38E12B07-27D7-4476-B62A-64403027871A</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string></string>
+                <key>icon</key>
+                <string>note</string>
+                <key>name</key>
+                <string>Notas</string>
+                <key>id</key>
+                <string>0CB862EF-3BE6-4FE5-807B-774EA5748F53</string>
+            </dict>
+        </array>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>Informes</string>
+        <key>icon</key>
+        <string>note</string>
+        <key>id</key>
+        <string>40B71AFC-C91F-460E-AB50-482DDF89DC2B</string>
+        <key>children</key>
+        <array>
+            <dict>
+                <key>nameView</key>
+                <string>Categorie Bar1</string>
+                <key>icon</key>
+                <string>chart.bar.xaxis</string>
+                <key>name</key>
+                <string>Categoría Barra 1</string>
+                <key>id</key>
+                <string>6CA852C4-5D90-444C-A432-496D678519E6</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Categorie Bar2</string>
+                <key>icon</key>
+                <string>chart.bar.xaxis</string>
+                <key>name</key>
+                <string>Categoría Barra 2</string>
+                <key>id</key>
+                <string>38E12B07-27D7-4476-B62A-64403027871A</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Mode de paiement</string>
+                <key>icon</key>
+                <string>chart.pie</string>
+                <key>name</key>
+                <string>Método de Pago</string>
+                <key>id</key>
+                <string>0CB862EF-3BE6-4FE5-807B-774EA5748F53</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Recette Depense Bar</string>
+                <key>icon</key>
+                <string>chart.bar.xaxis</string>
+                <key>name</key>
+                <string>Ingresos y Gastos (Barra)</string>
+                <key>id</key>
+                <string>702BEF56-353D-4426-A6ED-41B7B8ACAF61</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Recette Depense Pie</string>
+                <key>icon</key>
+                <string>chart.pie</string>
+                <key>name</key>
+                <string>Ingresos y Gastos (Circular)</string>
+                <key>id</key>
+                <string>6B2CDDB7-807B-4C82-B7A8-778793B35951</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Rubrique Bar</string>
+                <key>icon</key>
+                <string>chart.bar.xaxis</string>
+                <key>name</key>
+                <string>Sección Barra</string>
+                <key>id</key>
+                <string>558DDCB7-C230-4373-8943-9DBB8D0F4F9B</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Rubrique Pie</string>
+                <key>icon</key>
+                <string>chart.pie</string>
+                <key>name</key>
+                <string>Sección Circular</string>
+                <key>id</key>
+                <string>6C99829D-71ED-4004-9C9F-15A9B1DE4715</string>
+            </dict>
+        </array>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>Referencia de Cuenta</string>
+        <key>icon</key>
+        <string>note</string>
+        <key>id</key>
+        <string>59066FD3-781C-433C-A08B-16B2A23DB27C</string>
+        <key>children</key>
+        <array>
+            <dict>
+                <key>nameView</key>
+                <string>Identity</string>
+                <key>icon</key>
+                <string>person</string>
+                <key>name</key>
+                <string>Identidad</string>
+                <key>id</key>
+                <string>B7EA7423-F42A-4316-A0A4-FA4F6B00FE3B</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Scheduler</string>
+                <key>icon</key>
+                <string>calendar</string>
+                <key>name</key>
+                <string>Calendario de Pagos</string>
+                <key>id</key>
+                <string>7900BB24-560A-46E5-872D-8FB684A97AAC</string>
+            </dict>
+            <dict>
+                <key>nameView</key>
+                <string>Réglage</string>
+                <key>icon</key>
+                <string>bookmark</string>
+                <key>name</key>
+                <string>Configuraciones</string>
+                <key>id</key>
+                <string>64B530A8-1033-4A87-A413-FDAC6AB0B1B5</string>
+            </dict>
+        </array>
+    </dict>
+</array>
+</plist>

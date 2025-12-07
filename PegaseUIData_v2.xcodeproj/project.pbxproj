@@ -6,14 +6,37 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		03C33F192EE5CA9D009BFB65 /* _config.yml in Resources */ = {isa = PBXBuildFile; fileRef = 03C33F172EE5CA9D009BFB65 /* _config.yml */; };
+		03C33F1A2EE5CA9D009BFB65 /* .gitattributes in Resources */ = {isa = PBXBuildFile; fileRef = 03C33F182EE5CA9D009BFB65 /* .gitattributes */; };
+		03C33F1B2EE5CA9D009BFB65 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 03C33F152EE5CA9D009BFB65 /* README.md */; };
+		03C33F1C2EE5CA9D009BFB65 /* README_fr 1.1.md in Resources */ = {isa = PBXBuildFile; fileRef = 03C33F162EE5CA9D009BFB65 /* README_fr 1.1.md */; };
+		03C340142EE5D3EA009BFB65 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 03C340132EE5D3EA009BFB65 /* DGCharts */; };
+		03C340172EE5D404009BFB65 /* SwiftDate in Frameworks */ = {isa = PBXBuildFile; productRef = 03C340162EE5D404009BFB65 /* SwiftDate */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		03C33ED92EE5C91C009BFB65 /* PegaseUIData_v2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PegaseUIData_v2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		03C33F152EE5CA9D009BFB65 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		03C33F162EE5CA9D009BFB65 /* README_fr 1.1.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README_fr 1.1.md"; sourceTree = "<group>"; };
+		03C33F172EE5CA9D009BFB65 /* _config.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = _config.yml; sourceTree = "<group>"; };
+		03C33F182EE5CA9D009BFB65 /* .gitattributes */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitattributes; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		03C33EDB2EE5C91C009BFB65 /* PegaseUIData_v2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PegaseUIData_v2;
+			sourceTree = "<group>";
+		};
+		03C33EE92EE5CA33009BFB65 /* Doc */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Doc;
+			sourceTree = "<group>";
+		};
+		03C33EEA2EE5CA41009BFB65 /* Docs */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Docs;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +46,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				03C340172EE5D404009BFB65 /* SwiftDate in Frameworks */,
+				03C340142EE5D3EA009BFB65 /* DGCharts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32,6 +57,12 @@
 		03C33ED02EE5C91C009BFB65 = {
 			isa = PBXGroup;
 			children = (
+				03C33F152EE5CA9D009BFB65 /* README.md */,
+				03C33F162EE5CA9D009BFB65 /* README_fr 1.1.md */,
+				03C33F172EE5CA9D009BFB65 /* _config.yml */,
+				03C33F182EE5CA9D009BFB65 /* .gitattributes */,
+				03C33EEA2EE5CA41009BFB65 /* Docs */,
+				03C33EE92EE5CA33009BFB65 /* Doc */,
 				03C33EDB2EE5C91C009BFB65 /* PegaseUIData_v2 */,
 				03C33EDA2EE5C91C009BFB65 /* Products */,
 			);
@@ -62,9 +93,13 @@
 			);
 			fileSystemSynchronizedGroups = (
 				03C33EDB2EE5C91C009BFB65 /* PegaseUIData_v2 */,
+				03C33EE92EE5CA33009BFB65 /* Doc */,
+				03C33EEA2EE5CA41009BFB65 /* Docs */,
 			);
 			name = PegaseUIData_v2;
 			packageProductDependencies = (
+				03C340132EE5D3EA009BFB65 /* DGCharts */,
+				03C340162EE5D404009BFB65 /* SwiftDate */,
 			);
 			productName = PegaseUIData_v2;
 			productReference = 03C33ED92EE5C91C009BFB65 /* PegaseUIData_v2.app */;
@@ -94,6 +129,10 @@
 			);
 			mainGroup = 03C33ED02EE5C91C009BFB65;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				03C340122EE5D3EA009BFB65 /* XCRemoteSwiftPackageReference "Charts" */,
+				03C340152EE5D404009BFB65 /* XCRemoteSwiftPackageReference "SwiftDate" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 03C33EDA2EE5C91C009BFB65 /* Products */;
 			projectDirPath = "";
@@ -109,6 +148,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				03C33F192EE5CA9D009BFB65 /* _config.yml in Resources */,
+				03C33F1A2EE5CA9D009BFB65 /* .gitattributes in Resources */,
+				03C33F1B2EE5CA9D009BFB65 /* README.md in Resources */,
+				03C33F1C2EE5CA9D009BFB65 /* README_fr 1.1.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,6 +170,8 @@
 /* Begin XCBuildConfiguration section */
 		03C33EE42EE5C91D009BFB65 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 03C33EDB2EE5C91C009BFB65 /* PegaseUIData_v2 */;
+			baseConfigurationReferenceRelativePath = BuildNumber.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -191,6 +236,8 @@
 		};
 		03C33EE52EE5C91D009BFB65 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 03C33EDB2EE5C91C009BFB65 /* PegaseUIData_v2 */;
+			baseConfigurationReferenceRelativePath = BuildNumber.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -247,24 +294,25 @@
 		};
 		03C33EE72EE5C91D009BFB65 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 03C33EDB2EE5C91C009BFB65 /* PegaseUIData_v2 */;
+			baseConfigurationReferenceRelativePath = BuildNumber.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = 84WLNJ2YG4;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "thi.PegaseUIData-v2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -279,24 +327,25 @@
 		};
 		03C33EE82EE5C91D009BFB65 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 03C33EDB2EE5C91C009BFB65 /* PegaseUIData_v2 */;
+			baseConfigurationReferenceRelativePath = BuildNumber.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = 84WLNJ2YG4;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "thi.PegaseUIData-v2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -331,6 +380,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		03C340122EE5D3EA009BFB65 /* XCRemoteSwiftPackageReference "Charts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ChartsOrg/Charts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.0;
+			};
+		};
+		03C340152EE5D404009BFB65 /* XCRemoteSwiftPackageReference "SwiftDate" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/malcommac/SwiftDate";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		03C340132EE5D3EA009BFB65 /* DGCharts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 03C340122EE5D3EA009BFB65 /* XCRemoteSwiftPackageReference "Charts" */;
+			productName = DGCharts;
+		};
+		03C340162EE5D404009BFB65 /* SwiftDate */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 03C340152EE5D404009BFB65 /* XCRemoteSwiftPackageReference "SwiftDate" */;
+			productName = SwiftDate;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 03C33ED12EE5C91C009BFB65 /* Project object */;
 }

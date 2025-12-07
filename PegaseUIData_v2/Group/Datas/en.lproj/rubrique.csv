@@ -1,0 +1,63 @@
+section;category;type;goal;color
+Food;Food;0;100;red
+Food;Others;0;100;red
+
+Animals;Care;0;20;blue
+
+Insurance;Home;0;20;red
+Insurance;School;0;10;red
+
+Bank;Loans;0;0;brown
+Bank;Savings;0;0;brown
+Bank;Interests;0;0;brown
+Bank;Others;0;0;brown
+
+Miscellaneous;Accessories;0;0;gray
+Miscellaneous;Shoes;0;0;gray
+Miscellaneous;Hairdresser;0;0;gray
+Miscellaneous;Miscellaneous;0;0;gray
+Miscellaneous;Donations;0;0;gray
+Miscellaneous;Beauty;0;0;gray
+Miscellaneous;Transport;0;45;gray
+Miscellaneous;Clothing;0;50;gray
+
+Taxes;Property tax;0;120;green
+Taxes;Income tax;0;110;green
+Taxes;Housing tax;0;90;green
+Taxes;Others;0;0;green
+
+Leisure;Gift;0;0;orange
+Leisure;Entertainment;0;0;orange
+Leisure;Books;0;0;orange
+Leisure;Music;0;10;orange
+Leisure;Restaurants;0;20;orange
+Leisure;Shows;0;0;orange
+Leisure;Sports;0;30;orange
+Leisure;Holidays;0;100;orange
+Leisure;Others;0;0;orange
+
+Home;DIY;0;0;darkGray
+Home;Water;0;50;darkGray
+Home;Electricity;0;120;darkGray
+Home;Cash;0;0;darkGray
+Home;Gas;0;0;darkGray
+Home;Internet;0;45;darkGray
+Home;Rent;0;500;darkGray
+Home;Phone;0;25;darkGray
+Home;Others;0;25;darkGray
+
+Income;Salary;0;3000;purple
+
+Health;Dentist;0;0;green
+Health;Doctor;0;0;green
+Health;Glasses;0;0;green
+Health;Pharmacy;0;0;green
+Health;Health Insurance;0;0;green
+Health;Others;0;0;green
+
+Car;Fuel;0;50.0;green
+Car;Maintenance;0;0;green
+Car;Parking;0;0;green
+Car;Toll;0;0;green
+Car;Vehicle Purchase;0;180.;green
+Car;Others;0;180.;green
