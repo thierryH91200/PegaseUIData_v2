@@ -86,7 +86,7 @@ extension EntitySchedule {
 
 @MainActor
 protocol ScheduleManaging {
-    func create(account: EntityAccount?, name : String) throws -> EntitySchedule
+    func create() -> EntitySchedule
     func getAllData() -> [EntitySchedule]?
     func save () throws
 }
@@ -108,12 +108,16 @@ final class SchedulerManager: ScheduleManaging, ObservableObject  {
         schedulers.removeAll()
     }
 
-    @MainActor func create(account: EntityAccount?, name : String) throws -> EntitySchedule {
+    @MainActor func create() -> EntitySchedule {
         let entity = EntitySchedule()
         modelContext?.insert(entity)
-        try save()
-        schedulers.append(entity)
-        
+        do {
+            try save()
+            schedulers.append(entity)
+        } catch {
+            // Log and avoid appending if save failed
+            printTag("Erreur lors de la sauvegarde de l'échéancier: \(error.localizedDescription)", flag: true)
+        }
         return entity
     }
     

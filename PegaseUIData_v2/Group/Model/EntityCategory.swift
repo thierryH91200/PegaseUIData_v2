@@ -41,16 +41,27 @@ final class CategoryManager: ObservableObject {
     var modelContext: ModelContext? {
         DataContext.shared.context
     }
+    var undoManager: UndoManager? {
+        DataContext.shared.context?.undoManager
+    }
 
     init() {}
-   
+    
+    func create( name: String, objectif: Double, rubric: EntityRubric) -> EntityCategory? {
+        
+        let entity = EntityCategory(name: name, objectif: objectif, rubric: rubric)
+        modelContext?.insert(entity)
+        
+        // Sauvegardez le contexte
+        try? save()
+        return entity
+    }
+
     @MainActor func findOrCreate(account: EntityAccount,
                       name: String,
                       objectif: Double,
                       rubric: EntityRubric ) -> EntityCategory {
         
-//        let account = CurrentAccountManager.shared.getAccount()!
-
        if let existingCategory = find(name: name) {
             return existingCategory
         } else {
@@ -76,7 +87,7 @@ final class CategoryManager: ObservableObject {
         return categories.first { $0.name == name } ?? categories.first
     }
     
-    func delete(entity: EntityCategory, undoManager: UndoManager?) {
+    func delete(entity: EntityCategory) {
         
         guard let modelContext = modelContext else { return }
 
@@ -86,6 +97,14 @@ final class CategoryManager: ObservableObject {
         modelContext.delete(entity)
         modelContext.undoManager?.endUndoGrouping()
     }
+    func save () throws {
+        do {
+            try modelContext?.save()
+        } catch {
+            throw EnumError.saveFailed
+        }
+    }
+
 }
 
 extension Sequence where Element == EntityCategory {

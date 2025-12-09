@@ -15,7 +15,6 @@ struct TreasuryCurve: View {
     
     @Binding var dashboard: DashboardState
 
-    @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
     @StateObject private var viewModel = TresuryLineViewModel()
 

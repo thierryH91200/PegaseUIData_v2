@@ -14,12 +14,13 @@ import Combine
 
 
 struct ImportTransactionOFXFileView: View {
+    
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
     @Binding var isPresented: Bool // Permet de fermer la sheet depuis l'intérieur
     @State private var showOFXImporter = false
     @State private var isImporting = false
-    @Environment(\.modelContext) private var modelContext
     
     var body: some View {
         ZStack {

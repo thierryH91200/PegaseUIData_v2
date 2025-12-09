@@ -16,6 +16,7 @@ protocol ListManaging {
     func createTransactions(formState: TransactionFormState) -> EntityTransaction
     func find(uuid: UUID) -> EntityTransaction?
     func getAllComments(for account: EntityAccount) throws -> [String]
+    func delete(entity: EntityTransaction)
 
 }
 
@@ -56,6 +57,17 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
 
         return formState.currentTransaction!
     }
+    
+    func addSousTransaction(transaction: EntityTransaction, sousTransaction: EntitySousOperation ) -> EntityTransaction {
+        
+        modelContext?.insert(transaction)
+        sousTransaction.transaction = transaction
+        modelContext?.insert(sousTransaction)
+        transaction.addSubOperation(sousTransaction)
+
+        return transaction
+    }
+
     
     func find(uuid: UUID) -> EntityTransaction? {
         // Création du prédicat pour filtrer les transactions par UUID
@@ -162,13 +174,6 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
         modelContext.undoManager?.setActionName(String(localized: "Delete Person"))
         modelContext.delete(entity)
         modelContext.undoManager?.endUndoGrouping()
-
-        do {
-            try modelContext.save()
-            printTag("✅ L'entité a été supprimée avec succès.", flag: true)
-        } catch {
-            printTag("❗ Erreur lors de la suppression: \(error)", flag: true)
-        }
     }
     
     func printTransactions() {
@@ -199,6 +204,15 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
         currentAccount.isDemo = false
     }
     
+    func save() throws {
+        
+        do {
+            try modelContext?.save()
+        } catch {
+            throw EnumError.saveFailed
+        }
+    }
+
     
     @MainActor
     func undo() {

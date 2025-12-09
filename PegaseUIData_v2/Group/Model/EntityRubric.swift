@@ -51,15 +51,30 @@ final class RubricManager {
     var entitiesRubric: [EntityRubric] = []
     
     // Contexte pour les modifications
-   var modelContext: ModelContext? {
+    var modelContext: ModelContext? {
         DataContext.shared.context
     }
-    
+
     private init() { }
     
     @MainActor func reset() {
         entitiesRubric.removeAll()
         refresh()
+    }
+    
+    func create( name: String, color: NSColor) -> EntityRubric? {
+        // Créez une instance de EntityCarnetCheques
+        guard let account = CurrentAccountManager.shared.getAccount() else {
+            printTag("Aucun compte actif pour créer un carnet de chèques")
+            return nil
+        }
+        
+        let entity = EntityRubric(name: name, color: color, account: account)
+        modelContext?.insert(entity)
+        
+        // Sauvegardez le contexte
+        try? save()
+        return entity
     }
 
     @MainActor
@@ -133,8 +148,6 @@ final class RubricManager {
 
         let lines = content.components(separatedBy: .newlines).filter { !$0.isEmpty }
         guard !lines.isEmpty else { return }
-
-//        let account = currentAccount
 
         for (index, line) in lines.enumerated() {
             let columns = line.components(separatedBy: ";")

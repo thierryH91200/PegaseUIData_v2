@@ -10,7 +10,6 @@ import SwiftData
 import UniformTypeIdentifiers
 
 struct CSVEXportTransactionView: View {
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
     @State private var showFileExporter = false

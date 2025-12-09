@@ -11,7 +11,6 @@ import SwiftData
 
 struct TransactionLigne: View {
     
-    @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var transactionManager   : TransactionSelectionManager
     @EnvironmentObject private var colorManager : ColorManager
     

@@ -12,7 +12,7 @@ import Observation
 
 // MARK: 1. Composant principal
 struct OperationDialogView: View {
-    @Environment(\.modelContext) private var modelContext: ModelContext
+
     @Environment(\.dismiss) private var dismiss
     
     @EnvironmentObject var transactionManager: TransactionSelectionManager
@@ -185,12 +185,10 @@ struct OperationDialogView: View {
             // Mode création : on crée une seule transaction
             let sousTransaction = formState.currentSousTransaction
             guard let sousTransaction else { return }
-            let transaction = formState.currentTransaction!
+            var transaction = formState.currentTransaction!
+            
+            transaction = ListTransactionsManager.shared.addSousTransaction(transaction: transaction, sousTransaction: sousTransaction)
 
-            sousTransaction.transaction = transaction
-            modelContext.insert(sousTransaction)
-            transaction.addSubOperation(sousTransaction)
-            modelContext.insert(transaction)
         } else {
             // Mode édition : modifier toutes les transactions sélectionnées
             for transaction in transactionManager.selectedTransactions {
@@ -206,7 +204,7 @@ struct OperationDialogView: View {
         }
 
         do {
-            try save()
+            try ListTransactionsManager.shared.save()
             let count = transactionManager.selectedTransactions.count
             printTag("✅ \(count) Transaction(s) sauvegardées")
         } catch {
@@ -264,9 +262,9 @@ struct OperationDialogView: View {
         formState.currentTransaction = transaction
     }
     
-    func save() throws {
-        try modelContext.save()
-    }
+//    func save() throws {
+//        try modelContext.save()
+//    }
     
     func resetListTransactions() {
         
@@ -479,3 +477,4 @@ extension Collection where Element: Hashable {
         return uniqueValues.count == 1 ? uniqueValues.first : nil
     }
 }
+

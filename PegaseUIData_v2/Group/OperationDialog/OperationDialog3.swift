@@ -17,7 +17,6 @@ import SwiftData
 // MARK: - TransactionFormViewModel
 struct TransactionFormViewModel: View {
     
-    @Environment(\.modelContext) private var modelContext: ModelContext
     @EnvironmentObject var transactionManager: TransactionSelectionManager
     
     @Binding var linkedAccount: [EntityAccount]

@@ -77,8 +77,10 @@ extension EntityBankStatement {
     }
 
     var formattedStartSolde: String { formatEuro(startSolde) }
-    var formattedInterSolde: String { formatEuro(startSolde) }
-    
+    var formattedInterSolde: String { formatEuro(interSolde) }
+    var formattedEndSolde: String { formatEuro(endSolde) }
+    var formattedCBSolde: String { formatEuro(cbSolde) }
+
     var accountName: String {
         account.identity?.name ?? ""
     }
@@ -90,7 +92,7 @@ extension EntityBankStatement {
 
 @MainActor
 protocol BankStatementManaging {
-    func create(num: Int, startDate: Date, startSolde: Double) throws -> EntityBankStatement?
+    func create(num: Int, startDate: Date, startSolde: Double) -> EntityBankStatement?
     func getAllData() -> [EntityBankStatement]?
     func delete(entity: EntityBankStatement, undoManager: UndoManager?)
 
@@ -116,7 +118,7 @@ final class BankStatementManager : BankStatementManaging, ObservableObject {
     }
 
     
-    func create(num: Int, startDate: Date, startSolde: Double) throws -> EntityBankStatement? {
+    func create(num: Int, startDate: Date, startSolde: Double) -> EntityBankStatement? {
         
         guard let currentAccount = CurrentAccountManager.shared.getAccount() else {
             print("[BankStatementManager] Erreur : aucun compte courant trouvé.")
@@ -127,7 +129,7 @@ final class BankStatementManager : BankStatementManaging, ObservableObject {
         newMode.account = currentAccount
         
         modelContext?.insert(newMode)
-        try save()
+        try? save()
         return newMode
     }
     

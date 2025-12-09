@@ -13,7 +13,6 @@ import Combine
 
 
 struct ImportTransactionFileView: View {
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
     @State private var showFileImporter = false
@@ -119,7 +118,7 @@ struct ImportTransactionFileView: View {
                 
                 HStack(spacing: 20) {
                     Button(action: {
-                        importCSVTransactions(context: modelContext)
+                        importCSVTransactions()
                         dismiss()
                     }) {
                         Label("Import", systemImage: "tray.and.arrow.down")
@@ -151,7 +150,8 @@ struct ImportTransactionFileView: View {
     }
     
     // Fonction d'importation
-    func importCSVTransactions(context: ModelContext) {
+    func importCSVTransactions() {
+        
         guard !csvData.isEmpty else { return }
         
         let count = csvData.count
@@ -183,7 +183,7 @@ struct ImportTransactionFileView: View {
             
             let amount = getDouble(from: row, index: columnMapping[String(localized:"Amount")])
             
-            let transaction = EntityTransaction()
+            var transaction = EntityTransaction()
             transaction.createAt  = Date().noon
             transaction.updatedAt = Date().noon
             
@@ -195,20 +195,16 @@ struct ImportTransactionFileView: View {
             transaction.checkNumber   = "0"
             transaction.account       = account
             
-            context.insert(transaction)
-
             let sousTransaction = EntitySousOperation()
             sousTransaction.libelle  = libelle
             sousTransaction.amount  = amount
             sousTransaction.category = entityCategory
-            sousTransaction.transaction = transaction
             
-            context.insert(sousTransaction)
-            transaction.addSubOperation(sousTransaction)
-        }
+            transaction = ListTransactionsManager.shared.addSousTransaction(transaction: transaction, sousTransaction: sousTransaction)
+            }
         
         do {
-            try context.save()
+            try ListTransactionsManager.shared.save()
             printTag("Importation réussie 🎉", flag: true)
             NotificationCenter.default.post(name: .transactionsImported, object: nil)
 

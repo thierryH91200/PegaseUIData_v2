@@ -31,9 +31,7 @@ struct NotesView: View {
 }
 
 struct NotesView10: View {
-    @Environment(\.modelContext) private var modelContext: ModelContext
 
-    @EnvironmentObject var dataManager: BankStatementManager
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
 
     // Récupère le compte courant de manière sécurisée.
@@ -46,13 +44,7 @@ struct NotesView10: View {
         Text("NotesView")
             .font(.title)
         Text("\(compteCurrent?.name ?? String(localized:"No current account" ))")
-//            .onChange(of: currentAccountManager.getAccount()) { old, newAccount in
-//                if newAccount != "" {
-//                    refreshData()
-//                }
-//            }
     }
     private func refreshData() {
-        dataManager.statements = BankStatementManager.shared.getAllData() ?? []
     }
 }

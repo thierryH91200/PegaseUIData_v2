@@ -12,7 +12,6 @@ import UniformTypeIdentifiers
 
 struct OperationRow: View {
     
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
     @EnvironmentObject private var currentAccountManager : CurrentAccountManager
@@ -36,6 +35,7 @@ struct OperationRow: View {
                                  String(localized:"Amount")]
 
     private var transactions: [EntityTransaction] { ListTransactionsManager.shared.listTransactions }
+    
     // Récupère le compte courant de manière sécurisée.
     var compteCurrent: EntityAccount? {
         CurrentAccountManager.shared.getAccount()
@@ -153,7 +153,7 @@ struct OperationRow: View {
 
             HStack(spacing: 20) {
                 Button(action: {
-                    importCSVTransactions(context: modelContext)
+                    importCSVTransactions()
                     dismiss()
                 }) {
                     Label("Import", systemImage: "tray.and.arrow.down")
@@ -223,7 +223,7 @@ struct OperationRow: View {
         }
     }
 
-    func importCSVTransactions(context: ModelContext) {
+    func importCSVTransactions() {
         guard !csvData.isEmpty else { return }
         
         let count = csvData.count
@@ -254,7 +254,7 @@ struct OperationRow: View {
             
             let amount = getDouble(from: row, index: columnMapping[String(localized:"Amount")])
             
-            let transaction = EntityTransaction()
+            var transaction = EntityTransaction()
             
             transaction.createAt  = Date().noon
             transaction.updatedAt = Date().noon
@@ -271,16 +271,12 @@ struct OperationRow: View {
             sousTransaction.libelle     = libelle
             sousTransaction.amount      = amount
             sousTransaction.category    = entityCategory
-            sousTransaction.transaction = transaction
             
-            context.insert(sousTransaction)
-            transaction.addSubOperation(sousTransaction)
-
-            context.insert(transaction)
+            transaction = ListTransactionsManager.shared.addSousTransaction(transaction: transaction, sousTransaction: sousTransaction)
         }
         
         do {
-            try context.save()
+            try ListTransactionsManager.shared.save()
             printTag("Importation réussie 🎉")
         } catch {
             printTag("Erreur lors de l'enregistrement : \(error)")

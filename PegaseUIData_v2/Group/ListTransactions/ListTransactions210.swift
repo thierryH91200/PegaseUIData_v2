@@ -14,7 +14,6 @@ import SwiftData
 
 struct TransactionDetailView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
     
     private var transaction: EntityTransaction {
         ListTransactionsManager.shared.listTransactions[currentSectionIndex]

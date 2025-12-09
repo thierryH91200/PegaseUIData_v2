@@ -248,7 +248,6 @@ struct IconPickerGrid: View {
 
 struct GroupAccountFormView: View {
     
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
     @Binding var isPresented: Bool

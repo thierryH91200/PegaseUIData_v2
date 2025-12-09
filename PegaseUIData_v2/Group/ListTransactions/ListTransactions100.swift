@@ -9,9 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ListTransactionsView100: View {
-    
-    @Environment(\.modelContext) private var modelContext
-    
+        
     @State private var selectedTransactions: Set<UUID> = []
     @State private var refresh = false
 
@@ -115,9 +113,9 @@ struct ListTransactionsView100: View {
         let transactions = ListTransactionsManager.shared.getAllData()
         
         for transaction in transactions {
-            modelContext.delete(transaction)
+            ListTransactionsManager.shared.delete(entity: transaction)
         }
-        try? modelContext.save()
+        try? ListTransactionsManager.shared.save()
     }
     
     private func performFalseTask() async {
@@ -160,9 +158,7 @@ struct ListTransactionsView100: View {
 }
 
 struct ListTransactions200: View {
-    
-    @Environment(\.modelContext) private var modelContext
-    
+        
     @EnvironmentObject private var currentAccountManager : CurrentAccountManager
     @EnvironmentObject private var colorManager          : ColorManager
     
@@ -247,7 +243,7 @@ struct ListTransactions200: View {
                         let status = StatusManager.shared.find(name : transaction.status!.name)
                         let paymentMode = PaymentModeManager.shared.find(name: transaction.paymentMode!.name)
                         
-                        let newTransaction = EntityTransaction()
+                        var newTransaction = EntityTransaction()
                         newTransaction.dateOperation = transaction.dateOperation
                         newTransaction.datePointage  = transaction.datePointage
                         newTransaction.status        = status
@@ -265,20 +261,17 @@ struct ListTransactions200: View {
                             sousOperation.libelle     = item.libelle
                             sousOperation.amount      = item.amount
                             sousOperation.category    = category
-                            sousOperation.transaction = newTransaction
                             
-                            modelContext.insert(sousOperation)
-                            newTransaction.addSubOperation(sousOperation)
+                            newTransaction = ListTransactionsManager.shared.addSousTransaction(transaction: newTransaction, sousTransaction: sousOperation)
                         }
-                        
-                        modelContext.insert(newTransaction)
+//                        modelContext.insert(newTransaction)
                     }
                     if isCutOperation {
                         for transaction in clipboardTransactions {
-                            modelContext.delete(transaction)
+                            ListTransactionsManager.shared.delete(entity: transaction)
                         }
                     }
-                    try? modelContext.save()
+                    try? ListTransactionsManager.shared.save()
                     
                     _ = ListTransactionsManager.shared.getAllData()
                     clipboardTransactions = []

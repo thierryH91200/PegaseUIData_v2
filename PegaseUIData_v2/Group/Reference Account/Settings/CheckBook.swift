@@ -11,7 +11,6 @@ import SwiftData
 
 // Vue principale pour l'affichage des carnets de chèques
 struct CheckView: View {
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.undoManager) private var undoManager
 
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
@@ -104,7 +103,7 @@ struct CheckView: View {
                 }
                 .buttonStyle(.bordered)
                 .disabled(selectedItem == nil)
-#if !DEBUG
+//#if !DEBUG
                 Button(action: {
                     if let manager = undoManager, manager.canUndo {
                         selectedItem = nil
@@ -122,8 +121,8 @@ struct CheckView: View {
                         .actionButtonStyle(isEnabled: canUndo == true, activeColor: .green)
                 }
                 .buttonStyle(.plain)
-#endif // DEBUG
-#if DEBUG
+//#endif // DEBUG
+//#if DEBUG
                 Button(action: {
                     if let manager = undoManager, manager.canRedo {
                         selectedItem = nil
@@ -141,7 +140,7 @@ struct CheckView: View {
                         .actionButtonStyle(isEnabled: canRedo == true, activeColor: .orange)
                 }
                 .buttonStyle(.plain)
-#endif
+//#endif
 
             }
             
@@ -253,7 +252,7 @@ struct CheckBookTable: View {
 
 // Vue pour la boîte de dialogue d'ajout
 struct CheckBookFormView: View {
-    @Environment(\.modelContext) private var modelContext
+
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var dataManager: ChequeBookManager
     
@@ -369,7 +368,8 @@ struct CheckBookFormView: View {
                 existingItem.numPremier = numPremier
                 existingItem.numSuivant = numSuivant
                 existingItem.prefix = prefix
-                try? modelContext.save()
+                
+                ChequeBookManager.shared.save()
             }
         }
         

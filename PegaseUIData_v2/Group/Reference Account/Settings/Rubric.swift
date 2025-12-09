@@ -29,7 +29,6 @@ final class RubricDataManager: ObservableObject {
 
 struct RubricView: View {
     
-    @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var currentAccountManager : CurrentAccountManager
     @EnvironmentObject var dataManager : RubricDataManager
     
@@ -173,9 +172,9 @@ struct RubricView: View {
     }
     private func removeCategorySelectedItem() {
         if selectedRubric != nil {
-            modelContext.delete(selectedRubric!)
+            RubricManager.shared.delete(entity: selectedRubric!)
         } else {
-            modelContext.delete(selectedCategory!)
+            CategoryManager.shared.delete(entity: selectedCategory!)
         }
     }
     
@@ -185,12 +184,12 @@ struct RubricView: View {
     }
     
     private func removeRubric(_ rubric: EntityRubric) {
-        modelContext.delete(rubric)
+        RubricManager.shared.delete(entity: rubric)
         refreshData()
     }
     
     private func removeCategory(_ category: EntityCategory) {
-        modelContext.delete(category)
+        CategoryManager.shared.delete(entity: category)
         refreshData()
     }
     
@@ -295,11 +294,10 @@ struct RubricView: View {
 }
 
 struct RubricFormView: View {
-    @Environment(\.modelContext) private var modelContext
+
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var dataManager : RubricDataManager
 
-    
     @Binding var isPresented: Bool
     @Binding var isMode: Bool
     let rubric: EntityRubric?
@@ -358,27 +356,26 @@ struct RubricFormView: View {
     }
     
     private func save() {
-        let newItem: EntityRubric
-        let account = CurrentAccountManager.shared.getAccount()!
+        
+        let color = NSColor.fromSwiftUIColor(selectedColor)
+
+        // Update existing rubric or create a new one
         if let existing = rubric {
-            newItem = existing
+            existing.name = name
+            existing.color = color
+            // Keep existing account as-is
         } else {
-            let color = NSColor.fromSwiftUIColor(selectedColor)
-            newItem = EntityRubric(name: name, color: color, account: account)
-            modelContext.insert(newItem)
-            dataManager.rubrics.append(newItem) // ✅ Ajouter à la liste
+            
+            guard let created = RubricManager.shared.create(name: name, color: color) else { return }
+            
+            // Keep the data manager list in sync if available
+            dataManager.rubrics.append(created)
         }
-        
-        newItem.name = name
-        newItem.color = NSColor.fromSwiftUIColor(selectedColor)
-        newItem.account = CurrentAccountManager.shared.getAccount()!
-        
-        try? modelContext.save()
     }
 }
 
 struct CategoryFormView: View {
-    @Environment(\.modelContext) private var modelContext
+
     @Environment(\.dismiss) private var dismiss
     
     @Binding var isPresented: Bool
@@ -441,19 +438,19 @@ struct CategoryFormView: View {
     }
     
     private func save() {
-        let newItem: EntityCategory
-        
         if let existing = category {
-            newItem = existing
+            // Update existing category fields
+            existing.name = name
+            existing.objectif = Double(objectif) ?? 0.0
+            try? CategoryManager.shared.save()
+        } else if let rubric = rubric {
+            // Create a new category under the provided rubric
+            _ = CategoryManager.shared.create(name: name, objectif: Double(objectif) ?? 0.0, rubric: rubric)
         } else {
-            newItem = EntityCategory(name: name, objectif: Double(objectif) ?? 0.0, rubric: rubric!)
-            modelContext.insert(newItem)
+            // No rubric available to attach the new category; nothing to do
+            // You may want to show an alert in the future.
+            return
         }
-        
-        newItem.name = name
-        newItem.objectif = Double(objectif) ?? 0.0
-        
-        try? modelContext.save()
     }
 }
 

@@ -48,9 +48,7 @@ class NotificationManager {
 }
 
 struct UpcomingRemindersView: View {
-    
-    @Environment(\.modelContext) private var modelContext
-    
+        
     let upcoming: [EntitySchedule]
     
     let dateFormatter: DateFormatter = {

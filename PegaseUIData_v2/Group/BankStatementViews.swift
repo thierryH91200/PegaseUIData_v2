@@ -33,7 +33,7 @@ struct BankStatementView: View {
 }
 
 struct BankStatementListView: View {
-    @Environment(\.modelContext) private var modelContext
+
     @Environment(\.undoManager) private var undoManager
     
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
@@ -203,7 +203,7 @@ struct BankStatementListView: View {
         }
         
         .sheet(isPresented: $isAddDialogPresented , onDismiss: {setupDataManager()}) {
-            StatementFormView(isPresented: $isEditDialogPresented,
+            StatementFormView(isPresented: $isAddDialogPresented,
                               isModeCreate: $isModeCreate,
                               statement: nil )
         }
@@ -239,7 +239,6 @@ struct BankStatementListView: View {
     }
 }
 
-
 struct BankStatementTable: View {
     
     private let dateFormatter: DateFormatter = {
@@ -265,9 +264,11 @@ struct BankStatementTable: View {
             
             Group {
                 TableColumn("End Date") {  (statement: EntityBankStatement) in Text(dateFormatter.string(from: statement.endDate)) }
-                TableColumn("End balance") { statement in Text(String(format: "%.2f €", statement.endSolde)) }
+                TableColumn("End balance") { statement in
+                    Text(statement.formattedEndSolde) }
                 TableColumn("Date CB") { statement in Text(dateFormatter.string(from: statement.cbDate)) }
-                TableColumn("CB Balance") { statement in Text(String(format: "%.2f €", statement.cbSolde)) }
+                TableColumn("CB Balance") { statement in
+                    Text(statement.formattedCBSolde) }
                 TableColumn("Surname") { statement in Text(statement.accountSurname) }
                 TableColumn("Name") { statement in Text(statement.accountName) }
             }
@@ -329,7 +330,7 @@ class StatementFormViewModel: ObservableObject {
 }
 
 struct StatementFormView: View {
-    @Environment(\.modelContext) private var modelContext
+
     @Environment(\.dismiss) private var dismiss
         
     @Binding var isPresented: Bool
@@ -404,19 +405,25 @@ struct StatementFormView: View {
     }
     
     private func save() {
-        let entityBankStatement: EntityBankStatement
-        
-        if let existingStatement = statement {
-            entityBankStatement = existingStatement
-        } else {
-            entityBankStatement = EntityBankStatement()
-            modelContext.insert(entityBankStatement)
-        }
-        
+        // Determine target entity: reuse existing or create a new one
+        let entityBankStatement: EntityBankStatement = {
+            if let existing = statement {
+                return existing
+            } else {
+                return BankStatementManager.shared.create(num: 0, startDate: Date(), startSolde: 0.0)!
+            }
+        }()
+
+        // Apply values from the form view model
         viewModel.apply(to: entityBankStatement)
-        entityBankStatement.account = CurrentAccountManager.shared.getAccount()!
-        
-        try? modelContext.save()
+
+        // Attach to current account if available
+        if let account = CurrentAccountManager.shared.getAccount() {
+            entityBankStatement.account = account
+        }
+
+        // Persist using BankStatementManager
+        try? BankStatementManager.shared.save()
     }
 }
 
@@ -451,13 +458,13 @@ struct PDFDropDelegate: DropDelegate {
                 } catch {
                     printTag("Erreur lors du chargement du PDF: \(error)", flag: true)
                 }
+            } else if let error = error {
+                printTag("Erreur fournisseur d'élément: \(error)", flag: true)
             }
         }
-        
         return true
     }
 }
-
 
 struct StatementDetailView: View {
     let statement: EntityBankStatement

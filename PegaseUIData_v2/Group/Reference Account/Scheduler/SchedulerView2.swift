@@ -19,7 +19,6 @@ private enum UpdateTrigger {
 
 // Vue pour la boîte de dialogue d'ajout
 struct SchedulerFormView: View {
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
     @EnvironmentObject var dataManager: SchedulerManager
@@ -272,8 +271,7 @@ struct SchedulerFormView: View {
         if let existingStatement = scheduler {
             newItem = existingStatement
         } else {
-            newItem = EntitySchedule()
-            modelContext.insert(newItem!)
+            _ = SchedulerManager.shared.create()
         }
         if let frequence = Int16(frequency),
            let nextOccurrence = Int16(nextOccurrence),
@@ -296,7 +294,7 @@ struct SchedulerFormView: View {
             
             newItem?.account = CurrentAccountManager.shared.getAccount()!
             
-            try? modelContext.save()
+            try? SchedulerManager.shared.save()
             let allSchedulers = SchedulerManager.shared.getAllData()!
             dataManager.schedulers = allSchedulers
             if let last = allSchedulers.sorted(by: { $0.dateValeur < $1.dateValeur }).last {

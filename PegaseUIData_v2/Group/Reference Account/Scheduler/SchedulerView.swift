@@ -36,7 +36,6 @@ struct SchedulerView: View {
 
 struct Scheduler: View {
     
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.undoManager)  private var undoManager
     
     @EnvironmentObject var currentAccountManager : CurrentAccountManager

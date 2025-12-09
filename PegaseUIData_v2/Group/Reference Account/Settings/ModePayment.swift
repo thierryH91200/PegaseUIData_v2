@@ -10,7 +10,6 @@ import SwiftData
 
 struct ModePaymentView: View {
     
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.undoManager) private var undoManager
     
     @EnvironmentObject var currentAccountManager : CurrentAccountManager
@@ -236,7 +235,7 @@ struct ModePaiementTable: View {
 
 // Vue pour la boîte de dialogue d'ajout
 struct ModePaiementFormView: View {
-    @Environment(\.modelContext) private var modelContext
+
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var modePaiementViewManager: PaymentModeManager
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
@@ -301,23 +300,33 @@ struct ModePaiementFormView: View {
     }
     
     private func save() {
-        let newItem: EntityPaymentMode
-        
-        if let existing = modePaiement {
-            newItem = existing
-        } else {
-            let color = NSColor.fromSwiftUIColor(selectedColor)
-            let account = CurrentAccountManager.shared.getAccount()!
-            newItem = EntityPaymentMode(account: account, name: name, color: color)
-            modelContext.insert(newItem)
-            modePaiementViewManager.modePayments.append(newItem)
+        // Ensure we have a current account before proceeding
+        guard let account = CurrentAccountManager.shared.getAccount() else {
+            return
         }
-        
-        newItem.name = name
-        newItem.color = NSColor.fromSwiftUIColor(selectedColor)
-        newItem.account = CurrentAccountManager.shared.getAccount()!
-        
-        try? modelContext.save()
+
+        do {
+            let color = NSColor.fromSwiftUIColor(selectedColor)
+
+            if let existing = modePaiement {
+                // Update existing entity
+                // Persist using the manager if needed (manager expected to handle persistence/undo)
+                PaymentModeManager.shared.update(entity: existing, name: name, color: color)
+            } else {
+                // Create a new entity
+                let created = try PaymentModeManager.shared.create(account: account, name: name, color: color)
+                // Append to the view manager list for UI refresh if creation succeeded
+                if let newItem = created {
+                    modePaiementViewManager.modePayments.append(newItem)
+                } else {
+                    print("PaymentModeManager.create returned nil entity")
+                }
+            }
+        } catch {
+            // You may want to present an alert to the user in the future
+            // For now, simply log the error
+            print("Failed to save payment mode: \(error)")
+        }
     }
 }
 

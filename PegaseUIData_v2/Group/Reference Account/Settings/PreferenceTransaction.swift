@@ -29,7 +29,7 @@ final class PreferenceDataManager: ObservableObject {
 
 // Vue permettant de modifier les préférences de transactions pour un compte
 struct PreferenceTransactionView: View {
-    @Environment(\.modelContext) private var modelContext
+
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
     @EnvironmentObject var dataManager: PreferenceDataManager
     
@@ -110,8 +110,8 @@ struct PreferenceTransactionView: View {
                         }
                     }
                     
-                    Picker("No category", selection: $selectedCategoryID) {
-                        Text("No category").tag(nil as PersistentIdentifier?)
+                    Picker("Category", selection: $selectedCategoryID) {
+//                        Text("No category").tag(nil as PersistentIdentifier?)
                         ForEach(entityCategorie, id: \.self) {
                             Text($0.name).tag($0.persistentModelID as PersistentIdentifier?)
                         }

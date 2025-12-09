@@ -24,7 +24,6 @@ struct DemoDataCommand: Commands {
             .keyboardShortcut("D", modifiers: [.command, .shift])
             .textCase(.lowercase) // ← empêche SwiftUI de mettre en majuscules
 
-
             Button("Reset the base") {
                 resetAction()
             }
