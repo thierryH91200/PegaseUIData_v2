@@ -11,6 +11,7 @@ import SwiftData
 
 // Vue principale pour l'affichage des carnets de chèques
 struct CheckView: View {
+
     @Environment(\.undoManager) private var undoManager
 
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
@@ -18,11 +19,11 @@ struct CheckView: View {
     
     @State private var checkBooks: [EntityCheckBook] = []
 
-    @State private var selectedItem: EntityCheckBook.ID?
+    @State private var selectedItemID: EntityCheckBook.ID?
     @State private var lastDeletedID: UUID?
 
     var selectedCheckBook: EntityCheckBook? {
-        guard let id = selectedItem else { return nil }
+        guard let id = selectedItemID else { return nil }
         return checkBooks.first(where: { $0.id == id })
     }
 
@@ -36,7 +37,7 @@ struct CheckView: View {
     var canRedo : Bool? {
         undoManager?.canRedo ?? false
     }
-
+    
     var body: some View {
         VStack(spacing: 10) {
             // Affiche le compte actuel
@@ -46,7 +47,7 @@ struct CheckView: View {
             }
             
             // Table des carnets de chèques
-            CheckBookTable(checkBooks: dataManager.checkBooks, selection: $selectedItem)
+            CheckBookTable(checkBooks: dataManager.checkBooks, selection: $selectedItemID)
                 .frame(height: 300)
             
                 .onReceive(NotificationCenter.default.publisher(for: .NSUndoManagerDidUndoChange)) { _ in
@@ -60,14 +61,16 @@ struct CheckView: View {
                 .onChange(of: currentAccountManager.getAccount()) { old, newAccount in
                     // Mise à jour de la liste en cas de changement de compte
                     dataManager.checkBooks.removeAll()
-                    selectedItem = nil
+                    selectedItemID = nil
                     refreshData()
                 }
             
                 // Charge les données au démarrage de la vue
                 .onAppear {
                     setupDataManager()
+                    print("[ChequeBook] on Appear View undoManager =", undoManager as Any)
                 }
+            
                 .onDisappear {
                     checkBooks.removeAll()
                 }
@@ -90,23 +93,23 @@ struct CheckView: View {
                     isModeCreate = false
                 }) {
                     Label("Edit", systemImage: "pencil")
-                        .actionButtonStyle(isEnabled: selectedItem != nil, activeColor: .green)
+                        .actionButtonStyle(isEnabled: selectedItemID != nil, activeColor: .green)
                 }
-                .disabled(selectedItem == nil)
+                .disabled(selectedItemID == nil)
                 
                 Button( action: {
                     delete()
                     setupDataManager()
                 }) {
                     Label("Delete", systemImage: "trash")
-                        .actionButtonStyle(isEnabled: selectedItem != nil, activeColor: .red)
+                        .actionButtonStyle(isEnabled: selectedItemID != nil, activeColor: .red)
                 }
                 .buttonStyle(.bordered)
-                .disabled(selectedItem == nil)
+                .disabled(selectedItemID == nil)
 //#if !DEBUG
                 Button(action: {
                     if let manager = undoManager, manager.canUndo {
-                        selectedItem = nil
+                        selectedItemID = nil
                         lastDeletedID = nil
                         
                         manager.undo()
@@ -125,7 +128,7 @@ struct CheckView: View {
 //#if DEBUG
                 Button(action: {
                     if let manager = undoManager, manager.canRedo {
-                        selectedItem = nil
+                        selectedItemID = nil
                         lastDeletedID = nil
 
                         manager.redo()
@@ -141,7 +144,6 @@ struct CheckView: View {
                 }
                 .buttonStyle(.plain)
 //#endif
-
             }
             
             // Feuilles modales pour l'ajout/modification
@@ -184,22 +186,22 @@ struct CheckView: View {
     
     // Supprime un carnet de chèques sélectionné
     private func delete() {
-        
-        if let id = selectedItem,
+        if let id = selectedItemID,
            let item = checkBooks.first(where: { $0.id == id }) {
-            
+
             lastDeletedID = item.uuid
-            
             ChequeBookManager.shared.delete(entity: item, undoManager: undoManager)
 
-            DispatchQueue.main.async {
-                selectedItem = nil
+            // Laisser la table garder le focus un court instant
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                // Ne pas remettre selectedItemID à nil immédiatement
+                selectedItemID = nil
                 lastDeletedID = nil
                 refreshData()
             }
         }
     }
-    
+
     // Rafraîchit la liste des carnets de chèques
     private func refreshData() {
         dataManager.checkBooks = ChequeBookManager.shared.getAllData() ?? []

@@ -20,6 +20,7 @@ struct ContentView: View {
                     .onAppear { applyWindowProfile(isSplash: true, animated: true) }
             } else {
                 ContentView100()
+                    .modelContainer(containerManager.currentContainer!)
                     .onAppear { applyWindowProfile(isSplash: false, animated: true) }
             }
         }

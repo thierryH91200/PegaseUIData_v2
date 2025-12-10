@@ -139,8 +139,7 @@ final class ChequeBookManager : ObservableObject {
         save() // Assurez-vous de sauvegarder le contexte après modification
     }
 
-    func delete(entity: EntityCheckBook, undoManager: UndoManager? )
-    {
+    func delete(entity: EntityCheckBook, undoManager: UndoManager?) {
         guard let modelContext = modelContext else { return }
 
         modelContext.undoManager = undoManager
@@ -149,7 +148,7 @@ final class ChequeBookManager : ObservableObject {
         modelContext.delete(entity)
         modelContext.undoManager?.endUndoGrouping()
     }
-    
+
     @MainActor private func defaultCarnetCheques() {
         guard checkBooks.isEmpty else { return }
         

@@ -53,7 +53,6 @@ struct ContentView100: View {
     @AppStorage("choixCouleur") var choixCouleur: String = "Unie"
     
     @EnvironmentObject var containerManager: ContainerManager
-//    let account: EntityAccount 
 
     @StateObject private var currentAccountManager = CurrentAccountManager.shared
     @StateObject private var transactionManager = TransactionSelectionManager()
@@ -81,10 +80,6 @@ struct ContentView100: View {
 
     @State private var selectedColor: String? = "United"
 
-//    @State private var executed: Double = 0.0
-//    @State private var planned: Double = 0.0
-//    @State private var engaged: Double = 0.0
-//    
     @State private var dashboard: DashboardState = DashboardState()
       
     var body: some View {

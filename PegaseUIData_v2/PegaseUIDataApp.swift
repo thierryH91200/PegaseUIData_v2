@@ -36,6 +36,11 @@ struct DatabaseManagerApp: App {
                     openWindow(id: "about")
                 }
             }
+            CommandGroup(replacing: .appSettings) {
+                Button("Settings") {
+                    PreferencesWindowController.shared.showWindow()
+                }
+            }
 
             CommandGroup(after: .newItem) {
                 Button(String(localized: "Create New Document...")) {
@@ -71,6 +76,7 @@ struct DatabaseManagerApp: App {
         Window("About", id: "about") {
             AboutView()
         }
+        .defaultSize(width: 360, height: 220)
     }
     
     // MARK: - Helpers pour les panneaux système
