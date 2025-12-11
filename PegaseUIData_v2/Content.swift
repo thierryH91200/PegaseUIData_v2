@@ -162,12 +162,26 @@ struct ContentView100: View {
             
             ToolbarItemGroup(placement: .navigation) {
                 Button {
-                    viewModel.triggerImport()
+                    printTag("Import", flag: true)
                 }label: {
                     Label {
                         Text(String(localized: "Import", table: "MainApp"))
                     } icon: {
-                        Image(systemName: "arrow.down.doc")
+                        Image(systemName: "arrow.up.document.fill")
+                            .foregroundStyle(.red)     // couleur rouge
+                            .font(.title2)      // taille un peu plus grande
+                    }
+                    
+                }
+            }
+            ToolbarItemGroup(placement: .navigation) {
+                Button {
+                    viewModel.triggerImport()
+                }label: {
+                    Label {
+                        Text(String(localized: "Export", table: "MainApp"))
+                    } icon: {
+                        Image(systemName: "arrow.down.document.fill")
                             .foregroundStyle(.red)     // couleur rouge
                             .font(.title2)      // taille un peu plus grande
                     }

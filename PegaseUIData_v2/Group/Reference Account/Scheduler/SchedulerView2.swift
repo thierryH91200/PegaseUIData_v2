@@ -271,7 +271,7 @@ struct SchedulerFormView: View {
         if let existingStatement = scheduler {
             newItem = existingStatement
         } else {
-            _ = SchedulerManager.shared.create()
+            newItem = SchedulerManager.shared.create()
         }
         if let frequence = Int16(frequency),
            let nextOccurrence = Int16(nextOccurrence),

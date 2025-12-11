@@ -167,7 +167,7 @@ struct BankStatementListView: View {
                 }) {
                     Label("Undo", systemImage: "arrow.uturn.backward")
                         .actionButtonStyle(
-                            isEnabled: canUndo == false,
+                            isEnabled: canUndo == true,
                             activeColor: .green)
                 }
                 .buttonStyle(.plain)
@@ -180,7 +180,7 @@ struct BankStatementListView: View {
                 }) {
                     Label("Redo", systemImage: "arrow.uturn.forward")
                         .actionButtonStyle(
-                            isEnabled: canRedo == false,
+                            isEnabled: canRedo == true,
                             activeColor: .orange)
                 }
                 .buttonStyle(.plain)

@@ -106,7 +106,6 @@ struct CheckView: View {
                 }
                 .buttonStyle(.bordered)
                 .disabled(selectedItemID == nil)
-//#if !DEBUG
                 Button(action: {
                     if let manager = undoManager, manager.canUndo {
                         selectedItemID = nil
@@ -124,8 +123,6 @@ struct CheckView: View {
                         .actionButtonStyle(isEnabled: canUndo == true, activeColor: .green)
                 }
                 .buttonStyle(.plain)
-//#endif // DEBUG
-//#if DEBUG
                 Button(action: {
                     if let manager = undoManager, manager.canRedo {
                         selectedItemID = nil

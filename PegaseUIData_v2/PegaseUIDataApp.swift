@@ -19,6 +19,8 @@ struct DatabaseManagerApp: App {
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var containerManager = ContainerManager()
+    @State var viewModel = CSVViewModel()
+
     
     init() {
         ColorTransformer.register()
@@ -52,19 +54,17 @@ struct DatabaseManagerApp: App {
                     presentOpenPanelAndOpen()
                 }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
-            }
-            CommandGroup(replacing: .undoRedo) {
-                Button(String(localized: "Undo")) {
-                    DataContext.shared.undoManager?.undo()
-                    ListTransactionsManager.shared.undo()
+                
+                Divider()
+                
+                Button(String(localized: "Import CSV…")) {
+                    presentCSVImportPanelAndImport()
                 }
-                .keyboardShortcut("z")
-                .disabled(!(DataContext.shared.undoManager?.canUndo ?? false))
-                Button(String(localized: "Redo")) {
-                    DataContext.shared.undoManager?.redo()
+                .keyboardShortcut("i", modifiers: [.command, .shift])
+                Button(String(localized: "Export CSV…")) {
+                    print("Export")
                 }
-                .keyboardShortcut("Z", modifiers: [.command, .shift])
-                .disabled(!(DataContext.shared.undoManager?.canRedo ?? false))
+                .keyboardShortcut("e", modifiers: [.command, .shift])
             }
             CommandMenu(String(localized: "Help")) {
                 Button(String(localized: "Application Manual")) {
@@ -110,6 +110,24 @@ struct DatabaseManagerApp: App {
         panel.begin { response in
             if response == .OK, let url = panel.url {
                 containerManager.openDatabase(at: url)
+            }
+        }
+    }
+    
+    private func presentCSVImportPanelAndImport() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        // Autoriser uniquement les fichiers CSV
+        panel.allowedContentTypes = [.commaSeparatedText]
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                viewModel.triggerImport()
+
+                // TODO: Branchez ici votre logique d'import CSV
+                // Par exemple: containerManager.importCSV(at: url)
+                print("Selected CSV file: \(url.path)")
             }
         }
     }
