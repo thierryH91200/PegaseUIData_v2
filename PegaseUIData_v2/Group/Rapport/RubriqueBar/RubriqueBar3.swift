@@ -25,6 +25,7 @@ struct RubriqueBar: View {
     let transactions: [EntityTransaction]   
     @Binding var minDate: Date
     @Binding var maxDate: Date
+    @Binding var dashboard: DashboardState
     
     @AppStorage("RubriqueBar.selectedRubrique") private var storedRubrique: String = ""
     
@@ -105,9 +106,9 @@ struct RubriqueBar: View {
                 }
                 .padding(.top, 4)
                 .padding(.horizontal)
+                ListTransactionsView100(dashboard: $dashboard)
             }
             .padding()
-            
             Spacer()
         }
         .onAppear {

@@ -19,6 +19,8 @@ struct RubriquePie: View {
     @Binding var minDate: Date
     @Binding var maxDate: Date
     
+    @Binding var dashboard: DashboardState
+    
     private var totalDaysRange: ClosedRange<Double> {
         let cal = Calendar.current
         let start = cal.startOfDay(for: minDate)
@@ -92,11 +94,10 @@ struct RubriquePie: View {
                         trackHeight: 6
                     )
                     .frame(height: 30)
-                    
-                    Spacer()
                 }
                 .padding(.top, 4)
                 .padding(.horizontal)
+                ListTransactionsView100(dashboard: $dashboard)
             }
         }
         .onAppear {

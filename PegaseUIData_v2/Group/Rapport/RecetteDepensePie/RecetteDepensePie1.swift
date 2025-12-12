@@ -13,8 +13,9 @@ import Combine
 struct RecetteDepensePieView: View {
     
     @EnvironmentObject private var currentAccountManager : CurrentAccountManager
+    
+    @Binding var dashboard: DashboardState
 
-    @Binding var isVisible: Bool
     @State private var transactions: [EntityTransaction] = []
     @State private var minDate: Date = Date()
     @State private var maxDate: Date = Date()
@@ -25,7 +26,8 @@ struct RecetteDepensePieView: View {
         RecetteDepensePie(
             transactions: transactions,
             minDate: $minDate,
-            maxDate: $maxDate
+            maxDate: $maxDate,
+            dashboard: $dashboard
         )
         .id(refresh)
         .task {
@@ -51,7 +53,7 @@ struct RecetteDepensePieView: View {
     private func performFalseTask() async {
         // Exécute une tâche asynchrone (par exemple, un délai)
         try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconde de délai
-        isVisible = false
+        dashboard.isVisible = false
     }
     private func loadTransactions() async {
         transactions = ListTransactionsManager.shared.getAllData()

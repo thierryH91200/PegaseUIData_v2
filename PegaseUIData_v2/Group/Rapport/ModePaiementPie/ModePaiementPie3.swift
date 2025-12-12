@@ -15,9 +15,9 @@ struct ModePaiementView: View {
     @StateObject private var viewModel = ModePaymentPieViewModel()
 
     let transactions: [EntityTransaction]
-
     @Binding var minDate: Date
     @Binding var maxDate: Date
+    @Binding var dashboard: DashboardState
 
     private var totalDaysRange: ClosedRange<Double> {
         let cal = Calendar.current
@@ -92,12 +92,13 @@ struct ModePaiementView: View {
                         trackHeight: 6
                     )
                         .frame(height: 30)
-
-                    Spacer()
                 }
                 .padding(.top, 4)
                 .padding(.horizontal)
+                ListTransactionsView100(dashboard: $dashboard)
             }
+            .padding()
+            Spacer()
         }
         .onAppear {
             // Initialize slider bounds based on available data

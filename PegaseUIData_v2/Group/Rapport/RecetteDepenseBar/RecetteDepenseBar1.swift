@@ -14,7 +14,6 @@ struct RecetteDepenseBarView: View {
     
     @EnvironmentObject private var currentAccountManager : CurrentAccountManager
 
-    @Binding var isVisible: Bool
     @Binding var dashboard: DashboardState
     @State private var transactions: [EntityTransaction] = []
     @State private var minDate: Date = Date()
@@ -52,7 +51,7 @@ struct RecetteDepenseBarView: View {
     private func performFalseTask() async {
         // Exécute une tâche asynchrone (par exemple, un délai)
         try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconde de délai
-        isVisible = false
+        dashboard.isVisible = false
     }
     private func loadTransactions() async {
         transactions = ListTransactionsManager.shared.getAllData()

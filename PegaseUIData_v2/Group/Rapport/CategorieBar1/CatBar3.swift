@@ -130,7 +130,7 @@ struct CategorieBar1View1: View {
                         thumbSize: 24,
                         trackHeight: 6
                     )
-                        .frame(height: 50)
+                        .frame(height: 30)
                 }
                 .padding(.top, 4)
                 .padding(.horizontal)

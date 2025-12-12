@@ -10,7 +10,6 @@ import SwiftData
 import DGCharts
 import Combine
 
-
 struct RecetteDepensePie: View {
     
     @StateObject private var viewModel = RecetteDepensePieViewModel()
@@ -20,6 +19,8 @@ struct RecetteDepensePie: View {
     @Binding var minDate: Date
     @Binding var maxDate: Date
     
+    @Binding var dashboard: DashboardState
+
     @State private var selectedStart: Double = 0
     @State private var selectedEnd: Double = 30
     
@@ -94,16 +95,13 @@ struct RecetteDepensePie: View {
                         trackHeight: 6
                     )
                     .frame(height: 30)
-//                    SummaryView(
-//                        planned: 0,
-//                        engaged: 0,
-//                        executed: 0
-//                    )
-                    Spacer()
                 }
                 .padding(.top, 4)
                 .padding(.horizontal)
+                ListTransactionsView100(dashboard: $dashboard)
             }
+            .padding()
+            Spacer()
         }
         .onAppear {
             // Initialize slider bounds based on available data

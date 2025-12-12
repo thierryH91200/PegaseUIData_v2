@@ -29,7 +29,6 @@ struct CategorieBar1View: View {
             dashboard: $dashboard
         )
         .id(refresh)
-
         .task {
             await performFalseTask()
         }
