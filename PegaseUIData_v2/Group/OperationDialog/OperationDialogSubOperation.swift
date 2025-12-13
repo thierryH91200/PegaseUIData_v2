@@ -152,7 +152,7 @@ struct SubOperationDialog: View {
                     if let sum = subOperation?.amount {
                         amount = String(abs(sum)) // Toujours positif à l'affichage
                         let shouldBeExpanded = sum >= 0.0
-                        if isSigne != shouldBeExpanded { 
+                        if isSigne != shouldBeExpanded {
                             isSigne = shouldBeExpanded
                         }
                     } else {
@@ -218,12 +218,15 @@ struct SubOperationDialog: View {
 
 // MARK:  5. Composant pour la section des sous-opérations
 struct SubOperationsSectionView: View {
-    
+
+    @Environment(\.undoManager) private var undoManager
     @EnvironmentObject var formState: TransactionFormState
     
     @Binding var subOperations: [EntitySousOperation]
     @Binding var currentSubOperation: EntitySousOperation?
     @Binding var isShowingDialog: Bool
+    
+    @State private var selectedID: ObjectIdentifier?
     
     var body: some View {
 
@@ -236,31 +239,70 @@ struct SubOperationsSectionView: View {
             
             Text("Displayed sub-operations: \(subOperations.count)")
             
-            List {
+            List(selection: $selectedID) {
                 ForEach(subOperations.indices, id: \.self) { index in
-                    SubOperationRow(
-                        subOperation: $subOperations[index] ,
-                        onEdit: {
+                    SubOperationRow(subOperation: $subOperations[index])
+                        .tag(ObjectIdentifier(subOperations[index]))
+                        .onTapGesture(count: 2) {
                             currentSubOperation = subOperations[index]
                             isShowingDialog = true
-                        },
-                        onDelete: {
-                            subOperations.remove(at: index)
                         }
-                    )
                 }
-            }
+            }            
             .frame(height: 300)
-            
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color(NSColor.windowBackgroundColor))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.secondary.opacity(0.4), lineWidth: 1)
+            )
             HStack {
                 Button(action: {
                     isShowingDialog = true
                 }) {
-                    Image(systemName: "plus")
-                    Text("Add Sub-operation")
+                    Label("Add", systemImage: "plus")
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                 }
-                .padding(.leading)
+
+                Button(action: {
+                    if let sel = selectedID,
+                       let found = subOperations.first(where: { ObjectIdentifier($0) == sel }) {
+                        currentSubOperation = found
+                        isShowingDialog = true
+                    }
+                }) {
+                    Label("Edit", systemImage: "pencil")
+                        .actionButtonStyle(
+                            isEnabled: selectedID != nil,
+                            activeColor: .green)
+                }
+                .disabled(selectedID == nil)
+
+                Button(action: {
+                    if let sel = selectedID,
+                       let idx = subOperations.firstIndex(where: { ObjectIdentifier($0) == sel }) {
+                        let toDelete = subOperations[idx]
+                        subOperations.remove(at: idx)
+                        SubTransactionsManager.shared.delete(
+                            entity: toDelete,
+                            undoManager: undoManager)
+                        selectedID = nil
+                        currentSubOperation = nil
+                    }
+                }) {
+                    Label("Remove", systemImage: "trash")
+                        .actionButtonStyle(
+                            isEnabled: selectedID != nil,
+                            activeColor: .red)
+                }
+                .disabled(selectedID == nil)
             }
+            .padding(.leading)
         }
     }
 }
@@ -270,10 +312,7 @@ struct SubOperationRow: View {
     @EnvironmentObject private var colorManager          : ColorManager
     
     @State var foregroundColor : Color = .black
-
     @Binding var subOperation: EntitySousOperation
-    let onEdit: () -> Void
-    let onDelete: () -> Void
     
     var body: some View {
 
@@ -288,7 +327,6 @@ struct SubOperationRow: View {
                 Spacer()
                     .frame(width: 20)
             }
-            
             HStack {
                 Text(subOperation.libelle ?? String(localized: "No label"))
                     .foregroundColor(foregroundColor)
@@ -301,18 +339,6 @@ struct SubOperationRow: View {
                 
                 Spacer()
                     .frame(width: 20)
-                Button(action: onEdit) {
-                    Image(systemName: "pencil")
-                }
-                .buttonStyle(BorderlessButtonStyle())
-                .accessibilityLabel(String(localized: "Edit sub-operation"))
-                .accessibilityHint(String(localized: "Double tap to edit \(subOperation.libelle ?? "Sans libellé")"))
-                Button(action: onDelete) {
-                    Image(systemName: "trash")
-                }
-                .buttonStyle(BorderlessButtonStyle())
-                .accessibilityLabel(String(localized: "Delete sub-operation"))
-                .accessibilityHint(String(localized: "Double tap to delete \(subOperation.libelle ?? "Sans libellé")"))
             }
             Divider()
         }

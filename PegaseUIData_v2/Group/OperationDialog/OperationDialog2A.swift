@@ -5,13 +5,6 @@
 //  Created by Thierry Hentic on 03/06/2025.
 //
 
-//
-//  Untitled.swift
-//  PegaseUIData
-//
-//  Created by Thierry Hentic on 03/06/2025.
-//
-
 import SwiftUI
 import AppKit
 import SwiftData

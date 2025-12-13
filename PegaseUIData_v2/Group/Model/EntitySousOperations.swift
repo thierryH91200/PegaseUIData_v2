@@ -108,9 +108,16 @@ final class SubTransactionsManager {
     }
     
     // Suppression d'une entité
-    func delete(entity: EntitySousOperation) {
-        entity.transaction = nil
-        modelContext?.delete(entity)
-    }
+    func delete(entity: EntitySousOperation, undoManager: UndoManager?)  {
+        
+        guard let modelContext = modelContext else { return }
 
+        entity.transaction = nil
+
+        modelContext.undoManager = undoManager
+        modelContext.undoManager?.beginUndoGrouping()
+        modelContext.undoManager?.setActionName("Delete SubOperation")
+        modelContext.delete(entity)
+        modelContext.undoManager?.endUndoGrouping()
+    }
 }

@@ -42,15 +42,15 @@ struct RubriqueBar: View {
     
     var body: some View {
         VStack {
-            Text("Rubrique Bar")
+            Text("Rubric Bar")
                 .font(.headline)
                 .padding()
             
             HStack(spacing: 12) {
-                Text("Rubrique:")
-                Picker("Rubrique", selection: $viewModel.nameRubrique) {
+                Text("Rubric:")
+                Picker("Rubric", selection: $viewModel.nameRubrique) {
                     ForEach(viewModel.availableRubrics, id: \.self) { rub in
-                        Text(rub.isEmpty ? String(localized: "(Toutes)") : rub).tag(rub)
+                        Text(rub.isEmpty ? String(localized: "(All)") : rub).tag(rub)
                     }
                 }
                 .frame(maxWidth: 260)
@@ -73,7 +73,7 @@ struct RubriqueBar: View {
                 DGBarChart5Representable(
                     viewModel: viewModel,
                     entries: viewModel.dataEntries,
-                    title: String(localized: "Rubriqc Bar Chart"),
+                    title: String(localized: "Rubric Bar Chart"),
                     labels: viewModel.labels
                 )
                 .frame(maxWidth: .infinity,maxHeight: 400)

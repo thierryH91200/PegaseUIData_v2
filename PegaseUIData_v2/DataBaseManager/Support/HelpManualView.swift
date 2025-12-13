@@ -4,30 +4,30 @@ struct HelpManualView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Database Manager")
+                Text(String(localized:"Database Manager",table: "Help"))
                     .font(.largeTitle)
                     .fontWeight(.bold)
 
-                Text("Application Manual")
+                Text(String(localized:"Application Manual",table: "Help"))
                     .font(.title2)
                     .foregroundColor(.secondary)
 
                 Divider()
 
                 Group {
-                    Text("Purpose of the App")
+                    Text(String(localized:"Purpose of the App", table: "Help"))
                         .font(.headline)
-                    Text("Purpose Body")
+                    Text(String(localized:"Purpose Body", table: "Help"))
                 }
 
                 Group {
-                    Text("Getting Started")
+                    Text(String(localized:"Getting Started", table: "Help"))
                         .font(.headline)
                     Text(String(localized:"Intro2 : On launch, the welcome screen appears.\nFrom this screen, you can:\n- Create a new database (Create a new file)\n- Open an existing database (Open existing document…)\n- Open a sample project (Open sample document Project…)\n- Open a recent file (Recent files)",table: "Help"))
                 }
 
                 Group {
-                    Text("Create a New Database")
+                    Text(String(localized:"Create a New Database",table: "Help"))
                         .font(.headline)
                     Text(String(localized:"1. Click “Create a new file”.\n2. Choose a folder and a file name (the .store extension is recommended).\n3. Confirm: the database is created, a sample person is added, and the database opens.",table: "Help"))
                 }

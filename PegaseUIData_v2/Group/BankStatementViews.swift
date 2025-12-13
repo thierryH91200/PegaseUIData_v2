@@ -141,7 +141,7 @@ struct BankStatementListView: View {
                             isEnabled: selectedStatement != nil,
                             activeColor: .green)
                 }
-                .disabled(selectedStatement == nil) // Désactive le bouton si aucun élément n'est sélectionné
+                .disabled(selectedStatement == nil)
                 
                 // Bouton pour supprimer un enregistrement
                 Button(action: {

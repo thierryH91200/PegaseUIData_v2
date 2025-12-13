@@ -261,11 +261,7 @@ struct OperationDialogView: View {
         
         formState.currentTransaction = transaction
     }
-    
-//    func save() throws {
-//        try modelContext.save()
-//    }
-    
+        
     func resetListTransactions() {
         
         let account = CurrentAccountManager.shared.getAccount()
@@ -307,9 +303,8 @@ struct UnifiedTransactionEditorView: View {
 
     private var batchEditSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Édition groupée de \(transactionManager.selectedTransactions.count) opérations")
+            Text("Batch editing of \(transactionManager.selectedTransactions.count) operations")
                 .font(.headline)
-            // Ajoute tes champs de batch ici
         }
         .padding()
         .background(.quaternary)
