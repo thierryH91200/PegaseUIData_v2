@@ -10,18 +10,6 @@ import SwiftData
 import DGCharts
 import Combine
 
-//
-//  SinglePieChartView 2.swift
-//  PegaseUIData
-//
-//  Created by thierryH24 on 21/09/2025.
-//
-
-
-import SwiftUI
-import SwiftData
-import DGCharts
-import Combine
 
 
 struct SinglePie2ChartView: NSViewRepresentable {
@@ -34,6 +22,34 @@ struct SinglePie2ChartView: NSViewRepresentable {
         _formatter.numberStyle = .currency
         return _formatter
     }()
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    @MainActor
+    final class Coordinator: NSObject, ChartViewDelegate {
+        var parent: SinglePie2ChartView
+        weak var chartView: BarChartView?
+        private var refreshObserver: NSObjectProtocol?
+
+        init(parent: SinglePie2ChartView) {
+            self.parent = parent
+            super.init()
+        }
+
+        deinit {
+        }
+        
+        func chartValueSelected(_ chartView: ChartViewBase,
+                                entry: ChartDataEntry,
+                                highlight: Highlight) {
+        }
+        
+        func chartValueNothingSelected(_ chartView: ChartViewBase) {
+        }
+
+    }
 
     func makeNSView(context: Context) -> PieChartView {
         let chartView = PieChartView()

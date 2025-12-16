@@ -26,9 +26,15 @@ struct ModePaiementView: View {
         let days = cal.dateComponents([.day], from: start, to: end).day ?? 0
         return 0...Double(max(0, days))
     }
+    
+
 
     @State private var selectedStart: Double = 0
     @State private var selectedEnd: Double = 30
+
+    @State private var chartView: BarChartView?
+    @State private var selectedItem: DataGraph? = nil
+
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {

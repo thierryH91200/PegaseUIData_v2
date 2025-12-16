@@ -20,6 +20,8 @@ import Combine
 struct SinglePie1ChartView: NSViewRepresentable {
     let entries: [PieChartDataEntry]
     let title: String
+    var onSelectSlice: ((String?) -> Void)? = nil
+    var onClearSelection: (() -> Void)? = nil
 
     let formatterPrice: NumberFormatter = {
         let _formatter = NumberFormatter()
@@ -27,9 +29,79 @@ struct SinglePie1ChartView: NSViewRepresentable {
         _formatter.numberStyle = .currency
         return _formatter
     }()
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+    
+    @MainActor
+    final class Coordinator: NSObject, ChartViewDelegate {
+        var parent: SinglePie1ChartView
+        weak var chartView: PieChartView?
+        private var refreshObserver: NSObjectProtocol?
+
+        
+        init(parent: SinglePie1ChartView) {
+            self.parent = parent
+            super.init()
+        }
+        
+        deinit {
+        }
+        
+        func chartValueSelected(_ chartView: ChartViewBase,
+                                entry: ChartDataEntry,
+                                highlight: Highlight) {
+            guard let pieView = chartView as? PieChartView else { return }
+            // Keep a weak reference to the selected chart
+            self.chartView = pieView
+
+            // Extract label and value
+            let value = entry.y
+            let percent = highlight.y
+            let label: String
+            if let dataSet = pieView.data?.dataSets[safe: Int(highlight.dataSetIndex)] as? PieChartDataSet,
+               let pieEntry = dataSet.entries[safe: Int(highlight.x)] as? PieChartDataEntry,
+               let entryLabel = pieEntry.label {
+                label = entryLabel
+            } else if let pieEntry = entry as? PieChartDataEntry, let entryLabel = pieEntry.label {
+                label = entryLabel
+            } else {
+                label = ""
+            }
+            
+            parent.onSelectSlice?(label)
+
+            // Format currency using parent's formatter
+            let formattedValue = parent.formatterPrice.string(from: NSNumber(value: value)) ?? String(format: "%.2f", value)
+            let formattedPercent = String(format: "%.1f%%", percent)
+
+            let title = label.isEmpty ? "\(formattedValue) (\(formattedPercent))" : "\(label)\n\(formattedValue) (\(formattedPercent))"
+            let centerText = NSMutableAttributedString(string: title)
+            centerText.setAttributes([
+                .font: NSFont.systemFont(ofSize: 14, weight: .medium),
+                .foregroundColor: NSColor.labelColor
+            ], range: NSRange(location: 0, length: centerText.length))
+            pieView.centerAttributedText = centerText
+        }
+        
+        func chartValueNothingSelected(_ chartView: ChartViewBase) {
+            guard let pieView = chartView as? PieChartView else { return }
+            let centerText = NSMutableAttributedString(string: parent.title)
+            centerText.setAttributes([
+                .font: NSFont.systemFont(ofSize: 15, weight: .medium),
+                .foregroundColor: NSColor.labelColor
+            ], range: NSRange(location: 0, length: centerText.length))
+            pieView.centerAttributedText = centerText
+
+            parent.onClearSelection?()
+        }
+    }
 
     func makeNSView(context: Context) -> PieChartView {
         let chartView = PieChartView()
+        chartView.delegate = context.coordinator
+        context.coordinator.chartView = chartView
         chartView.noDataText = String(localized: "No chart data available.")
         chartView.usePercentValuesEnabled = false
         chartView.drawHoleEnabled = true
@@ -82,4 +154,9 @@ struct SinglePie1ChartView: NSViewRepresentable {
 
 }
 
+extension Collection {
+    subscript(safe index: Index) -> Element? {
+        return indices.contains(index) ? self[index] : nil
+    }
+}
 

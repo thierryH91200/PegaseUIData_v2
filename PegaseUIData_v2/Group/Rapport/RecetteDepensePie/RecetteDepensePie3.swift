@@ -65,10 +65,14 @@ struct RecetteDepensePie: View {
                 } else {
                     
                     SinglePie2ChartView(entries: viewModel.dataEntriesRecette,
-                                       title: String(localized : "Receipts"))
+                                       title: String(localized : "Receipts"),
+                                        onSelectPie: { index, item in
+                                            selectedItem = item }
+)
                     .frame(width: 600, height: 400)
                     .padding()
                 }
+                
                 
             }
             

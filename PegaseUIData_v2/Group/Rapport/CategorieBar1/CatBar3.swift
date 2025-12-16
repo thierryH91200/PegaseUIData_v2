@@ -99,8 +99,8 @@ struct CategorieBar1View1: View {
                     viewModel: viewModel,
                     entries: viewModel.dataEntries,
                     onSelectBar: { index, item in
-                        selectedItem = item
-                    })
+                        selectedItem = item }
+                )
                 .frame(maxWidth: .infinity, maxHeight: 400)
                 .padding()
                 .onAppear {
@@ -119,13 +119,7 @@ struct CategorieBar1View1: View {
                         upperValue: $selectedEnd,
                         totalRange: totalDaysRange,
                         valueLabel: { value in
-                            let cal = Calendar.current
-                            let base = cal.startOfDay(for: minDate)
-                            let date = cal.date(byAdding: .day, value: Int(value), to: base) ?? base
-                            let formatter = DateFormatter()
-                            formatter.dateStyle = .short
-                            let date1 = formatter.string(from: date)
-                            return date1
+                            sliderDateLabel(value)
                         },
                         thumbSize: 24,
                         trackHeight: 6
@@ -135,7 +129,6 @@ struct CategorieBar1View1: View {
                 .padding(.top, 4)
                 .padding(.horizontal)
                 ListTransactionsView100(dashboard: $dashboard)
-
             }
             .padding()
             Spacer()
@@ -162,6 +155,16 @@ struct CategorieBar1View1: View {
             viewModel.selectedEnd = newEnd
             updateChart()
         }
+    }
+    
+    private func sliderDateLabel(_ value: Double) -> String {
+        let cal = Calendar.current
+        let base = cal.startOfDay(for: minDate)
+        let date = cal.date(byAdding: .day, value: Int(value), to: base) ?? base
+
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        return formatter.string(from: date)
     }
     
     private func updateChart() {

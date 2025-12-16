@@ -21,7 +21,6 @@ struct DGBarChart7Representable: NSViewRepresentable {
     /// Called when a bar is tapped. Provides the selected index and its associated DataGraph.
     var onSelectBar: ((Int, DataGraph) -> Void)? = nil
 
-
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
     }
