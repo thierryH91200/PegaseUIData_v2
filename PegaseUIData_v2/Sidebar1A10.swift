@@ -46,7 +46,7 @@ struct Sidebar1A: View {
                         if selectedAccountID == nil {
                             if let firstFolder = folders.first, let firstAccount = firstFolder.children.first {
                                 selectedAccountID = firstAccount.uuid
-                                let firstModeName: String = firstAccount.paymentMode?.first?.name ?? ""
+                                let firstModeName: String = firstAccount.paymentMode.first?.name ?? ""
                                 selectedMode = firstModeName
                             }
                         }

@@ -32,7 +32,7 @@ final class DummyModel {
     //    @Attribute(.ephemeral) var solde: Double? = 0.0
 
     @Relationship(deleteRule: .cascade, inverse: \EntitySchedule.account)
-    var echeanciers: [EntitySchedule]?
+    var echeanciers: [EntitySchedule] = []
     
     @Relationship(deleteRule: .cascade, inverse: \EntityIdentity.account)
     var identity: EntityIdentity?
@@ -47,24 +47,24 @@ final class DummyModel {
     var initAccount: EntityInitAccount?
     
     @Relationship(deleteRule: .cascade, inverse: \EntityPaymentMode.account)
-    var paymentMode: [EntityPaymentMode]?
+    var paymentMode: [EntityPaymentMode] = []
     
     @Relationship(deleteRule: .cascade, inverse: \EntityStatus.account)
-    var status: [EntityStatus]?
+    var status: [EntityStatus] = []
 
     @Relationship(deleteRule: .cascade, inverse: \EntityBankStatement.account)
-    var bankStatement: [EntityBankStatement]?
+    var bankStatement: [EntityBankStatement] = []
     
     @Relationship(deleteRule: .cascade, inverse: \EntityRubric.account)
-    var rubric: [EntityRubric]?
+    var rubric: [EntityRubric] = []
     
     @Relationship(deleteRule: .cascade, inverse: \EntityCheckBook.account)
-    var carnetCheques: [EntityCheckBook]?
+    var carnetCheques: [EntityCheckBook] = []
 
     var compteLie: EntityTransaction?
     
     @Relationship(deleteRule: .cascade, inverse: \EntityTransaction.account)
-    var transactions: [EntityTransaction]?
+    var transactions: [EntityTransaction] = []
     
     @Relationship var folder: EntityFolderAccount?
 
@@ -88,19 +88,20 @@ extension EntityAccount: Equatable {
 extension EntityAccount {
     @Transient
     @MainActor
-    var solde: Double
-    {
-        guard isAccount == true else { return 0.0 }
-        
-        var balance = 0.0
-        if let transactions = transactions {
-            for transaction in transactions {
-                balance += transaction.amount
-            }
-        }
-        return balance
+    var solde: Double {
+        guard isAccount else { return 0.0 }
+        return transactions.reduce(0.0) { $0 + $1.amount }
     }
 }
+
+//extension EntityTransaction {
+//    func asChartEntry() -> ChartDataEntry {
+//        ChartDataEntry(x: dateOperation.timeIntervalSince1970,
+//                       y: amount)
+//    }
+//}
+
+
 
 protocol AccountManaging {
     func create(nameAccount: String,
@@ -176,6 +177,8 @@ final class AccountManager: AccountManaging {
         return account
     }
     
+    // createAccount -> crée un compte minimal (sans relations complètes)
+    // createOptionAccount -> complète le compte avec identité, banque, init, modes de paiement, statuts, rubriques, préférences
     func createAccount(
         name: String,
         icon: String,
@@ -185,7 +188,7 @@ final class AccountManager: AccountManaging {
         account.name = name
         account.nameIcon = icon
         account.uuid = UUID()
-//        account.folder = folder
+        account.folder = folder
         modelContext?.insert(account)
         save()
         return account
@@ -269,7 +272,6 @@ final class AccountManager: AccountManaging {
         modelContext?.undoManager?.setActionName("Delete Account")
         modelContext?.delete(account)
         modelContext?.undoManager?.endUndoGrouping()
-
         save()
     }
 
@@ -277,6 +279,7 @@ final class AccountManager: AccountManaging {
         do {
             try modelContext?.save()
         } catch {
+            assertionFailure("Save failed: \(error)")
             print(EnumError.saveFailed)
         }
     }
@@ -295,145 +298,49 @@ final class AccountManager: AccountManaging {
 
 }
 
-//@MainActor
-//final class CurrentAccountManager: ObservableObject {
-//    
-//    static let shared = CurrentAccountManager()
-//    
-//    // UUID stocké en String pour compatibilité avec AppStorage/UI
-//    @Published var currentAccountID: String
-//
-//    // Propriété calculée pratique pour accéder directement à l'objet
-//    var currentAccount: EntityAccount? {
-//        getAccount()
-//    }
-//
-//    private init() {
-//        self.currentAccountID = ""
-//    }
-//
-//    // Affectation d'un compte à la variable globale
-//    // Retourne true si l'ID est valide et correspond à un compte existant.
-//    @discardableResult
-//    func setAccount(_ id: String) -> Bool {
-//        guard let uuid = UUID(uuidString: id) else {
-//            printTag("setAccount: ID invalide \(id)")
-//            return false
-//        }
-//        if let account = AccountManager.shared.getAccount(uuid: uuid) {
-//            self.currentAccountID = account.uuid.uuidString
-//            return true
-//        } else {
-//            printTag("setAccount: aucun compte trouvé pour \(id)")
-//            return false
-//        }
-//    }
-//    
-//    // Récupération d'un compte
-//    func getAccount() -> EntityAccount? {
-//        guard let uuid = UUID(uuidString: currentAccountID) else {
-//            return nil
-//        }
-//        guard let account = AccountManager.shared.getAccount(uuid: uuid) else {
-//            return nil
-//        }
-//        return account
-//    }
-//    
-//    // Réinitialiser le compte courant
-//    func clearAccount() {
-//        self.currentAccountID = ""
-//    }
-//}
-
-//extension EntityTransaction {
-//    func asChartEntry() -> ChartDataEntry {
-//        ChartDataEntry(x: dateOperation.timeIntervalSince1970,
-//                       y: amount)
-//    }
-//}
 
 @MainActor
 final class CurrentAccountManager: ObservableObject {
-    
+
     static let shared = CurrentAccountManager()
-    
-    // UUID stocké en String pour compatibilité avec AppStorage/UI
-    @Published var currentAccountID: String
-        
-    private init() {
-        self.currentAccountID = ""
-    }
-    
-    // Propriété calculée pratique pour accéder directement à l'objet
-    // Retourne nil si le contexte est absent ou si l’ID n’est pas valide.
+
+    // UUID du compte courant (String pour AppStorage / UI)
+    @Published private(set) var currentAccountID: String = ""
+
+    private init() {}
+
+    /// Accès direct au compte courant
     var currentAccount: EntityAccount? {
-        guard let ctx = DataContext.shared.context else {
-            return nil
-        }
-        guard let uuid = UUID(uuidString: currentAccountID) else {
-            return nil
-        }
-        // Fetch sécurisé
-        let predicate = #Predicate<EntityAccount> { $0.uuid == uuid }
-        var descriptor = FetchDescriptor<EntityAccount>(predicate: predicate)
-        descriptor.fetchLimit = 1
-        do {
-            return try ctx.fetch(descriptor).first
-        } catch {
-            printTag("CurrentAccountManager.currentAccount fetch error: \(error.localizedDescription)")
-            return nil
-        }
+        getAccount()
     }
-    
-    // Affectation d'un compte à la variable globale
-    // Retourne true si l'ID est valide et correspond à un compte existant.
+
+    /// Définit le compte courant
     @discardableResult
     func setAccount(_ id: String) -> Bool {
         guard let uuid = UUID(uuidString: id) else {
-            printTag("setAccount: ID invalide \(id)")
+            printTag("CurrentAccountManager.setAccount: UUID invalide \(id)")
             return false
         }
-        // Ne pas faire de fetch si le contexte est absent
-        guard DataContext.shared.context != nil else {
-            // On enregistre quand même l’ID si vous voulez le restaurer plus tard,
-            // mais c’est plus sûr de refuser tant que le contexte est absent.
-            // Ici, on refuse pour éviter un état incohérent.
-            printTag("setAccount: contexte absent, impossible d'affecter l'ID \(id)")
+
+        guard let account = AccountManager.shared.getAccount(uuid: uuid) else {
+            printTag("CurrentAccountManager.setAccount: compte introuvable \(id)")
             return false
         }
-        if let account = AccountManager.shared.getAccount(uuid: uuid) {
-            self.currentAccountID = account.uuid.uuidString
-            return true
-        } else {
-            printTag("setAccount: aucun compte trouvé pour \(id)")
-            return false
-        }
+
+        currentAccountID = account.uuid.uuidString
+        return true
     }
-    
-    // Récupération d'un compte par ID en toute sécurité
+
+    /// Récupération du compte courant
     func getAccount() -> EntityAccount? {
-        guard let ctx = DataContext.shared.context else {
-            return nil
-        }
         guard let uuid = UUID(uuidString: currentAccountID) else {
             return nil
         }
-        let predicate = #Predicate<EntityAccount> { $0.uuid == uuid }
-        var descriptor = FetchDescriptor<EntityAccount>(predicate: predicate)
-        descriptor.fetchLimit = 1
-        do {
-            return try ctx.fetch(descriptor).first
-        } catch {
-            printTag("CurrentAccountManager.getAccount fetch error: \(error.localizedDescription)")
-            return nil
-        }
+        return AccountManager.shared.getAccount(uuid: uuid)
     }
-    
-    // Réinitialiser le compte courant
+
+    /// Réinitialise le compte courant
     func clearAccount() {
-        self.currentAccountID = ""
-        // Si vous avez un snapshot publié, mettez-le à nil ici.
-        // self.currentAccountSnapshot = nil
+        currentAccountID = ""
     }
 }
