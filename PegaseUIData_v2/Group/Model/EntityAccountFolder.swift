@@ -57,7 +57,7 @@ extension EntityFolderAccount {
 
 protocol AccountFoldeManaging {
     func reset()
-    func create(name: String, nameImage: String)
+    func create(name: String, nameImage: String) -> EntityFolderAccount
     func getAllData() -> [EntityFolderAccount]
     func getRoot() -> [EntityFolderAccount]
     func findAccount(by id: UUID) -> EntityAccount?
@@ -81,13 +81,14 @@ final class AccountFolderManager: AccountFoldeManaging {
         folderAccount.removeAll()
     }
 
-    func create(name: String, nameImage: String) {
+    func create(name: String, nameImage: String) -> EntityFolderAccount{
         let entity = EntityFolderAccount()
         entity.name = name
         entity.nameImage = nameImage
         
         modelContext?.insert(entity)
         saveIfNeeded()
+        return entity
     }
     
     func createHeader(name: String) -> EntityFolderAccount {

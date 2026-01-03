@@ -1,0 +1,56 @@
+
+/*
+ Predicate.strings
+ THPredicateEditorSwift
+ 
+ Created by thierryH24 on 21/04/2018.
+ Copyright © 2018 thierryH24. All rights reserved.
+ */
+
+// MARK: - Document
+
+"%[Any]@ of the following are true" = "%[Any]@ of the following are true";
+"%[All]@ of the following are true" = "%[All]@ of the following are true";
+"%[None]@ of the following are true" = "%[None]@ of the following are true";
+
+"dateOperation" = "date operation";
+"%[dateOperation]@ %[is]@ %@" = "%1$[dateOfBirth]@ %2$[is]@ %3$@";
+"%[dateOperation]@ %[is less than]@ %@" = "%1$[dateOfBirth]@ %2$[is less than]@ %3$@";
+"%[dateOperation]@ %[is less than or equal to]@ %@" = "%1$[dateOfBirth]@ %2$[is less than or equal to]@ %3$@";
+"%[dateOperation]@ %[is greater than]@ %@" = "%1$[dateOfBirth]@ %2$[is greater than]@ %3$@";
+"%[dateOperation]@ %[is greater than or equal to]@ %@" = "%1$[dateOfBirth]@ %2$[is greater than or equal to]@ %3$@";
+
+"datePointage" = "date pointage";
+"%[datePointage]@ %[is]@ %@" = "%1$[datePointage]@ %2$[is]@ %3$@";
+"%[datePointage]@ %[is less than]@ %@" = "%1$[datePointage]@ %2$[is less than]@ %3$@";
+"%[datePointage]@ %[is less than or equal to]@ %@" = "%1$[datePointage]@ %2$[is less than or equal to]@ %3$@";
+"%[datePointage]@ %[is greater than]@ %@" = "%1$[datePointage]@ %2$[is greater than]@ %3$@";
+"%[datePointage]@ %[is greater than or equal to]@ %@" = "%1$[datePointage]@ %2$[is greater than or equal to]@ %3$@";
+
+"Status" = "Status";
+"%[Status]@ %[is]@ %[Mexico]@" = "%1$[Status]@ %2$[is]@ %3$[Mexico]@";
+"%[Status]@ %[is]@ %[Canada]@" = "%1$[Status]@ %2$[is]@ %3$[Canada]@";
+"%[Status]@ %[is]@ %[Brazil]@" = "%1$[Status]@ %2$[is]@ %3$[Brazil]@";
+"%[Status]@ %[is not]@ %[Mexico]@" = "%1$[Status]@ %2$[is not]@ %3$[Mexico]@";
+"%[Status]@ %[is not]@ %[Canada]@" = "%1$[Status]@ %2$[is not]@ %3$[Canada]@";
+"%[Status]@ %[is not]@ %[Brazil]@" = "%1$[Status]@ %2$[is not]@ %3$[Brazil]@";
+
+
+"Mode" = "Mode";
+"%[Mode]@ %[is]@ %[Mexico]@" = "%1$[Mode]@ %2$[is]@ %3$[Mexico]@";
+"%[Mode]@ %[is not]@ %[Mexico]@" = "%1$[Mode]@ %2$[is not]@ %3$[Mexico]@";
+
+"%[Mode]@ %[is]@ %[Canada]@" = "%1$[Mode]@ %2$[is]@ %3$[Canada]@";
+"%[Mode]@ %[is not]@ %[Canada]@" = "%1$[Mode]@ %2$[is not]@ %3$[Canada]@";
+
+"%[Mode]@ %[is]@ %[Brazil]@" = "%1$[Mode]@ %2$[is]@ %3$[Brazil]@";
+"%[Mode]@ %[is not]@ %[Brazil]@" = "%1$[Mode]@ %2$[is not]@ %3$[Brazil]@";
+
+"amount" = "amount";
+"%[amount]@ %[is]@ %@" = "%1$[amount]@ %2$[is]@ %3$@";
+"%[amount]@ %[is not]@ %@" = "%1$[amount]@ %2$[is not]@ %3$@";
+"%[amount]@ %[is less than]@ %@" = "%1$[amount]@ %2$[is less than]@ %3$@";
+"%[amount]@ %[is less than or equal to]@ %@" = "%1$[amount]@ %2$[is less than or equal to]@ %3$@";
+"%[amount]@ %[is greater than]@ %@" = "%1$[amount]@ %2$[eis greater thane]@ %3$@";
+"%[amount]@ %[is greater than or equal to]@ %@" = "%1$[amount]@ %2$[is greater than or equal to]@ %3$@";
+

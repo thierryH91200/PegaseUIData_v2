@@ -10,87 +10,6 @@ import SwiftData
 import Combine
 
 
-struct AccountFactory {
-    static func createAccount(modelContext: ModelContext, name: String, icon: String) -> EntityAccount {
-        
-        let account = EntityAccount()
-        account.name = name
-        account.nameIcon = icon
-        account.uuid = UUID()
-        
-        print(account.uuid.uuidString)
-        
-        modelContext.insert(account)
-        save()
-        return account
-    }
-
-    @MainActor static func createOptionAccount(modelContext: ModelContext, account : EntityAccount, idName: String, idSurName: String, numAccount: String) -> EntityAccount {
-        
-        print(account.uuid.uuidString)
-        
-        let id = account.uuid.uuidString
-        CurrentAccountManager.shared.setAccount(id )
-        
-        let identity = EntityIdentity(name: idName, surName: idSurName, account: account)
-        account.identity = identity
-        
-        let banqueInfo = EntityBanqueInfo(account: account)
-        account.bank = banqueInfo
-        
-        let initAccount = EntityInitAccount(account: account)
-        initAccount.codeAccount = numAccount
-        initAccount.account = account
-        account.initAccount = initAccount
-        
-        PaymentModeManager.shared.createDefaultPaymentModes(for: account)
-        account.paymentMode = PaymentModeManager.shared.modePayments
-        
-        StatusManager.shared.defaultStatus(account: account)
-        account.status = StatusManager.shared.resolveStatuses(for: account)
-        
-        RubricManager.shared.defaultRubric(for: account)
-        let rubric = RubricManager.shared.getAllData(account: account)
-        account.rubric = rubric
-
-        let entityPreference = PreferenceManager.shared.defaultPref(account: account)
-        account.preference = entityPreference
-        
-        modelContext.insert(account)
-        do {
-            try modelContext.save()
-        } catch {
-            // Log technique; tu peux remplacer par OSLog si tu préfères
-            print("❌ Error saving after create Person:", error)
-        }
-
-        return account
-    }
-    
-    static func save () {
-        var modelContext: ModelContext? {
-            DataContext.shared.context
-        }
-
-        do {
-            try modelContext?.save()
-        } catch {
-            printTag("Erreur lors de la sauvegarde de l'entité : \(error)", flag: true)
-        }
-    }
-
-
-    static func createHeader(modelContext: ModelContext, name: String) -> EntityFolderAccount {
-        let header = EntityFolderAccount()
-        header.name = name
-        header.nameImage = "folder.fill"
-        header.uuid = UUID()
-        
-        modelContext.insert(header)
-        return header
-    }
-}
-
 @Observable
 final class InitManager {
     
@@ -111,10 +30,7 @@ final class InitManager {
 
     // Initialise la base si elle est vide
     @MainActor func initialize() {
-//        guard let ctx = modelContext else {
-//            printTag("InitManager.initialize: ModelContext indisponible.", flag: true)
-//            return
-//        }
+
         // Déterminer si des dossiers existent déjà (critère: isRoot == false)
         let entities = AccountFolderManager.shared.getRoot()
         guard entities.isEmpty == true else {
@@ -131,10 +47,12 @@ final class InitManager {
         }
         
         // Création des dossiers (folders)
-        let folder1 = AccountFactory.createHeader(modelContext: ctx,
-                                                  name: String(localized :"Bank Account",table : "Account"))
-        let folder2 = AccountFactory.createHeader(modelContext: ctx,
-                                                  name: String(localized :"Save",table : "Account"))
+        let folder1 = AccountFolderManager.shared.create(
+            name: String(localized :"Bank Account",table : "Account"),
+            nameImage: "folder.fill")
+        let folder2 = AccountFolderManager.shared.create(
+            name: String(localized :"Save",table : "Account"),
+            nameImage: "folder.fill")
         
         let typeAccounts : [String] = [
             String(localized :"Current account1",table : "Account"),
@@ -155,13 +73,12 @@ final class InitManager {
         
         // Comptes rattachés au premier dossier
         for config in accountsConfig[0...2] {
-            var account = AccountFactory.createAccount(
-                modelContext: ctx,
+            var account = AccountManager.shared.createAccount(
                 name: config.0,
-                icon: config.1
+                icon: config.1,
+                folder: folder1
             )
-            account = AccountFactory.createOptionAccount(
-                modelContext: ctx,
+            account = AccountManager.shared.createOptionAccount(
                 account : account,
                 idName: config.2,
                 idSurName: config.3,
@@ -173,13 +90,12 @@ final class InitManager {
 
         // Comptes rattachés au second dossier
         for config in accountsConfig[3...3] {
-            var account = AccountFactory.createAccount(
-                modelContext: ctx,
+            var account = AccountManager.shared.createAccount(
                 name: config.0,
-                icon: config.1
+                icon: config.1,
+                folder: folder2
             )
-            account = AccountFactory.createOptionAccount(
-                modelContext: ctx,
+            account = AccountManager.shared.createOptionAccount(
                 account : account,
                 idName: config.2,
                 idSurName: config.3,

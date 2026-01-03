@@ -133,6 +133,11 @@ final class StatusManager: StatusManaging {
         }
     }
     
+    @MainActor func getAllNames() -> [String] {
+        
+        return getAllData().map { $0.name }
+    }
+
     func getAllData(for account: EntityAccount? = nil) -> [EntityStatus] {
         
         guard let account = account ?? CurrentAccountManager.shared.getAccount() else { return [] }
