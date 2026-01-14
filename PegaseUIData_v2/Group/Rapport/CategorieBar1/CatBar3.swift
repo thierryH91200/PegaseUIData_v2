@@ -133,6 +133,7 @@ struct CategorieBar1View1: View {
             .padding()
             Spacer()
         }
+        
         .onAppear {
             
             let listTransactions = ListTransactionsManager.shared.getAllData()
