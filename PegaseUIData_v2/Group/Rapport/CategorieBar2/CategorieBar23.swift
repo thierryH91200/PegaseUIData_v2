@@ -93,7 +93,7 @@ struct CategorieBar2View2: View {
                 }
                 .padding(.top, 4)
                 .padding(.horizontal)
-                ListTransactionsView100(
+                TransactionListContainer(
                     dashboard: $dashboard)
             }
             .padding()

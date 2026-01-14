@@ -179,7 +179,7 @@ struct ContentView100: View {
                     viewModel.triggerImport()
                 }label: {
                     Label {
-                        Text(String(localized: "Export", table: "MainApp"))
+                        Text(String(localized: "Export"))
                     } icon: {
                         Image(systemName: "arrow.down.document.fill")
                             .foregroundStyle(.red)     // couleur rouge
@@ -391,13 +391,13 @@ struct DetailContainer: View {
     var detailViews: [String: (Binding<Bool>) -> AnyView] {
         [
             String(localized: "List of transactions",table: "Menu")     : { isVisible in
-                AnyView(ListTransactionsView100( dashboard: $dashboard)) },
+                AnyView(TransactionListContainer( dashboard: $dashboard)) },
             
             String(localized: "Cash flow curve",table: "Menu")          : { isVisible in
                 AnyView(TreasuryCurveView( dashboard: $dashboard)) },
 
             String(localized: "Bank website",table: "Menu")             : { isVisible in
-                AnyView(BankWebsiteView(isVisible            : isVisible,)) },
+                AnyView(HybridContentData100(isVisible : isVisible, dashboard: $dashboard)) },
             String(localized: "Internet rapprochement",table: "Menu")   : { isVisible in AnyView(InternetReconciliationView(isVisible : isVisible)) },
             String(localized: "Bank statement",table: "Menu")           : { isVisible in AnyView(BankStatementView(isVisible          : isVisible)) },
             String(localized: "Notes",table: "Menu")                    : { isVisible in

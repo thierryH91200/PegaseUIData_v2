@@ -10,15 +10,6 @@ import SwiftData
 import SwiftUI
 import Combine
 
-@Model
-final class DummyModel {
-    @Attribute(.unique) var id: UUID
-
-    init() {
-        self.id = UUID()
-    }
-}
-
 
 @Model class EntityAccount: Identifiable {
 

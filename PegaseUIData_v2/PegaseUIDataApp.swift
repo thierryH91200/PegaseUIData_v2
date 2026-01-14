@@ -21,12 +21,10 @@ struct DatabaseManagerApp: App {
     @StateObject private var containerManager = ContainerManager()
     @State var viewModel = CSVViewModel()
 
-    
     init() {
         ColorTransformer.register()
     }
 
-    
     var body: some Scene {
         WindowGroup {
             ContentView()

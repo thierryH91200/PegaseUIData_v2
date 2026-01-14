@@ -113,7 +113,7 @@ struct TreasuryCurve: View {
                             .font(.footnote)
                             .foregroundColor(.secondary)
                             .padding(.top, 4)
-                        ListTransactionsView100(
+                        TransactionListContainer(
                             dashboard: $dashboard)
                         .frame(height: 600)
                     }

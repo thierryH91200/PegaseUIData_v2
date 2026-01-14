@@ -1,0 +1,57 @@
+
+/*
+ Localizable.strings
+ ComptaGraphVa
+ 
+ Created by thierryH24 on 21/04/2018.
+ Copyright © 2018 thierryH24. All rights reserved.
+ */
+
+// MARK: - Document
+
+"%[Any]@ of the following are true" = "%[Une]@ des conditions suivantes est vraie";
+"%[All]@ of the following are true" = "%[Toutes]@ les conditions sont vraies";
+"%[None]@ of the following are true" = "%[Aucune]@ des conditions suivantes n'est vraie";
+
+"dateOperation" = "date de l'operation";
+"%[dateOperation]@ %[is]@ %@" = "%1$[date de l'operation]@ %2$[est]@ %3$@";
+"%[dateOperation]@ %[is not]@ %@" = "%1$[dateOperation]@ %2$[n'est pas égal à]@ %3$@";
+"%[dateOperation]@ %[is less than]@ %@" = "%1$[date de l'operation]@ %2$[est plus petite que]@ %3$@";
+"%[dateOperation]@ %[is less than or equal to]@ %@" = "%1$[date de l'operation]@ %2$[est plus petit ou égal à]@ %3$@";
+"%[dateOperation]@ %[is greater than]@ %@" = "%1$[date de l'operation]@ %2$[est plus grand que]@ %3$@";
+"%[dateOperation]@ %[is greater than or equal to]@ %@" = "%1$[date de l'operation]@ %2$[est plus grand ou égal à]@ %3$@";
+
+"datePointage" = "date de pointage";
+"%[datePointage]@ %[is]@ %@" = "%1$[date de pointage]@ %2$[est]@ %3$@";
+"%[datePointage]@ %[is less than]@ %@" = "%1$[date de pointage]@ %2$[est plus petite que]@ %3$@";
+"%[datePointage]@ %[is less than or equal to]@ %@" = "%1$[date de pointage]@ %2$[est plus petit ou égal à]@ %3$@";
+"%[datePointage]@ %[is greater than]@ %@" = "%1$[date de pointage]@ %2$[est plus grand que]@ %3$@";
+"%[datePointage]@ %[is greater than or equal to]@ %@" = "%1$[date de pointage]@ %2$[est plus grand ou égal à]@ %3$@";
+
+"Status" = "Status";
+"%[country]@ %[is]@ %[Mexico]@" = "%1$[Pays]@ %2$[est]@ %3$[Mexique]@";
+"%[country]@ %[is]@ %[Canada]@" = "%1$[Pays]@ %2$[est]@ %3$[Canada]@";
+"%[country]@ %[is]@ %[Brazil]@" = "%1$[Pays]@ %2$[est]@ %3$[Bresil]@";
+
+"%[Status]@ %[is not]@ %[Mexico]@" = "%1$[Status]@ %2$[n'est pas]@ %3$[Mexique]@";
+"%[Status]@ %[is not]@ %[Canada]@" = "%1$[Status]@ %2$[n'est pas]@ %3$[Canada]@";
+"%[Status]@ %[is not]@ %[Brazil]@" = "%1$[Status]@ %2$[n'est pas]@ %3$[Bresil]@";
+
+"Mode" = "Mode";
+"%[Mode]@ %[is]@ %[Mexico]@" = "%1$[Mode]@ %2$[is]@ %3$[Mexico]@";
+"%[Mode]@ %[is not]@ %[Mexico]@" = "%1$[Mode]@ %2$[is not]@ %3$[Mexico]@";
+
+"%[Mode]@ %[is]@ %[Canada]@" = "%1$[Mode]@ %2$[is]@ %3$[Canada]@";
+"%[Mode]@ %[is not]@ %[Canada]@" = "%1$[Mode]@ %2$[is not]@ %3$[Canada]@";
+
+"%[Mode]@ %[is]@ %[Brazil]@" = "%1$[Mode]@ %2$[is]@ %3$[Brazil]@";
+"%[Mode]@ %[is not]@ %[Brazil]@" = "%1$[Mode]@ %2$[is not]@ %3$[Brazil]@";
+
+"amount" = "Montant";
+"%[amount]@ %[is]@ %@" = "%1$[Montant]@ %2$[est égal à]@ %3$@";
+"%[amount]@ %[is not]@ %@" = "%1$[Montant]@ %2$[n'est pas égal à]@ %3$@";
+"%[amount]@ %[is less than]@ %@" = "%1$[Montant]@ %2$[est plus petit que]@ %3$@";
+"%[amount]@ %[is less than or equal to]@ %@" = "%1$[Montant]@ %2$[est plus petit ou égal à]@ %3$@";
+"%[amount]@ %[is greater than]@ %@" = "%1$[Montant]@ %2$[est plus grand que]@ %3$@";
+"%[amount]@ %[is greater than or equal to]@ %@" = "%1$[Montant]@ %2$[est plus grand ou égal à]@ %3$@";
+

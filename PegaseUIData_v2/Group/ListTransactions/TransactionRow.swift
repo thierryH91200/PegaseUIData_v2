@@ -1,23 +1,32 @@
 //
-//  ListTransactions120.swift
+//  TransactionRow.swift
 //  PegaseUIData
 //
 //  Created by Thierry hentic on 25/03/2025.
+//  Refactored by Claude Code on 14/01/2026.
 //
 
 import SwiftUI
 import SwiftData
+import OSLog
 
+/// Displays a single transaction row in the list
+///
+/// Features:
+/// - Multi-selection support (Command/Shift click)
+/// - Context menu for common operations (status change, payment mode, delete)
+/// - Hover effect for better UX
+/// - Color-coded based on transaction type
+/// - Keyboard shortcuts (Cmd+A, Escape, Cmd+Z, Shift+Cmd+Z)
+struct TransactionRow: View {
 
-struct TransactionLigne: View {
-    
-    @EnvironmentObject var transactionManager   : TransactionSelectionManager
-    @EnvironmentObject private var colorManager : ColorManager
-    
+    @EnvironmentObject var transactionManager: TransactionSelectionManager
+    @EnvironmentObject private var colorManager: ColorManager
+
     let transaction: EntityTransaction
     @Binding var selectedTransactions: Set<UUID>
     let visibleTransactions: [EntityTransaction]
-    
+
     @State var showTransactionInfo: Bool = false
     @GestureState private var isShiftPressed = false
     @GestureState private var isCmdPressed = false
@@ -25,17 +34,16 @@ struct TransactionLigne: View {
     @State private var showPopover = false
     @State private var inputText = ""
 
-    
     @State private var backgroundColor = Color.clear
-    
+
     var isSelected: Bool {
         selectedTransactions.contains(transaction.uuid)
     }
-    
+
     var body: some View {
         let isSelected = selectedTransactions.contains(transaction.uuid)
         let textColor = isSelected ? Color.white : colorManager.colorForTransaction(transaction)
-        
+
         HStack(spacing: 0) {
             Group {
                 Text(transaction.datePointageString)
@@ -59,7 +67,8 @@ struct TransactionLigne: View {
                 Text(transaction.bankStatementString)
                     .frame(width: ColumnWidths.releve, alignment: .leading)
                 verticalDivider()
-                Text(transaction.checkNumber != "0" ? transaction.checkNumber : "—").frame(width: ColumnWidths.cheque, alignment: .leading)
+                Text(transaction.checkNumber != "0" ? transaction.checkNumber : "—")
+                    .frame(width: ColumnWidths.cheque, alignment: .leading)
                 verticalDivider()
             }
             Group {
@@ -74,7 +83,7 @@ struct TransactionLigne: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .listRowInsets(EdgeInsets()) // ⬅️ Supprime la marge à gauche des lignes
+        .listRowInsets(EdgeInsets())
         .padding(.vertical, 6)
         .background(
             RoundedRectangle(cornerRadius: 8)
@@ -84,8 +93,8 @@ struct TransactionLigne: View {
         .padding(.horizontal, 4)
         .padding(.vertical, 2)
         .foregroundColor(textColor)
-        .cornerRadius(8) // Arrondi les coins du fond sélectionné
-        .contentShape(Rectangle()) // Permet de cliquer sur toute la ligne
+        .cornerRadius(8)
+        .contentShape(Rectangle())
         .onTapGesture {
             toggleSelection()
         }
@@ -102,7 +111,33 @@ struct TransactionLigne: View {
                 .updating($isShiftPressed) { _, state, _ in state = NSEvent.modifierFlags.contains(.shift) }
         )
         .contextMenu {
-            // Afficher les détails
+            contextMenuContent
+        }
+        .popover(isPresented: $showPopover, arrowEdge: .trailing) {
+            bankStatementPopover
+        }
+        .popover(isPresented: $showTransactionInfo, arrowEdge: .top) {
+            transactionDetailPopover
+        }
+        .onAppear {
+            backgroundColor = isSelected ? Color.accentColor.opacity(0.2) : Color.clear
+            setupKeyboardShortcuts()
+        }
+    }
+
+    // MARK: - View Components
+
+    @ViewBuilder
+    func verticalDivider() -> some View {
+        Rectangle()
+            .fill(Color.gray.opacity(0.4))
+            .frame(width: 2, height: 20)
+            .padding(.horizontal, 2)
+    }
+
+    private var contextMenuContent: some View {
+        Group {
+            // Show details
             Button(action: {
                 transactionManager.selectedTransaction = transaction
                 transactionManager.isCreationMode = false
@@ -110,74 +145,96 @@ struct TransactionLigne: View {
             }) {
                 Label("Show details", systemImage: "info.circle")
             }
-            // Liste des noms et couleurs des status
-            let names = [ String(localized :"Planned"),
-                          String(localized :"In progress"),
-                          String(localized :"Executed") ]
-            Menu {
-                Button(names[0]) { mettreAJourStatusPourSelection(nouveauStatus: names[0]) }
-                Button(names[1]) { mettreAJourStatusPourSelection(nouveauStatus: names[1]) }
-                Button(names[2]) { mettreAJourStatusPourSelection(nouveauStatus: names[2]) }
-            } label: {
-                Label("Change status", systemImage: "square.and.pencil")
-            }
-            .disabled(selectedTransactions.isEmpty)
-            
-            let namesPayements = PaymentModeManager.shared.getAllNames()
-            Menu {
-                ForEach(namesPayements, id: \.self) { mode in
-                    Button(mode) {
-                        mettreAJourModePourSelection(nouveauMode: mode)
-                    }
-                }
-            } label: {
-                Label("Change Payment Mode", systemImage: "square.and.pencil")
-            }
-            .disabled(selectedTransactions.isEmpty)
-            
-            Menu {
-                Button("New statement…") {
-                    showPopover = true
-                }
-            } label: {
-                Label("Bank statement", systemImage: "square.and.pencil")
-            }
-            
+
+            // Change status menu
+            statusChangeMenu
+
+            // Change payment mode menu
+            paymentModeChangeMenu
+
+            // Bank statement menu
+            bankStatementMenu
+
+            // Delete button
             Button(role: .destructive, action: {
-                supprimerTransactionsSelectionnees()
+                deleteSelectedTransactions()
             }) {
                 Label("Remove", systemImage: "trash")
             }
             .disabled(selectedTransactions.isEmpty)
         }
-        
-        .popover(isPresented: $showPopover, arrowEdge: .trailing) {
-            VStack(spacing: 12) {
-                Text("Create a statement")
-                    .font(.headline)
+    }
 
-                TextField("Statement number", text: $inputText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal)
+    private var statusChangeMenu: some View {
+        let names = [
+            String(localized: "Planned"),
+            String(localized: "In progress"),
+            String(localized: "Executed")
+        ]
 
-                HStack {
-                    Button("Cancel") {
-                        showPopover = false
-                    }
-                    Button("OK") {
-                        print("Relevé saisi: \(inputText)")
-                        mettreAJourRelevePourSelection(nouveauReleve: inputText)
-                        showPopover = false
-                    }
-                    .keyboardShortcut(.defaultAction)
-                }
-                .padding(.top, 8)
-            }
-            .padding()
-            .frame(width: 250)
+        return Menu {
+            Button(names[0]) { updateStatusForSelection(newStatus: names[0]) }
+            Button(names[1]) { updateStatusForSelection(newStatus: names[1]) }
+            Button(names[2]) { updateStatusForSelection(newStatus: names[2]) }
+        } label: {
+            Label("Change status", systemImage: "square.and.pencil")
         }
+        .disabled(selectedTransactions.isEmpty)
+    }
 
-        .popover(isPresented: $showTransactionInfo, arrowEdge: .top) {
+    private var paymentModeChangeMenu: some View {
+        let paymentModes = PaymentModeManager.shared.getAllNames()
+
+        return Menu {
+            ForEach(paymentModes, id: \.self) { mode in
+                Button(mode) {
+                    updatePaymentModeForSelection(newMode: mode)
+                }
+            }
+        } label: {
+            Label("Change Payment Mode", systemImage: "square.and.pencil")
+        }
+        .disabled(selectedTransactions.isEmpty)
+    }
+
+    private var bankStatementMenu: some View {
+        Menu {
+            Button("New statement…") {
+                showPopover = true
+            }
+        } label: {
+            Label("Bank statement", systemImage: "square.and.pencil")
+        }
+    }
+
+    private var bankStatementPopover: some View {
+        VStack(spacing: 12) {
+            Text("Create a statement")
+                .font(.headline)
+
+            TextField("Statement number", text: $inputText)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
+
+            HStack {
+                Button("Cancel") {
+                    showPopover = false
+                }
+                Button("OK") {
+                    AppLogger.transactions.info("Bank statement entered: \(inputText)")
+                    updateBankStatementForSelection(newStatement: inputText)
+                    showPopover = false
+                }
+                .keyboardShortcut(.defaultAction)
+            }
+            .padding(.top, 8)
+        }
+        .padding()
+        .frame(width: 250)
+    }
+
+    private var transactionDetailPopover: some View {
+        Group {
             if let index = ListTransactionsManager.shared.listTransactions.firstIndex(where: { $0.id == transaction.id }) {
                 TransactionDetailView(currentSectionIndex: index, selectedTransaction: $selectedTransactions)
                     .frame(minWidth: 400, minHeight: 300)
@@ -187,57 +244,18 @@ struct TransactionLigne: View {
                     .padding()
             }
         }
-        // Keyboard shortcut: Cmd+A to select all transactions, Escape to deselect all
-        .onAppear {
-            backgroundColor = isSelected ? Color.accentColor.opacity(0.2) : Color.clear
-            NSEvent.addLocalMonitorForEvents(matching: [.keyDown]) { event in
-                if event.modifierFlags.contains(.command), event.charactersIgnoringModifiers == "a" {
-                    // Tout sélectionner
-                    for transaction in ListTransactionsManager.shared.listTransactions {
-                        selectedTransactions.insert(transaction.uuid)
-                    }
-                    transactionManager.selectedTransactions = ListTransactionsManager.shared.listTransactions
-                    return nil
-                }
-                
-                if event.keyCode == 53 { // Escape key
-                    // Tout désélectionner
-                    selectedTransactions.removeAll()
-                    transactionManager.selectedTransaction = nil
-                    transactionManager.selectedTransactions = []
-                    return nil
-                }
-                // Undo: Cmd+Z
-                if event.modifierFlags.contains(.command), event.charactersIgnoringModifiers == "z" {
-                    ListTransactionsManager.shared.undo()
-                    return nil
-                }
-                // Redo: Shift+Cmd+Z
-                if event.modifierFlags.contains([.command, .shift]), event.charactersIgnoringModifiers == "Z" {
-                    ListTransactionsManager.shared.redo()
-                    return nil
-                }
-                return event
-            }
-        }
     }
-    
-    @ViewBuilder
-    func verticalDivider() -> some View {
-        Rectangle()
-            .fill(Color.gray.opacity(0.4))
-            .frame(width: 2, height: 20)
-            .padding(.horizontal, 2)
-    }
-    
+
+    // MARK: - Private Methods
+
     private func transactionByID(_ uuid: UUID) -> EntityTransaction? {
         return ListTransactionsManager.shared.listTransactions.first { $0.uuid == uuid }
     }
-    
+
     private func toggleSelection() {
         let isCommand = NSEvent.modifierFlags.contains(.command)
         let isShift = NSEvent.modifierFlags.contains(.shift)
-        
+
         if isShift, let lastID = transactionManager.lastSelectedTransactionID,
            let lastIndex = visibleTransactions.firstIndex(where: { $0.uuid == lastID }),
            let currentIndex = visibleTransactions.firstIndex(where: { $0.id == transaction.id }) {
@@ -246,25 +264,21 @@ struct TransactionLigne: View {
                 ? lastIndex...currentIndex
                 : currentIndex...lastIndex
 
-            // Sélectionne tous les IDs dans la plage visible
             let idsInRange = visibleTransactions[range].map { $0.uuid }
 
-            // Nettoie l’ancienne sélection et ajoute la nouvelle
             selectedTransactions.removeAll()
             selectedTransactions.formUnion(idsInRange)
-            
+
         } else if isCommand {
             if selectedTransactions.contains(transaction.uuid) {
                 selectedTransactions.remove(transaction.uuid)
             } else {
                 selectedTransactions.insert(transaction.uuid)
             }
-            // MAJ du dernier élément sélectionné, très important pour la sélection shift !
             transactionManager.lastSelectedTransactionID = transaction.uuid
         } else {
             selectedTransactions.removeAll()
             selectedTransactions.insert(transaction.uuid)
-            // MAJ du dernier élément sélectionné, très important pour la sélection shift !
             transactionManager.lastSelectedTransactionID = transaction.uuid
         }
 
@@ -274,35 +288,30 @@ struct TransactionLigne: View {
         transactionManager.selectedTransactions = ListTransactionsManager.shared.listTransactions.filter { selectedTransactions.contains($0.uuid) }
         transactionManager.isCreationMode = false
     }
-    
-    private func supprimerTransactionsSelectionnees() {
+
+    private func deleteSelectedTransactions() {
         withAnimation {
-            // 1) Capture les indices ordonnés des éléments sélectionnés dans la liste visible
             let selectedIDs = Array(selectedTransactions)
             let orderedSelectedIndices: [Int] = visibleTransactions.enumerated()
                 .filter { selectedIDs.contains($0.element.uuid) }
                 .map { $0.offset }
                 .sorted()
 
-            // 2) Déterminer une cible de re-sélection (index voisin)
             let targetIndexAfter: Int? = orderedSelectedIndices.last.map { $0 + 1 }
             let targetIndexBefore: Int? = orderedSelectedIndices.first.map { $0 - 1 }
 
-            // 3) Supprimer du contexte si non déjà supprimé
             let transactionsToDelete = ListTransactionsManager.shared.listTransactions.filter { selectedTransactions.contains($0.uuid) }
+
+            AppLogger.transactions.info("Deleting \(transactionsToDelete.count) transaction(s)")
+
             for transaction in transactionsToDelete where !transaction.isDeleted {
                 ListTransactionsManager.shared.delete(entity: transaction)
             }
 
-            // 4) Rafraîchir les données
             _ = ListTransactionsManager.shared.getAllData(ascending: false)
 
-            // 5) Reconstituer la liste visible après suppression
-            //    Ici, on part de visibleTransactions passé en paramètre de la vue. Si ta source change
-            //    (filtre/tri), assure-toi que la vue parent le réévalue. On se contente de l'état courant.
             let newVisible = visibleTransactions
 
-            // 6) Choisir une nouvelle sélection (l'élément après, sinon l'élément avant)
             var newSelectedID: UUID? = nil
             if let idx = targetIndexAfter, idx >= 0, idx < newVisible.count {
                 newSelectedID = newVisible[idx].uuid
@@ -310,7 +319,6 @@ struct TransactionLigne: View {
                 newSelectedID = newVisible[idx].uuid
             }
 
-            // 7) Appliquer la nouvelle sélection et synchroniser le TransactionSelectionManager
             selectedTransactions.removeAll()
             if let uuid = newSelectedID {
                 selectedTransactions.insert(uuid)
@@ -323,42 +331,41 @@ struct TransactionLigne: View {
             transactionManager.isCreationMode = false
         }
     }
-    private func mettreAJourRelevePourSelection(nouveauReleve: String) {
+
+    private func updateBankStatementForSelection(newStatement: String) {
         withAnimation {
             guard let undo = ListTransactionsManager.shared.modelContext?.undoManager else {
-                // Fallback sans undo manager
                 let selected = ListTransactionsManager.shared.listTransactions.filter { selectedTransactions.contains($0.uuid) }
                 for transaction in selected {
-                    transaction.bankStatement = Double(nouveauReleve) ?? 0.0
+                    transaction.bankStatement = Double(newStatement) ?? 0.0
                 }
-                
                 return
             }
 
             undo.beginUndoGrouping()
-            undo.setActionName("Change status")
+            undo.setActionName("Change bank statement")
 
             let selected = ListTransactionsManager.shared.listTransactions.filter { selectedTransactions.contains($0.uuid) }
+            AppLogger.transactions.info("Updating bank statement for \(selected.count) transaction(s)")
+
             for transaction in selected {
-                transaction.bankStatement = Double(nouveauReleve) ?? 0.0
+                transaction.bankStatement = Double(newStatement) ?? 0.0
             }
-            
 
             do {
                 try ListTransactionsManager.shared.modelContext?.save()
             } catch {
-                print("Error saving context after status change: \(error)")
+                AppLogger.data.error("Failed to save bank statement update: \(error.localizedDescription)")
             }
             undo.endUndoGrouping()
         }
     }
 
-    private func mettreAJourStatusPourSelection(nouveauStatus: String) {
+    private func updateStatusForSelection(newStatus: String) {
         withAnimation {
             guard let undo = ListTransactionsManager.shared.modelContext?.undoManager else {
-                // Fallback sans undo manager
                 let selected = ListTransactionsManager.shared.listTransactions.filter { selectedTransactions.contains($0.uuid) }
-                if let status = StatusManager.shared.find(name: nouveauStatus) {
+                if let status = StatusManager.shared.find(name: newStatus) {
                     for transaction in selected {
                         transaction.status = status
                     }
@@ -370,7 +377,9 @@ struct TransactionLigne: View {
             undo.setActionName("Change status")
 
             let selected = ListTransactionsManager.shared.listTransactions.filter { selectedTransactions.contains($0.uuid) }
-            if let status = StatusManager.shared.find(name: nouveauStatus) {
+            AppLogger.transactions.info("Updating status to '\(newStatus)' for \(selected.count) transaction(s)")
+
+            if let status = StatusManager.shared.find(name: newStatus) {
                 for transaction in selected {
                     transaction.status = status
                 }
@@ -379,17 +388,17 @@ struct TransactionLigne: View {
             do {
                 try ListTransactionsManager.shared.modelContext?.save()
             } catch {
-                print("Error saving context after status change: \(error)")
+                AppLogger.data.error("Failed to save status update: \(error.localizedDescription)")
             }
             undo.endUndoGrouping()
         }
     }
-    private func mettreAJourModePourSelection(nouveauMode: String) {
+
+    private func updatePaymentModeForSelection(newMode: String) {
         withAnimation {
             guard let undo = ListTransactionsManager.shared.modelContext?.undoManager else {
-                // Fallback sans undo manager
                 let selected = ListTransactionsManager.shared.listTransactions.filter { selectedTransactions.contains($0.uuid) }
-                if let mode = PaymentModeManager.shared.find(name: nouveauMode) {
+                if let mode = PaymentModeManager.shared.find(name: newMode) {
                     for transaction in selected {
                         transaction.paymentMode = mode
                     }
@@ -401,7 +410,9 @@ struct TransactionLigne: View {
             undo.setActionName("Change payment mode")
 
             let selected = ListTransactionsManager.shared.listTransactions.filter { selectedTransactions.contains($0.uuid) }
-            if let mode = PaymentModeManager.shared.find(name: nouveauMode) {
+            AppLogger.transactions.info("Updating payment mode to '\(newMode)' for \(selected.count) transaction(s)")
+
+            if let mode = PaymentModeManager.shared.find(name: newMode) {
                 for transaction in selected {
                     transaction.paymentMode = mode
                 }
@@ -410,9 +421,48 @@ struct TransactionLigne: View {
             do {
                 try ListTransactionsManager.shared.modelContext?.save()
             } catch {
-                print("Error saving context after status change: \(error)")
+                AppLogger.data.error("Failed to save payment mode update: \(error.localizedDescription)")
             }
             undo.endUndoGrouping()
+        }
+    }
+
+    private func setupKeyboardShortcuts() {
+        NSEvent.addLocalMonitorForEvents(matching: [.keyDown]) { event in
+            if event.modifierFlags.contains(.command), event.charactersIgnoringModifiers == "a" {
+                // Select all
+                for transaction in ListTransactionsManager.shared.listTransactions {
+                    selectedTransactions.insert(transaction.uuid)
+                }
+                transactionManager.selectedTransactions = ListTransactionsManager.shared.listTransactions
+                AppLogger.ui.debug("Selected all transactions")
+                return nil
+            }
+
+            if event.keyCode == 53 { // Escape key
+                // Deselect all
+                selectedTransactions.removeAll()
+                transactionManager.selectedTransaction = nil
+                transactionManager.selectedTransactions = []
+                AppLogger.ui.debug("Deselected all transactions")
+                return nil
+            }
+
+            // Undo: Cmd+Z
+            if event.modifierFlags.contains(.command), event.charactersIgnoringModifiers == "z" {
+                ListTransactionsManager.shared.undo()
+                AppLogger.ui.debug("Undo action triggered")
+                return nil
+            }
+
+            // Redo: Shift+Cmd+Z
+            if event.modifierFlags.contains([.command, .shift]), event.charactersIgnoringModifiers == "Z" {
+                ListTransactionsManager.shared.redo()
+                AppLogger.ui.debug("Redo action triggered")
+                return nil
+            }
+
+            return event
         }
     }
 }

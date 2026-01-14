@@ -97,7 +97,7 @@ struct RubriquePie: View {
                 }
                 .padding(.top, 4)
                 .padding(.horizontal)
-                ListTransactionsView100(dashboard: $dashboard)
+                TransactionListContainer(dashboard: $dashboard)
             }
         }
         .onAppear {

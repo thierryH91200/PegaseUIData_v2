@@ -99,7 +99,7 @@ struct RecetteDepensePie: View {
                 }
                 .padding(.top, 4)
                 .padding(.horizontal)
-                ListTransactionsView100(dashboard: $dashboard)
+                TransactionListContainer(dashboard: $dashboard)
             }
             .padding()
             Spacer()

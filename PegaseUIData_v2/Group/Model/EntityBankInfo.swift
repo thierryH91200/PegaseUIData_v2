@@ -35,7 +35,6 @@ final class EntityBanqueInfo : Identifiable{
     init() {
         self.account = CurrentAccountManager.shared.getAccount()!
     }
-
 }
 
 @MainActor
@@ -81,11 +80,8 @@ final class BankManager : BankManaging {
         entity.town = ""
         entity.uuid = UUID()
         
+        modelContext?.insert(entity)
         return entity
-    }
-    
-    func delete(entity: EntityBanqueInfo) {
-        modelContext?.delete(entity  )
     }
     
     @discardableResult
@@ -112,6 +108,10 @@ final class BankManager : BankManaging {
             return nil
         }
         return entitiesBank.first
+    }
+    
+    func delete(entity: EntityBanqueInfo) {
+        modelContext?.delete(entity  )
     }
     
     func save() throws {

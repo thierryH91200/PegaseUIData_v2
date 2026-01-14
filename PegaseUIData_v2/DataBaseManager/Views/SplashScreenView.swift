@@ -56,6 +56,12 @@ private struct LeftPanelView: View {
     @State private var showResetAlert = false
     @State private var showCopySuccessAlert = false
     
+    var appName: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
+        ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+        ?? "Application"
+    }
+
     var body: some View {
         VStack(spacing: 20) {
             Spacer()
@@ -66,7 +72,7 @@ private struct LeftPanelView: View {
                 .frame(width: 100, height: 100)
                 .foregroundColor(.accentColor)
             
-            Text("PegaseUIData")
+            Text(appName)
                 .font(.largeTitle)
                 .fontWeight(.bold)
             

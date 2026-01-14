@@ -1,11 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "035-bank.png",
+      "filename" : "icons8-museum-81.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "icons8-museum-80.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
