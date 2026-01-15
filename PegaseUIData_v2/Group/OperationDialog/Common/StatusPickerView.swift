@@ -15,22 +15,20 @@ struct StatusPickerView: View {
     @Binding var selectedStatus: EntityStatus?
 
     var body: some View {
-        Picker("Statut", selection: $selectedStatus) {
-            Text("Sélectionner...")
-                .tag(nil as EntityStatus?)
-
-            ForEach(statuses) { status in
-                HStack {
-                    Circle()
-                        .fill(Color(status.color))
-                        .frame(width: 10, height: 10)
+        HStack {
+            Picker("", selection: $selectedStatus) {
+                ForEach(statuses) { status in
                     Text(status.name)
+                        .foregroundColor(Color(status.color))
+                        .tag(status as EntityStatus?)
                 }
-                .tag(status as EntityStatus?)
             }
+            .pickerStyle(.menu)
+            .labelsHidden()
+            Spacer()
         }
-        .pickerStyle(.menu)
-        // If you want a menu style:
+        .frame(maxWidth: .infinity)
+
     }
 }
 

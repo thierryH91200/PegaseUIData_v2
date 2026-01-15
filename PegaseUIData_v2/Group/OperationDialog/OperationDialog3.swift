@@ -36,7 +36,6 @@ struct TransactionFormViewModel: View {
     @Binding var selectedStatus: EntityStatus?
     @Binding var selectedMode: EntityPaymentMode?
     @Binding var selectedAccount : EntityAccount?
-//    @State private var selectedAccount: EntityAccount? = nil
 
     // 🔁 Valeurs de remplacement pour édition multiple (batch)
     var overrideTransactionDate: Date? = nil
@@ -109,11 +108,10 @@ struct TransactionFormViewModel: View {
             }
             GridRow {
                 FormField(label: String(localized:"Payment method")) {
-                    Picker("", selection: $selectedMode) {
-                        ForEach(modes, id: \.uuid) { mode in
-                            Text(mode.name).tag(mode)
-                        }
-                    }
+                    PaymentModePickerView(
+                        paymentModes: modes,
+                        selectedMode: $selectedMode
+                    )
                 }
             }
             GridRow {
@@ -129,11 +127,10 @@ struct TransactionFormViewModel: View {
             }
             GridRow {
                 FormField(label: String(localized:"Status")) {
-                    Picker("", selection: $selectedStatus) {
-                        ForEach(status, id: \.self) { index in
-                            Text(index.name).tag(index)
-                        }
-                    }
+                    StatusPickerView(
+                        statuses: status,
+                        selectedStatus: $selectedStatus
+                    )
                     HelpButton {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("• **Planned**: estimated check-in date, amount subject to changee")
@@ -244,7 +241,7 @@ struct TransactionFormViewModel: View {
                 }
                 
                 DispatchQueue.main.async {
-                    selectedMode = modes.first
+//                    selectedMode = modes.first
                     selectedMode = entityPreference?.paymentMode
                     selectedStatus = entityPreference?.status
                     selectedBankStatement = ""
@@ -266,7 +263,7 @@ struct TransactionFormViewModel: View {
             .onChange(of: linkedAccount) { old, newValue in
                 if let oldSelected = selectedAccount {
                     selectedAccount = newValue.first(where: { $0.uuid == oldSelected.uuid })
-                }                
+                }
                 return
             }
             .onChange(of: selectedAccount) { oldValue, newValue in

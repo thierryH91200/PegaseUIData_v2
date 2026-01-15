@@ -22,7 +22,7 @@ struct FormActionButtonsView: View {
 
             Spacer()
 
-            Button("Enregistrer") {
+            Button("Save") {
                 onSave()
             }
             .keyboardShortcut(.defaultAction)

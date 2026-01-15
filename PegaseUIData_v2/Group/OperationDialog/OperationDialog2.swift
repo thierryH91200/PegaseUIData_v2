@@ -414,7 +414,6 @@ struct BatchEditFormView: View {
                 formState.bankStatement = value
             }
         }
-        
     }
     
     // Picker du mode de paiement
@@ -425,13 +424,14 @@ struct BatchEditFormView: View {
                 formState.selectedMode = newValue
             }
         )
-        
+
         return Picker("Payment method", selection: binding) {
             Text("Multiple value").tag(nil as EntityPaymentMode?)
             ForEach(formState.paymentModes, id: \.self) { mode in
                 Text(mode.name).tag(mode)
             }
         }
+        .pickerStyle(.menu)
     }
     
     // Picker du statut
@@ -442,14 +442,21 @@ struct BatchEditFormView: View {
                 formState.selectedStatus = newValue
             }
         )
-        
+
         return HStack(alignment: .top, spacing: 8) {
-            Picker("Status", selection: binding) {
+            Picker("Statut", selection: binding) {
                 Text("Multiple value").tag(nil as EntityStatus?)
                 ForEach(formState.status, id: \.self) { status in
-                    Text(status.name).tag(Optional(status)) // important : Optional()
+                    HStack {
+                        Circle()
+                            .fill(Color(status.color))
+                            .frame(width: 10, height: 10)
+                        Text(status.name)
+                    }
+                    .tag(Optional(status)) // important : Optional()
                 }
             }
+            .pickerStyle(.menu)
             HelpButton {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("• **Planned**: estimated check-in date, editable amount")

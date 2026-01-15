@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import Combine
+import Observation
 
 
 // Gestionnaire de préférences des transactions
@@ -38,6 +39,9 @@ struct PreferenceTransactionView: View {
     @State private var entityPaymentMode : [EntityPaymentMode] = []
     @State private var entityStatus      : [EntityStatus]      = []
     
+    @State var selectedStatus: EntityStatus? = nil
+    @State var selectedMode: EntityPaymentMode? = nil
+
     @State var selectedStatusID   : PersistentIdentifier?
     @State var selectedRubricID   : PersistentIdentifier?
     @State var selectedCategoryID : PersistentIdentifier?
@@ -47,8 +51,7 @@ struct PreferenceTransactionView: View {
     @State var changeCounter = 0
 
     private func resolveStatus() -> EntityStatus? {
-        guard let id = selectedStatusID, let context = dataManager.modelContext else { return nil }
-        return context.model(for: id) as? EntityStatus
+        return selectedStatus
     }
     private func resolveRubric() -> EntityRubric? {
         guard let id = selectedRubricID, let context = dataManager.modelContext else { return nil }
@@ -59,8 +62,9 @@ struct PreferenceTransactionView: View {
         return context.model(for: id) as? EntityCategory
     }
     private func resolveMode() -> EntityPaymentMode? {
-        guard let id = selectedModeID, let context = dataManager.modelContext else { return nil }
-        return context.model(for: id) as? EntityPaymentMode
+//        guard let id = selectedModeID, let context = dataManager.modelContext else { return nil }
+//        return context.model(for: id) as? EntityPaymentMode
+        return selectedMode
     }
     
     var body: some View {
@@ -72,21 +76,20 @@ struct PreferenceTransactionView: View {
             // Sélection des préférences
             HStack(spacing: 30) {
                 VStack(alignment: .leading) {
-                    Picker("Status", selection: $selectedStatusID) {
-//                        Text("Aucun statut").tag(nil as PersistentIdentifier?)
-                        ForEach(entityStatus, id: \.self) { index in
-                            Text(index.name).tag(index.persistentModelID as PersistentIdentifier?)
-                        }
+                    FormField(label: String(localized:"Status")) {
+                        StatusPickerView(
+                            statuses: entityStatus,
+                            selectedStatus: $selectedStatus
+                        )
                     }
-                    .pickerStyle(MenuPickerStyle())
-                    
-                    Picker("Mode", selection: $selectedModeID) {
-//                        Text("Aucun mode de paiement").tag(nil as PersistentIdentifier?)
-                        ForEach(entityPaymentMode, id: \.self) {
-                            Text($0.name).tag($0.persistentModelID as PersistentIdentifier?)
-                        }
+
+                    FormField(label: String(localized:"Mode")) {
+                        PaymentModePickerView(
+                            paymentModes: entityPaymentMode,
+                            selectedMode: $selectedMode
+                        )
                     }
-                    .pickerStyle(MenuPickerStyle())
+
                 }
                 
                 VStack(alignment: .leading) {
@@ -239,11 +242,11 @@ struct PreferenceTransactionView: View {
         guard DataContext.shared.context != nil else { return }
 
         let modes = PaymentModeManager.shared.getAllData()
-            entityPaymentMode = modes
+        entityPaymentMode = modes
         
         if let account = CurrentAccountManager.shared.getAccount() {
             let status = StatusManager.shared.getAllData(for: account)
-                entityStatus = status
+            entityStatus = status
             
         } else {
             entityStatus = []
@@ -263,6 +266,7 @@ struct PreferenceTransactionView: View {
             selectedRubricID = nil
             selectedCategoryID = nil
             isExpanded = false
+            
             entityStatus = StatusManager.shared.getAllData(for: account)
             entityPaymentMode = PaymentModeManager.shared.getAllData()
             entityRubric = RubricManager.shared.getAllData()
@@ -271,7 +275,11 @@ struct PreferenceTransactionView: View {
         }
         
         selectedStatusID = entityPreference.status?.persistentModelID
+        selectedStatus = entityPreference.status
+        
         selectedModeID = entityPreference.paymentMode?.persistentModelID
+        selectedMode = entityPreference.paymentMode
+        
         selectedRubricID = entityPreference.category?.rubric?.persistentModelID
         selectedCategoryID = entityPreference.category?.persistentModelID
         isExpanded = entityPreference.signe

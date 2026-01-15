@@ -37,9 +37,6 @@ struct HybridContentData: View {
 
             VStack(spacing: 12) {
                 
-                HStack {
-                    Spacer()
-                }
                 TransactionListContainer(dashboard: $dashboard)
                     .task {
                     }
