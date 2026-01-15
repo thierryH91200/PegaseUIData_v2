@@ -237,7 +237,6 @@ class ContainerManager: ObservableObject {
         try? context.delete(model: EntityPaymentMode.self)
         try? context.delete(model: EntityStatus.self)
         try? context.delete(model: EntityPreference.self)
-        try? context.delete(model: EntityCategory.self)
         try? context.delete(model: EntityRubric.self)
         try? context.delete(model: EntitySchedule.self)
         try? context.delete(model: EntitySousOperation.self)

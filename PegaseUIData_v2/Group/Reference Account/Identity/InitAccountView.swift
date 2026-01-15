@@ -111,7 +111,11 @@ struct InitAccountView: View {
 
             let accountInitInfo = InitAccountManager.shared.getAllData()
             dataManager.initAccount = accountInitInfo ?? {
-                let newInitAccount = EntityInitAccount(account: CurrentAccountManager.shared.getAccount()!)
+                guard let account = CurrentAccountManager.shared.getAccount() else {
+                    print("⚠️ Erreur: aucun compte sélectionné pour l'initialisation")
+                    return nil
+                }
+                let newInitAccount = EntityInitAccount(account: account) // ✅ Sécurisé
                 modelContext.insert(newInitAccount)
                 return newInitAccount
             }()

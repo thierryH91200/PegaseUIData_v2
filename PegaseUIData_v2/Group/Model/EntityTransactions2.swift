@@ -13,7 +13,7 @@ import Combine
 
 
 protocol ListManaging {
-    func createTransactions(formState: TransactionFormState) -> EntityTransaction
+    func createTransactions(formState: TransactionFormState) -> EntityTransaction?
     func find(uuid: UUID) -> EntityTransaction?
     func getAllComments(for account: EntityAccount) throws -> [String]
     func delete(entity: EntityTransaction)
@@ -44,20 +44,27 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
     }
 
     @discardableResult
-    func createTransactions(formState: TransactionFormState) -> EntityTransaction {
+    func createTransactions(formState: TransactionFormState) -> EntityTransaction? {
         // Create entityTransaction
-        formState.currentTransaction = EntityTransaction()
-        formState.currentTransaction?.createAt = Date().noon
-        formState.currentTransaction?.updatedAt = Date().noon
-        formState.currentTransaction?.uuid = UUID()
-        let account = CurrentAccountManager.shared.getAccount()!
-        formState.currentTransaction?.account = account
-        
-        modelContext!.insert(formState.currentTransaction!)
+        guard let context = modelContext else {
+            print("⚠️ Erreur: modelContext n'est pas disponible")
+            return nil
+        }
 
-        return formState.currentTransaction!
+        guard let account = CurrentAccountManager.shared.getAccount() else {
+            print("⚠️ Erreur: aucun compte sélectionné")
+            return nil
+        }
+
+        let transaction = EntityTransaction()
+        transaction.uuid = UUID()
+
+        formState.currentTransaction = transaction
+        context.insert(transaction)
+
+        return transaction
     }
-    
+
     func addSousTransaction(transaction: EntityTransaction, sousTransaction: EntitySousOperation ) -> EntityTransaction {
         
         modelContext?.insert(transaction)

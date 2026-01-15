@@ -38,7 +38,10 @@ class TransactionSelectionManager: ObservableObject, Identifiable {
         case 0:
             return .create
         case 1:
-            return .editSingle(selectedTransactions.first!)
+            guard let firstTransaction = selectedTransactions.first else {
+                return .create
+            }
+            return .editSingle(firstTransaction)
         default:
             return .editMultiple(selectedTransactions)
         }

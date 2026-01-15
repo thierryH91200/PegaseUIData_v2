@@ -165,16 +165,20 @@ struct RubricView: View {
                 CategoryFormView(isPresented: $isAddDialogCategoryPresented, isModeCreate: $modeCreate, rubric: nil, category: nil)
             }
             .sheet(isPresented: $isEditDialogCategoryPresented) {
-                let rubric = selectedCategory!.rubric
-                CategoryFormView(isPresented: $isEditDialogCategoryPresented, isModeCreate: $modeCreate, rubric: rubric, category: selectedCategory)
+                let rubric = selectedCategory?.rubric
+                CategoryFormView(
+                    isPresented: $isEditDialogCategoryPresented,
+                    isModeCreate: $modeCreate,
+                    rubric: rubric,
+                    category: selectedCategory)
             }
         }
     }
     private func removeCategorySelectedItem() {
-        if selectedRubric != nil {
-            RubricManager.shared.delete(entity: selectedRubric!)
-        } else {
-            CategoryManager.shared.delete(entity: selectedCategory!)
+        if let rubric = selectedRubric {
+            RubricManager.shared.delete(entity: rubric)
+        } else if let category = selectedCategory {
+            CategoryManager.shared.delete(entity: category)
         }
     }
     
