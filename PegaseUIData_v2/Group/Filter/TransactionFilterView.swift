@@ -200,32 +200,53 @@ final class TransactionFilterViewModel: ObservableObject {
 
         print("🔍 Application du prédicat...")
 
-        // Si pas de prédicat, charger toutes les transactions
-        guard let predicate = predicate else {
-            print("   → Aucun prédicat, chargement de toutes les transactions")
-            filteredTransactions = allTransactions
+        // Récupérer le compte courant
+        guard let currentAccount = CurrentAccountManager.shared.getAccount() else {
+            print("❌ Aucun compte courant défini")
+            filteredTransactions = []
             currentPredicate = nil
             isFiltered = false
             return
         }
 
-        print("   → NSPredicate format: \(predicate.predicateFormat)")
+        print("   → Compte courant: \(currentAccount.name)")
+
+        // Créer le prédicat pour le compte courant
+        let accountPredicate = NSPredicate(format: "account == %@", argumentArray: [currentAccount])
+        print("   → Prédicat compte: \(accountPredicate.predicateFormat)")
+
+        // Combiner avec le prédicat de l'éditeur
+        let finalPredicate: NSPredicate
+        if let userPredicate = predicate {
+            print("   → Prédicat utilisateur: \(userPredicate.predicateFormat)")
+            finalPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [accountPredicate, userPredicate])
+            print("   → Prédicat combiné: \(finalPredicate.predicateFormat)")
+        } else {
+            print("   → Aucun prédicat utilisateur, utilisation du prédicat compte uniquement")
+            finalPredicate = accountPredicate
+        }
 
         do {
-            // Valider le prédicat
+            // Valider le prédicat combiné
             print("   → Validation du prédicat...")
-            try PredicateEditorValidator.validate(predicate)
+            try PredicateEditorValidator.validate(finalPredicate)
             print("   ✅ Prédicat valide")
 
             // Convertir en SwiftData Predicate
             print("   → Conversion en SwiftData Predicate...")
-            let swiftDataPredicate = TransactionPredicateParser.swiftDataPredicate(from: predicate)
+            let swiftDataPredicate = TransactionPredicateParser.swiftDataPredicate(from: finalPredicate)
 
             if swiftDataPredicate == nil {
-                print("   ⚠️ Conversion a retourné nil, utilisation sans prédicat")
-                filteredTransactions = allTransactions
-                currentPredicate = nil
-                isFiltered = false
+                print("   ⚠️ Conversion a retourné nil, chargement avec prédicat compte uniquement")
+                // Fallback: utiliser seulement le prédicat compte
+                let accountOnlyPredicate = TransactionPredicateParser.swiftDataPredicate(from: accountPredicate)
+                let descriptor = FetchDescriptor<EntityTransaction>(
+                    predicate: accountOnlyPredicate,
+                    sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
+                )
+                filteredTransactions = try modelContext.fetch(descriptor)
+                currentPredicate = predicate
+                isFiltered = predicate != nil
                 return
             }
 
@@ -245,13 +266,23 @@ final class TransactionFilterViewModel: ObservableObject {
 
             // Update state
             currentPredicate = predicate
-            isFiltered = true
+            isFiltered = predicate != nil
 
         } catch let error as PredicateValidationError {
             print("❌ Erreur de validation : \(error.localizedDescription)")
-            print("   → Chargement de toutes les transactions")
+            print("   → Chargement avec prédicat compte uniquement")
+            do {
+                let accountOnlyPredicate = TransactionPredicateParser.swiftDataPredicate(from: accountPredicate)
+                let descriptor = FetchDescriptor<EntityTransaction>(
+                    predicate: accountOnlyPredicate,
+                    sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
+                )
+                filteredTransactions = try modelContext.fetch(descriptor)
+            } catch {
+                print("   ❌ Échec du chargement: \(error)")
+                filteredTransactions = []
+            }
             currentPredicate = nil
-            filteredTransactions = allTransactions
             isFiltered = false
 
         } catch {
@@ -259,17 +290,19 @@ final class TransactionFilterViewModel: ObservableObject {
             print("   Type d'erreur: \(type(of: error))")
             print("   Description: \(error.localizedDescription)")
 
-            // En cas d'erreur de fetch, essayer sans prédicat
-            print("   → Tentative de chargement sans prédicat...")
+            // En cas d'erreur de fetch, essayer avec prédicat compte uniquement
+            print("   → Tentative de chargement avec prédicat compte uniquement...")
             do {
+                let accountOnlyPredicate = TransactionPredicateParser.swiftDataPredicate(from: accountPredicate)
                 let descriptor = FetchDescriptor<EntityTransaction>(
+                    predicate: accountOnlyPredicate,
                     sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
                 )
                 filteredTransactions = try modelContext.fetch(descriptor)
-                print("   ✅ Chargement sans prédicat réussi: \(filteredTransactions.count) résultats")
+                print("   ✅ Chargement avec compte uniquement réussi: \(filteredTransactions.count) résultats")
             } catch {
-                print("   ❌ Échec même sans prédicat: \(error)")
-                filteredTransactions = allTransactions
+                print("   ❌ Échec même avec compte uniquement: \(error)")
+                filteredTransactions = []
             }
 
             currentPredicate = nil

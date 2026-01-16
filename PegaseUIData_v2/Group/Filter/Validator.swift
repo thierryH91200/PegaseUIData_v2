@@ -42,6 +42,7 @@ struct PredicateEditorValidator {
 
     // Champs autorisés (doit matcher ton parser SwiftData)
     static let allowedKeys: Set<String> = [
+        "account",
         "amount",
         "dateOperation",
         "datePointage",

@@ -13,6 +13,9 @@ import Foundation
 @MainActor
 struct TransactionPredicateParser {
 
+    // Cache pour stocker l'EntityAccount extrait du NSPredicate
+    private static var cachedAccount: EntityAccount?
+
     // MARK: - Main Conversion Function
 
     /// Convertit un NSPredicate en Predicate<EntityTransaction>
@@ -23,6 +26,9 @@ struct TransactionPredicateParser {
         }
 
         print("      [Parser] Format original: \(nsPredicate.predicateFormat)")
+
+        // Extraire l'EntityAccount si présent dans le prédicat
+        extractAccountFromPredicate(nsPredicate)
 
         // Normaliser le format
         let format = normalizePredicateFormat(nsPredicate.predicateFormat)
@@ -92,7 +98,6 @@ struct TransactionPredicateParser {
     }
 
     // MARK: - Tokenization
-
     private enum Token {
         case expr(String)
         case and
@@ -253,6 +258,9 @@ struct TransactionPredicateParser {
         case .date(let v):
             print("         [Binary] → Création prédicat Date")
             result = predicateForDate(key: lhs, op: op, value: v)
+        case .account(let v):
+            print("         [Binary] → Création prédicat Account")
+            result = predicateForAccount(key: lhs, op: op, value: v)
         }
 
         print("         [Binary] Résultat: \(result != nil ? "✅" : "❌")")
@@ -266,11 +274,19 @@ struct TransactionPredicateParser {
         case double(Double)
         case bool(Bool)
         case date(Date)
+        case account(EntityAccount)
     }
 
     /// Parse une valeur selon la clé (détermine le type attendu)
     private static func parseValue(for key: String, from rhs: String) -> ParsedValue? {
         switch key {
+        case "account":
+            // Utiliser l'account mis en cache lors de l'extraction
+            if let account = cachedAccount {
+                return .account(account)
+            }
+            return nil
+
         case "status", "mode", "checkNumber":
             return .string(rhs)
 
@@ -455,9 +471,60 @@ struct TransactionPredicateParser {
             return nil
         }
     }
+
+    /// Construit un prédicat pour la propriété account (EntityAccount)
+    private static func predicateForAccount(key: String, op: String, value: EntityAccount) -> Predicate<EntityTransaction>? {
+        guard key == "account" else { return nil }
+
+        // Utiliser l'UUID pour la comparaison
+        let accountUUID = value.uuid
+
+        switch op {
+        case "==": return #Predicate { $0.account.uuid == accountUUID }
+        case "!=": return #Predicate { $0.account.uuid != accountUUID }
+        default: return nil
+        }
+    }
+
+    /// Extrait l'EntityAccount depuis un NSPredicate
+    private static func extractAccountFromPredicate(_ predicate: NSPredicate) {
+        // Réinitialiser le cache
+        cachedAccount = nil
+
+        // Si c'est un NSCompoundPredicate, explorer les sous-prédicats
+        if let compound = predicate as? NSCompoundPredicate {
+            for subPredicate in compound.subpredicates as? [NSPredicate] ?? [] {
+                extractAccountFromPredicate(subPredicate)
+                if cachedAccount != nil { return }
+            }
+        }
+
+        // Si c'est un NSComparisonPredicate
+        if let comparison = predicate as? NSComparisonPredicate {
+            // Vérifier si le left expression est "account"
+            if let keyPath = comparison.leftExpression.keyPathString,
+               keyPath == "account" {
+                // Extraire l'objet depuis le right expression
+                if comparison.rightExpression.expressionType == .constantValue,
+                   let account = comparison.rightExpression.constantValue as? EntityAccount {
+                    print("      [Parser] EntityAccount trouvé: \(account.name) (\(account.uuid))")
+                    cachedAccount = account
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Helper Extensions
+
+extension NSExpression {
+    var keyPathString: String? {
+        if expressionType == .keyPath {
+            return self.keyPath
+        }
+        return nil
+    }
+}
 
 extension TransactionPredicateParser {
 

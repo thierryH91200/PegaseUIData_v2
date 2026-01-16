@@ -25,17 +25,19 @@ Le crash `Fatal error: Unexpected class type: NSColor` a été résolu en modifi
 6. ✅ `QUICKSTART.md` - Guide de démarrage
 7. ✅ `DEBUG_GUIDE.md` - Guide de debug
 8. ✅ `SOLUTION_NSCOLOR.md` - Solution au problème NSColor ⭐
+9. ✅ `ACCOUNT_FILTER.md` - Filtre automatique sur le compte courant 🆕
 
 ### Fonctionnalités opérationnelles
 - ✅ Interface NSPredicateEditor native macOS
 - ✅ Templates pour tous les champs EntityTransaction
 - ✅ Parsing NSPredicate vers SwiftData Predicate
 - ✅ Support des opérateurs: ==, !=, >, >=, <, <=
-- ✅ Support des types: String, Double, Date
+- ✅ Support des types: String, Double, Date, EntityAccount 🆕
 - ✅ Support AND/OR (dans le parser)
 - ✅ Validation des prédicats
 - ✅ Logs détaillés pour le debug
 - ✅ **Filtrage sur status et mode sans crash** 🎉
+- ✅ **Filtrage automatique par compte courant** 🆕
 
 ---
 
@@ -43,6 +45,7 @@ Le crash `Fatal error: Unexpected class type: NSColor` a été résolu en modifi
 
 | Champ | Type | Status | Exemple |
 |-------|------|--------|---------|
+| `account` | EntityAccount | ✅ AUTO 🆕 | Automatique via compte courant |
 | `status` | String (via relation) | ✅ CORRIGÉ | `status == "Validé"` |
 | `mode` | String (via relation) | ✅ CORRIGÉ | `mode == "Carte"` |
 | `dateOperation` | Date | ✅ OK | `dateOperation > Date()` |
@@ -175,6 +178,7 @@ let swiftDataPredicate = TransactionPredicateParser.swiftDataPredicate(from: nsP
 | Fichier | Description | Priorité |
 |---------|-------------|----------|
 | `QUICKSTART.md` | Guide de démarrage rapide | 🟢 Lire en premier |
+| `ACCOUNT_FILTER.md` | Filtre automatique sur compte courant | 🟢 Important 🆕 |
 | `SOLUTION_NSCOLOR.md` | Explication du problème résolu | 🟢 Important |
 | `DEBUG_GUIDE.md` | Guide de debug détaillé | 🟡 Si problème |
 | `STATUS.md` | Ce fichier - état actuel | 🟢 Référence |
@@ -207,6 +211,8 @@ Le module Transaction Predicate Editor est maintenant **pleinement fonctionnel**
 ✅ S'exécute sans crash
 ✅ Filtre correctement sur tous les champs
 ✅ Support status et mode via relations
+✅ **Filtre automatique par compte courant** 🆕
+✅ Support EntityAccount dans les prédicats 🆕
 ✅ Documentation complète disponible
 
 ### Prochaine étape
