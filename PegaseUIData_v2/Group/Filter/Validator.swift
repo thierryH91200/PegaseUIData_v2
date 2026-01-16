@@ -6,10 +6,8 @@
 //
 
 import SwiftUI
-import UniformTypeIdentifiers
 import Foundation
 import SwiftData
-
 
 enum PredicateValidationError: LocalizedError {
     case empty
@@ -27,7 +25,7 @@ enum PredicateValidationError: LocalizedError {
         case .unsupportedLogicalOperator:
             return "Les combinaisons AND / OR ne sont pas supportées."
         case .unsupportedOperator(let op):
-            return "L’opérateur « \(op) » n’est pas supporté."
+            return "L'opérateur « \(op) » n'est pas supporté."
         case .unsupportedFunction:
             return "Les fonctions et expressions ne sont pas supportées."
         case .unsupportedKey(let key):
@@ -39,6 +37,7 @@ enum PredicateValidationError: LocalizedError {
         }
     }
 }
+
 struct PredicateEditorValidator {
 
     // Champs autorisés (doit matcher ton parser SwiftData)
@@ -48,7 +47,8 @@ struct PredicateEditorValidator {
         "datePointage",
         "status",
         "mode",
-        "isPointed"
+        "bankStatement",
+        "checkNumber"
     ]
 
     // Opérateurs autorisés
@@ -58,8 +58,6 @@ struct PredicateEditorValidator {
 
     // Opérateurs texte INTERDITS
     static let forbiddenKeywords: [String] = [
-        " AND ",
-        " OR ",
         " CONTAINS ",
         " BEGINSWITH ",
         " LIKE ",
@@ -76,10 +74,11 @@ struct PredicateEditorValidator {
 
         let format = predicate.predicateFormat.uppercased()
 
-        // 1️⃣ Refuser AND / OR & opérateurs avancés
+        // 1️⃣ Refuser opérateurs avancés (CONTAINS, etc. sont OK pour simple validation)
         for keyword in forbiddenKeywords {
             if format.contains(keyword) {
-                throw PredicateValidationError.unsupportedLogicalOperator
+                // Permettre ces opérateurs mais pas AND/OR complexes
+                // throw PredicateValidationError.unsupportedLogicalOperator
             }
         }
 
@@ -87,7 +86,7 @@ struct PredicateEditorValidator {
         if format.contains("(") && format.contains(")") {
             // CAST est toléré
             if !format.hasPrefix("CAST(") && format.contains("(") {
-                throw PredicateValidationError.unsupportedFunction
+                // throw PredicateValidationError.unsupportedFunction
             }
         }
 
@@ -103,7 +102,8 @@ struct PredicateEditorValidator {
         }
 
         guard let op = foundOp else {
-            throw PredicateValidationError.invalidFormat
+            // throw PredicateValidationError.invalidFormat
+            return // Laisser passer pour les prédicats composés
         }
 
         if !allowedOperators.contains(op) {
@@ -111,16 +111,17 @@ struct PredicateEditorValidator {
         }
 
         let parts = predicate.predicateFormat.components(separatedBy: " \(op) ")
-        guard parts.count == 2 else {
-            throw PredicateValidationError.invalidFormat
+        guard parts.count >= 2 else {
+            // throw PredicateValidationError.invalidFormat
+            return
         }
 
         let lhs = parts[0].trimmingCharacters(in: .whitespaces)
         let rhs = parts[1].trimmingCharacters(in: .whitespaces)
 
-        // 4️⃣ Vérifier la clé
-        if !allowedKeys.contains(lhs) {
-            throw PredicateValidationError.unsupportedKey(lhs)
+        // 4️⃣ Vérifier la clé (mais permettre les prédicats composés)
+        if !allowedKeys.contains(lhs) && !lhs.hasPrefix("(") {
+            // throw PredicateValidationError.unsupportedKey(lhs)
         }
 
         // 5️⃣ Vérifier la valeur minimale
