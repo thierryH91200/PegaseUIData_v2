@@ -109,11 +109,14 @@ struct TransactionNSPredicateEditorWrapper: NSViewRepresentable {
         predicateEditor.autoresizingMask = [.width]
 
         // Configuration des templates de prédicat pour EntityTransaction
-        let templates = createTransactionPredicateTemplates()
+//        let templates = createTransactionPredicateTemplates()
+        let templates =  defaultPredicateTemplates()
         predicateEditor.rowTemplates = templates
 
         // Ajouter une ligne par défaut
-        predicateEditor.addRow(nil)
+        predicateEditor.addRow(self)
+        predicateEditor.canRemoveAllRows = false
+
 
         predicateEditor.target = context.coordinator
         predicateEditor.action = #selector(Coordinator.predicateChanged(_:))
@@ -180,158 +183,30 @@ struct TransactionNSPredicateEditorWrapper: NSViewRepresentable {
 
     // MARK: - Predicate Templates for EntityTransaction
 
-    /// Crée les templates de prédicat pour les propriétés d'EntityTransaction
-    private func createTransactionPredicateTemplates() -> [NSPredicateEditorRowTemplate] {
-        var templates: [NSPredicateEditorRowTemplate] = []
+    func defaultPredicateTemplates() -> [NSPredicateEditorRowTemplate] {
+        
+        let templateCompoundTypes = NSPredicateEditorRowTemplate( compoundTypes: [.and, .or, .not] )
 
-        // amount (Double)
-        let amountExp = [NSExpression(forKeyPath: "amount")]
-        templates.append(NSPredicateEditorRowTemplate(
-            leftExpressions: amountExp,
-            rightExpressionAttributeType: .doubleAttributeType,
-            modifier: .direct,
-            operators: [
-                NSNumber(value: NSComparisonPredicate.Operator.equalTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.notEqualTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.greaterThan.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.greaterThanOrEqualTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.lessThan.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.lessThanOrEqualTo.rawValue)
-            ],
-            options: 0
-        ))
+        let template1 = RowTemplateRelationshipDate(leftExpressions: [NSExpression(forKeyPath: "Date Operation")], leftEntity: "dateOperation")
+        let template2 = RowTemplateRelationshipDate(leftExpressions: [NSExpression(forKeyPath: "Date Pointage")], leftEntity: "datePointage")
+        
+        let template3 = RowTemplateRelationshipStatus(leftExpressions: [NSExpression(forKeyPath: "Status")], leftEntity: "statut")
+        let template4 = RowTemplateRelationshipMode(leftExpressions: [NSExpression(forKeyPath: "Mode")], leftEntity: "paymentMode")
+        
+        let template5 = RowTemplateRelationshipLibelle(leftExpressions: [NSExpression(forKeyPath: "Libelle")])
+        let template6 = RowTemplateRelationshipRubrique(leftExpressions: [NSExpression(forKeyPath: "Rubric")])
+        let template7 = RowTemplateRelationshipCategory(leftExpressions: [NSExpression(forKeyPath: "Category")])
+        let template8 = RowTemplateRelationshipMontant(leftExpressions: [NSExpression(forKeyPath: "Montant")])
 
-        // dateOperation (Date)
-        let dateOpExp = [NSExpression(forKeyPath: "dateOperation")]
-        templates.append(NSPredicateEditorRowTemplate(
-            leftExpressions: dateOpExp,
-            rightExpressionAttributeType: .dateAttributeType,
-            modifier: .direct,
-            operators: [
-                NSNumber(value: NSComparisonPredicate.Operator.equalTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.notEqualTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.greaterThan.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.greaterThanOrEqualTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.lessThan.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.lessThanOrEqualTo.rawValue)
-            ],
-            options: 0
-        ))
-
-        // datePointage (Date)
-        let datePointExp = [NSExpression(forKeyPath: "datePointage")]
-        templates.append(NSPredicateEditorRowTemplate(
-            leftExpressions: datePointExp,
-            rightExpressionAttributeType: .dateAttributeType,
-            modifier: .direct,
-            operators: [
-                NSNumber(value: NSComparisonPredicate.Operator.equalTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.notEqualTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.greaterThan.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.greaterThanOrEqualTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.lessThan.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.lessThanOrEqualTo.rawValue)
-            ],
-            options: 0
-        ))
-
-        // bankStatement (Double)
-        let bankExp = [NSExpression(forKeyPath: "bankStatement")]
-        templates.append(NSPredicateEditorRowTemplate(
-            leftExpressions: bankExp,
-            rightExpressionAttributeType: .doubleAttributeType,
-            modifier: .direct,
-            operators: [
-                NSNumber(value: NSComparisonPredicate.Operator.equalTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.notEqualTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.greaterThan.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.greaterThanOrEqualTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.lessThan.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.lessThanOrEqualTo.rawValue)
-            ],
-            options: 0
-        ))
-
-        // checkNumber (String)
-        let checkExp = [NSExpression(forKeyPath: "checkNumber")]
-        templates.append(NSPredicateEditorRowTemplate(
-            leftExpressions: checkExp,
-            rightExpressionAttributeType: .stringAttributeType,
-            modifier: .direct,
-            operators: [
-                NSNumber(value: NSComparisonPredicate.Operator.equalTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.notEqualTo.rawValue)
-            ],
-            options: 0
-        ))
-
-        // status (String)
-        let statusExp = [NSExpression(forKeyPath: "status")]
-        templates.append(NSPredicateEditorRowTemplate(
-            leftExpressions: statusExp,
-            rightExpressionAttributeType: .stringAttributeType,
-            modifier: .direct,
-            operators: [
-                NSNumber(value: NSComparisonPredicate.Operator.equalTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.notEqualTo.rawValue)
-            ],
-            options: 0
-        ))
-
-        // mode (String)
-        let modeExp = [NSExpression(forKeyPath: "mode")]
-        templates.append(NSPredicateEditorRowTemplate(
-            leftExpressions: modeExp,
-            rightExpressionAttributeType: .stringAttributeType,
-            modifier: .direct,
-            operators: [
-                NSNumber(value: NSComparisonPredicate.Operator.equalTo.rawValue),
-                NSNumber(value: NSComparisonPredicate.Operator.notEqualTo.rawValue)
-            ],
-            options: 0
-        ))
-
-        // Compound templates (AND/OR/NOT)
-        let compoundTypes: [NSNumber] = [
-            NSNumber(value: NSCompoundPredicate.LogicalType.and.rawValue),
-            NSNumber(value: NSCompoundPredicate.LogicalType.or.rawValue),
-            NSNumber(value: NSCompoundPredicate.LogicalType.not.rawValue)
-        ]
-        templates.append(NSPredicateEditorRowTemplate(compoundTypes: compoundTypes))
-
-        return templates
+//        predicateEditor.rowTemplates.removeAll()
+        let rowTemplates = [ templateCompoundTypes, template1, template2, template3, template4, template5, template6, template7, template8]
+        
+//        predicateEditor.canRemoveAllRows = false
+//
+//        if predicateEditor.predicate == nil {
+//            predicateEditor.addRow(self)
+//        }
+        return rowTemplates
     }
 }
 
-// MARK: - Preview
-
-#Preview {
-    struct PreviewWrapper: View {
-        @State private var predicate: NSPredicate?
-
-        var body: some View {
-            VStack {
-                TransactionPredicateEditorView(
-                    predicate: $predicate,
-                    onPredicateChange: { newPredicate in
-                        print("Predicate changed: \(newPredicate?.predicateFormat ?? "nil")")
-                    }
-                )
-                .padding()
-
-                Spacer()
-
-                if let pred = predicate {
-                    Text("Current predicate:")
-                        .font(.headline)
-                    Text(pred.predicateFormat)
-                        .font(.caption)
-                        .padding()
-                }
-            }
-            .frame(width: 600, height: 400)
-        }
-    }
-
-    return PreviewWrapper()
-}

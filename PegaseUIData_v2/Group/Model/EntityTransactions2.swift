@@ -51,11 +51,6 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
             return nil
         }
 
-        guard let account = CurrentAccountManager.shared.getAccount() else {
-            print("⚠️ Erreur: aucun compte sélectionné")
-            return nil
-        }
-
         let transaction = EntityTransaction()
         transaction.uuid = UUID()
 

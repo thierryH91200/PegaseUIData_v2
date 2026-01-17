@@ -60,7 +60,6 @@ extension EntityCheckBook {
     }
 }
 
-
 // Responsabilités d’un Manager :
 //    •    CRUD (Create, Read, Update, Delete) pour les entités.
 //    •    Gestion des relations complexes entre les entités (ex. relation entre EntityCarnetCheques et EntityAccount).

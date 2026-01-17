@@ -5,6 +5,7 @@
 //  Created by thierryH24 on 28/11/2018.
 //  Copyright © 2018 thierryH24. All rights reserved.
 //
+//
 
 import AppKit
 
@@ -119,11 +120,7 @@ final class RowTemplateRelationshipStatus: NSPredicateEditorRowTemplate {
         let operators: [NSComparisonPredicate.Operator] = RowTemplateRelationshipStatus.boolOperators
         for o in operators { operatorsNSNumber.append( NSNumber(value: o.rawValue) ) }
         
-        let planifie = "Planifie"
-        let engaged = "Engaged"
-        let realise = "Realise"
-        let status = [planifie, engaged, realise]
-        
+        let status = StatusManager.shared.getAllNames()
         for statut in status {
             arrStatus.append( NSExpression(forKeyPath: statut))
         }
@@ -141,13 +138,13 @@ final class RowTemplateRelationshipStatus: NSPredicateEditorRowTemplate {
     
     override func predicate(withSubpredicates subpredicates: [NSPredicate]?) -> NSPredicate {
         
+        
         let predicate = super.predicate(withSubpredicates: subpredicates) as! NSComparisonPredicate
         let operatorType = predicate.predicateOperatorType
         let operatorName = findOperatorType(operatorType: operatorType)
         let right = String(format: "%@", predicate.rightExpression)
-        let findRight = StatusManager.shared.find( name: "Engagé")
         
-        let predicateFormat  = String(format : "%@ %@ %d", RowTemplateRelationshipStatus.entity , operatorName, findRight as! CVarArg)
+        let predicateFormat  = String(format : "status.name %@ \"%@\"", operatorName,  predicate.rightExpression)
         
         let newPredicate = NSPredicate(format: predicateFormat)
         return newPredicate
@@ -236,7 +233,7 @@ final class RowTemplateRelationshipMontant: NSPredicateEditorRowTemplate {
     }
 }
 
-// MARK: - Mode
+//// MARK: - Mode
 final class RowTemplateRelationshipMode: NSPredicateEditorRowTemplate {
     
     static var entity = ""
@@ -259,7 +256,6 @@ final class RowTemplateRelationshipMode: NSPredicateEditorRowTemplate {
             arrayMode.append( NSExpression(forKeyPath: modePaiement.name))
         }
 
-        
         super.init(leftExpressions: leftExpressions ,
                    rightExpressions: arrayMode ,
                    modifier: .direct,
@@ -284,10 +280,10 @@ final class RowTemplateRelationshipMode: NSPredicateEditorRowTemplate {
     }
 }
 
-// MARK: - Date
-// func init()
-// func init(leftExpressions: [NSExpression], leftEntity : String)
-// func predicate
+//// MARK: - Date
+//// func init()
+//// func init(leftExpressions: [NSExpression], leftEntity : String)
+//// func predicate
 
 final class RowTemplateRelationshipDate: NSPredicateEditorRowTemplate {
     

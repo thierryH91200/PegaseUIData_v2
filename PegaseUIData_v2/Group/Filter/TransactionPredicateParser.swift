@@ -14,7 +14,7 @@ import Foundation
 struct TransactionPredicateParser {
 
     // Cache pour stocker l'EntityAccount extrait du NSPredicate
-    private static var cachedAccount: EntityAccount?
+    private static var lhsAccount: UUID = UUID()
 
     // MARK: - Main Conversion Function
 
@@ -28,7 +28,7 @@ struct TransactionPredicateParser {
         print("      [Parser] Format original: \(nsPredicate.predicateFormat)")
 
         // Extraire l'EntityAccount si présent dans le prédicat
-        extractAccountFromPredicate(nsPredicate)
+//        extractAccountFromPredicate(nsPredicate)
 
         // Normaliser le format
         let format = normalizePredicateFormat(nsPredicate.predicateFormat)
@@ -202,6 +202,11 @@ struct TransactionPredicateParser {
 
     /// Parse une expression binaire (key op value)
     private static func predicateForBinary(_ expr: String) -> Predicate<EntityTransaction>? {
+        
+        let account = CurrentAccountManager.shared.getAccount()
+        guard let account else { return nil }
+        lhsAccount = account.uuid
+
         let s = trimOuterParens(expr)
         print("         [Binary] Expression: \(s)")
 
@@ -279,13 +284,19 @@ struct TransactionPredicateParser {
 
     /// Parse une valeur selon la clé (détermine le type attendu)
     private static func parseValue(for key: String, from rhs: String) -> ParsedValue? {
-        switch key {
-        case "account":
-            // Utiliser l'account mis en cache lors de l'extraction
-            if let account = cachedAccount {
-                return .account(account)
-            }
-            return nil
+        // Normaliser la clé pour gérer les cas où NSPredicateEditor génère des keyPaths complets
+        let normalizedKey: String
+        if key.hasPrefix("status.") {
+            normalizedKey = "status"
+        } else if key.hasPrefix("paymentMode.") || key.hasPrefix("mode.") {
+            normalizedKey = "mode"
+        } else {
+            normalizedKey = key
+        }
+
+        print("         [ParseValue] key='\(key)', normalizedKey='\(normalizedKey)', rhs='\(rhs)'")
+
+        switch normalizedKey {
 
         case "status", "mode", "checkNumber":
             return .string(rhs)
@@ -376,28 +387,40 @@ struct TransactionPredicateParser {
 
     /// Construit un prédicat pour les propriétés de type String
     private static func predicateForString(key: String, op: String, value: String) -> Predicate<EntityTransaction>? {
-        switch key {
+        // Normaliser la clé pour gérer les cas où NSPredicateEditor génère des keyPaths complets
+        
+        let normalizedKey: String
+        if key.hasPrefix("status.") {
+            normalizedKey = "status"
+        } else if key.hasPrefix("paymentMode.") || key.hasPrefix("mode.") {
+            normalizedKey = "mode"
+        } else {
+            normalizedKey = key
+        }
+
+        print("         [PredicateForString] key='\(key)', normalizedKey='\(normalizedKey)', op='\(op)', value='\(value)'")
+
+        switch normalizedKey {
         case "status":
-            // Filtrer sur status.name au lieu de statusString
-            // pour éviter le problème avec NSColor dans EntityStatus
+            // Filtrer sur status directement (relation avec EntityStatus)
             switch op {
-            case "==": return #Predicate { $0.status?.name == value }
-            case "!=": return #Predicate { $0.status?.name != value }
+                case "==": return #Predicate<EntityTransaction> { entity in entity.status?.name == value && entity.account.uuid == lhsAccount }
+            case "!=": return #Predicate<EntityTransaction> { entity in entity.status?.name != value && entity.account.uuid == lhsAccount }
             default: return nil
             }
 
         case "mode":
-            // Filtrer sur paymentMode.name au lieu de paymentModeString
+            // Filtrer sur paymentMode directement (relation avec EntityPaymentMode)
             switch op {
-            case "==": return #Predicate { $0.paymentMode?.name == value }
-            case "!=": return #Predicate { $0.paymentMode?.name != value }
+            case "==": return #Predicate<EntityTransaction> { entity in entity.paymentMode?.name == value && entity.account.uuid == lhsAccount }
+            case "!=": return #Predicate<EntityTransaction> { entity in entity.paymentMode?.name != value && entity.account.uuid == lhsAccount }
             default: return nil
             }
 
         case "checkNumber":
             switch op {
-            case "==": return #Predicate { $0.checkNumber == value }
-            case "!=": return #Predicate { $0.checkNumber != value }
+            case "==": return #Predicate<EntityTransaction> { entity in entity.checkNumber == value && entity.account.uuid == lhsAccount }
+            case "!=": return #Predicate<EntityTransaction> { entity in entity.checkNumber != value && entity.account.uuid == lhsAccount }
             default: return nil
             }
 
@@ -411,23 +434,23 @@ struct TransactionPredicateParser {
         switch key {
         case "amount":
             switch op {
-            case "==": return #Predicate { $0.amount == value }
-            case "!=": return #Predicate { $0.amount != value }
-            case ">":  return #Predicate { $0.amount > value }
-            case ">=": return #Predicate { $0.amount >= value }
-            case "<":  return #Predicate { $0.amount < value }
-            case "<=": return #Predicate { $0.amount <= value }
+            case "==": return #Predicate<EntityTransaction> { entity in entity.amount == value && entity.account.uuid == lhsAccount }
+                case "!=": return #Predicate<EntityTransaction> { entity in entity.amount != value && entity.account.uuid == lhsAccount }
+            case ">":  return #Predicate<EntityTransaction> { entity in entity.amount > value && entity.account.uuid == lhsAccount }
+            case ">=": return #Predicate<EntityTransaction> { entity in entity.amount >= value && entity.account.uuid == lhsAccount }
+            case "<":  return #Predicate<EntityTransaction> { entity in entity.amount < value && entity.account.uuid == lhsAccount }
+            case "<=": return #Predicate<EntityTransaction> { entity in entity.amount <= value && entity.account.uuid == lhsAccount }
             default: return nil
             }
 
         case "bankStatement":
             switch op {
-            case "==": return #Predicate { $0.bankStatement == value }
-            case "!=": return #Predicate { $0.bankStatement != value }
-            case ">":  return #Predicate { $0.bankStatement > value }
-            case ">=": return #Predicate { $0.bankStatement >= value }
-            case "<":  return #Predicate { $0.bankStatement < value }
-            case "<=": return #Predicate { $0.bankStatement <= value }
+            case "==": return #Predicate<EntityTransaction> { entity in entity.bankStatement == value && entity.account.uuid == lhsAccount }
+            case "!=": return #Predicate<EntityTransaction> { entity in entity.bankStatement != value && entity.account.uuid == lhsAccount }
+            case ">":  return #Predicate<EntityTransaction> { entity in entity.bankStatement > value && entity.account.uuid == lhsAccount }
+            case ">=": return #Predicate<EntityTransaction> { entity in entity.bankStatement >= value && entity.account.uuid == lhsAccount }
+            case "<":  return #Predicate<EntityTransaction> { entity in entity.bankStatement < value && entity.account.uuid == lhsAccount }
+            case "<=": return #Predicate<EntityTransaction> { entity in entity.bankStatement <= value && entity.account.uuid == lhsAccount }
             default: return nil
             }
 
@@ -447,23 +470,23 @@ struct TransactionPredicateParser {
         switch key {
         case "datePointage":
             switch op {
-            case "==": return #Predicate { $0.datePointage == value }
-            case "!=": return #Predicate { $0.datePointage != value }
-            case ">":  return #Predicate { $0.datePointage > value }
-            case ">=": return #Predicate { $0.datePointage >= value }
-            case "<":  return #Predicate { $0.datePointage < value }
-            case "<=": return #Predicate { $0.datePointage <= value }
+            case "==": return #Predicate<EntityTransaction> { entity in entity.datePointage == value && entity.account.uuid == lhsAccount }
+            case "!=": return #Predicate<EntityTransaction> { entity in entity.datePointage != value && entity.account.uuid == lhsAccount }
+            case ">":  return #Predicate<EntityTransaction> { entity in entity.datePointage > value && entity.account.uuid == lhsAccount }
+            case ">=": return #Predicate<EntityTransaction> { entity in entity.datePointage >= value && entity.account.uuid == lhsAccount }
+            case "<":  return #Predicate<EntityTransaction> { entity in entity.datePointage < value && entity.account.uuid == lhsAccount }
+            case "<=": return #Predicate<EntityTransaction> { entity in entity.datePointage <= value && entity.account.uuid == lhsAccount }
             default: return nil
             }
 
         case "dateOperation":
             switch op {
-            case "==": return #Predicate { $0.dateOperation == value }
-            case "!=": return #Predicate { $0.dateOperation != value }
-            case ">":  return #Predicate { $0.dateOperation > value }
-            case ">=": return #Predicate { $0.dateOperation >= value }
-            case "<":  return #Predicate { $0.dateOperation < value }
-            case "<=": return #Predicate { $0.dateOperation <= value }
+            case "==": return #Predicate<EntityTransaction> { entity in entity.dateOperation == value && entity.account.uuid == lhsAccount }
+            case "!=": return #Predicate<EntityTransaction> { entity in entity.dateOperation != value && entity.account.uuid == lhsAccount }
+            case ">":  return #Predicate<EntityTransaction> { entity in entity.dateOperation > value && entity.account.uuid == lhsAccount }
+            case ">=": return #Predicate<EntityTransaction> { entity in entity.dateOperation >= value && entity.account.uuid == lhsAccount }
+            case "<":  return #Predicate<EntityTransaction> { entity in entity.dateOperation < value && entity.account.uuid == lhsAccount }
+            case "<=": return #Predicate<EntityTransaction> { entity in entity.dateOperation <= value && entity.account.uuid == lhsAccount }
             default: return nil
             }
 
@@ -480,39 +503,39 @@ struct TransactionPredicateParser {
         let accountUUID = value.uuid
 
         switch op {
-        case "==": return #Predicate { $0.account.uuid == accountUUID }
-        case "!=": return #Predicate { $0.account.uuid != accountUUID }
+        case "==": return #Predicate<EntityTransaction> { entity in entity.account.uuid == accountUUID }
+        case "!=": return #Predicate<EntityTransaction> { entity in entity.account.uuid != accountUUID }
         default: return nil
         }
     }
 
     /// Extrait l'EntityAccount depuis un NSPredicate
-    private static func extractAccountFromPredicate(_ predicate: NSPredicate) {
-        // Réinitialiser le cache
-        cachedAccount = nil
-
-        // Si c'est un NSCompoundPredicate, explorer les sous-prédicats
-        if let compound = predicate as? NSCompoundPredicate {
-            for subPredicate in compound.subpredicates as? [NSPredicate] ?? [] {
-                extractAccountFromPredicate(subPredicate)
-                if cachedAccount != nil { return }
-            }
-        }
-
-        // Si c'est un NSComparisonPredicate
-        if let comparison = predicate as? NSComparisonPredicate {
-            // Vérifier si le left expression est "account"
-            if let keyPath = comparison.leftExpression.keyPathString,
-               keyPath == "account" {
-                // Extraire l'objet depuis le right expression
-                if comparison.rightExpression.expressionType == .constantValue,
-                   let account = comparison.rightExpression.constantValue as? EntityAccount {
-                    print("      [Parser] EntityAccount trouvé: \(account.name) (\(account.uuid))")
-                    cachedAccount = account
-                }
-            }
-        }
-    }
+//    private static func extractAccountFromPredicate(_ predicate: NSPredicate) {
+//        // Réinitialiser le cache
+//        cachedAccount = nil
+//
+//        // Si c'est un NSCompoundPredicate, explorer les sous-prédicats
+//        if let compound = predicate as? NSCompoundPredicate {
+//            for subPredicate in compound.subpredicates as? [NSPredicate] ?? [] {
+//                extractAccountFromPredicate(subPredicate)
+//                if cachedAccount != nil { return }
+//            }
+//        }
+//
+//        // Si c'est un NSComparisonPredicate
+//        if let comparison = predicate as? NSComparisonPredicate {
+//            // Vérifier si le left expression est "account"
+//            if let keyPath = comparison.leftExpression.keyPathString,
+//               keyPath == "account" {
+//                // Extraire l'objet depuis le right expression
+//                if comparison.rightExpression.expressionType == .constantValue,
+//                   let account = comparison.rightExpression.constantValue as? EntityAccount {
+//                    print("      [Parser] EntityAccount trouvé: \(account.name) (\(account.uuid))")
+//                    cachedAccount = account
+//                }
+//            }
+//        }
+//    }
 }
 
 // MARK: - Helper Extensions
