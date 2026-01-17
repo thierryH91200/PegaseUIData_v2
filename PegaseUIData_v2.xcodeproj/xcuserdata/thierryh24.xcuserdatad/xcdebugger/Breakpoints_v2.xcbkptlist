@@ -293,8 +293,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "392"
             endingLineNumber = "392"
-            landmarkName = "TransactionPredicateParser"
-            landmarkType = "14">
+            landmarkName = "predicateForString(key:op:value:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -309,8 +309,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "388"
             endingLineNumber = "388"
-            landmarkName = "parseBool(_:)"
-            landmarkType = "7">
+            landmarkName = "TransactionPredicateParser"
+            landmarkType = "14">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -325,22 +325,22 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "378"
             endingLineNumber = "378"
-            landmarkName = "parseDateLiteral(_:)"
-            landmarkType = "7">
+            landmarkName = "TransactionPredicateParser"
+            landmarkType = "14">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "862C8F05-E9C6-4C96-AA10-923D5A13C2B6"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PegaseUIData_v2/Group/Filter/TransactionFilterView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "299"
-            endingLineNumber = "299"
+            startingLineNumber = "317"
+            endingLineNumber = "317"
             landmarkName = "loadAllTransactions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -355,8 +355,8 @@
             filePath = "PegaseUIData_v2/Group/Filter/TransactionFilterView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "90"
-            endingLineNumber = "90"
+            startingLineNumber = "108"
+            endingLineNumber = "108"
             landmarkName = "resultsList"
             landmarkType = "24">
          </BreakpointContent>

@@ -189,13 +189,3 @@ struct TransactionListContainer: View {
         }
     }
 }
-
-// MARK: - Preview
-
-#Preview {
-    TransactionListContainer(dashboard: .constant(DashboardState(
-        executed: 2000.00,
-        planned: 5000.00,
-        engaged: 3500.00
-    )))
-}

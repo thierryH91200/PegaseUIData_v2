@@ -8,11 +8,18 @@
 import SwiftUI
 import SwiftData
 import Combine
+import os
 
 /// Vue complète avec PredicateEditor et liste filtrée de transactions
 struct TransactionFilterView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = TransactionFilterViewModel()
+    
+    @EnvironmentObject private var currentAccountManager: CurrentAccountManager
+    
+    @State private var refresh = false
+
+
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,9 +41,20 @@ struct TransactionFilterView: View {
             // Results
             resultsList
         }
+        .id(refresh)
+        
         .onAppear {
             viewModel.setModelContext(modelContext)
         }
+        .onChange(of: currentAccountManager.currentAccountID) { old, new in
+            AppLogger.account.debug("Account change detected: \(String(describing: new))")
+            viewModel.loadAllTransactions()
+
+            withAnimation {
+                refresh.toggle()
+            }
+        }
+
     }
 
     // MARK: - Subviews
@@ -294,7 +312,7 @@ final class TransactionFilterViewModel: ObservableObject {
         isFiltered = false
     }
 
-    private func loadAllTransactions() {
+    func loadAllTransactions() {
         
         allTransactions = ListTransactionsManager.shared.getAllData()
         filteredTransactions = allTransactions

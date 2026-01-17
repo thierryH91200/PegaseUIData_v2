@@ -508,34 +508,6 @@ struct TransactionPredicateParser {
         default: return nil
         }
     }
-
-    /// Extrait l'EntityAccount depuis un NSPredicate
-//    private static func extractAccountFromPredicate(_ predicate: NSPredicate) {
-//        // Réinitialiser le cache
-//        cachedAccount = nil
-//
-//        // Si c'est un NSCompoundPredicate, explorer les sous-prédicats
-//        if let compound = predicate as? NSCompoundPredicate {
-//            for subPredicate in compound.subpredicates as? [NSPredicate] ?? [] {
-//                extractAccountFromPredicate(subPredicate)
-//                if cachedAccount != nil { return }
-//            }
-//        }
-//
-//        // Si c'est un NSComparisonPredicate
-//        if let comparison = predicate as? NSComparisonPredicate {
-//            // Vérifier si le left expression est "account"
-//            if let keyPath = comparison.leftExpression.keyPathString,
-//               keyPath == "account" {
-//                // Extraire l'objet depuis le right expression
-//                if comparison.rightExpression.expressionType == .constantValue,
-//                   let account = comparison.rightExpression.constantValue as? EntityAccount {
-//                    print("      [Parser] EntityAccount trouvé: \(account.name) (\(account.uuid))")
-//                    cachedAccount = account
-//                }
-//            }
-//        }
-//    }
 }
 
 // MARK: - Helper Extensions

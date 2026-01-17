@@ -109,7 +109,6 @@ struct TransactionNSPredicateEditorWrapper: NSViewRepresentable {
         predicateEditor.autoresizingMask = [.width]
 
         // Configuration des templates de prédicat pour EntityTransaction
-//        let templates = createTransactionPredicateTemplates()
         let templates =  defaultPredicateTemplates()
         predicateEditor.rowTemplates = templates
 

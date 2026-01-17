@@ -360,7 +360,6 @@ struct AppearancePopoverButton: View {
         result.isTemplate = false
         return result
     }
-
 }
 
 struct SidebarContainer: View {
