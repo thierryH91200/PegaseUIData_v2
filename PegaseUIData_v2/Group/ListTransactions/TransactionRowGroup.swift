@@ -45,8 +45,10 @@ struct TransactionRowGroup: View {
         String(localized: "Amount")
     ]
 
+    var filteredTransactions: [EntityTransaction]?
+
     private var transactions: [EntityTransaction] {
-        ListTransactionsManager.shared.listTransactions
+        filteredTransactions ?? ListTransactionsManager.shared.listTransactions
     }
 
     var compteCurrent: EntityAccount? {

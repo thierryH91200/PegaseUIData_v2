@@ -23,8 +23,10 @@ struct TransactionTableView: View {
     @EnvironmentObject private var currentAccountManager: CurrentAccountManager
     @EnvironmentObject private var colorManager: ColorManager
 
+    var filteredTransactions: [EntityTransaction]?
+
     private var transactions: [EntityTransaction] {
-        ListTransactionsManager.shared.listTransactions
+        filteredTransactions ?? ListTransactionsManager.shared.listTransactions
     }
 
     @Binding var dashboard: DashboardState
@@ -147,7 +149,10 @@ struct TransactionTableView: View {
                     .padding(.vertical, 6)
                     .background(Color.gray.opacity(0.1))
 
-                    TransactionRowGroup(selectedTransactions: $selectedTransactions)
+                    TransactionRowGroup(
+                        selectedTransactions: $selectedTransactions,
+                        filteredTransactions: filteredTransactions
+                    )
                 }
                 .listStyle(.plain)
                 .frame(minWidth: 800, maxWidth: 1200)

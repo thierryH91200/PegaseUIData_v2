@@ -399,7 +399,7 @@ struct DetailContainer: View {
                 AnyView(TreasuryCurveView( dashboard: $dashboard)) },
 
             String(localized: "Bank website",table: "Menu")             : { isVisible in
-                AnyView(HybridContentData100(isVisible : isVisible, dashboard: $dashboard)) },
+                AnyView(HybridContentData100(isVisible : isVisible)) },
             String(localized: "Internet rapprochement",table: "Menu")   : { isVisible in AnyView(InternetReconciliationView(isVisible : isVisible)) },
             String(localized: "Bank statement",table: "Menu")           : { isVisible in AnyView(BankStatementView(isVisible          : isVisible)) },
             String(localized: "Notes",table: "Menu")                    : { isVisible in

@@ -20,7 +20,45 @@ struct RubriquePie: View {
     @Binding var maxDate: Date
     
     @Binding var dashboard: DashboardState
-    
+
+    @State private var selectedRubrique: String? = nil
+    @State private var selectedTransactionType: TransactionType? = nil
+
+    enum TransactionType {
+        case expense
+        case income
+    }
+
+    private var filteredTransactions: [EntityTransaction] {
+        guard let selectedRubric = selectedRubrique else {
+            return []
+        }
+
+        // If "Autres" is selected, we can't filter properly
+        if selectedRubric == "Autres" {
+            return []
+        }
+
+        let filtered = viewModel.listTransactions.filter { transaction in
+            // Filter by rubrique from sousOperations
+            let hasSousOperationWithRubric = transaction.sousOperations.contains { sousOp in
+                sousOp.category?.rubric?.name == selectedRubric
+            }
+
+            // Also filter by transaction type if specified
+            if let type = selectedTransactionType {
+                let isExpense = transaction.amount < 0
+                let matchesType = (type == .expense && isExpense) || (type == .income && !isExpense)
+                return hasSousOperationWithRubric && matchesType
+            }
+            return hasSousOperationWithRubric
+        }
+
+        printTag("Selected rubrique: \(selectedRubric), Type: \(String(describing: selectedTransactionType)), Filtered count: \(filtered.count), Total: \(viewModel.listTransactions.count)")
+
+        return filtered
+    }
+
     private var totalDaysRange: ClosedRange<Double> {
         let cal = Calendar.current
         let start = cal.startOfDay(for: minDate)
@@ -28,15 +66,24 @@ struct RubriquePie: View {
         let days = cal.dateComponents([.day], from: start, to: end).day ?? 0
         return 0...Double(max(0, days))
     }
-    
+
     @State private var selectedStart: Double = 0
     @State private var selectedEnd: Double = 30
     
     var body: some View {
         VStack {
-            Text(String(localized:"Rubrique pie"))
-                .font(.headline)
-                .padding()
+            HStack {
+                Text(String(localized:"Rubrique pie"))
+                    .font(.headline)
+
+                if let rubrique = selectedRubrique, let type = selectedTransactionType {
+                    let typeLabel = type == .expense ? "Expense" : "Income"
+                    Text("[\(typeLabel): \(rubrique)]")
+                        .font(.caption)
+                        .foregroundColor(type == .expense ? .red : .green)
+                }
+            }
+            .padding()
             
             HStack {
                 if viewModel.dataEntriesDepense.isEmpty {
@@ -48,10 +95,24 @@ struct RubriquePie: View {
                     .frame(width: 600, height: 400)
                     .padding()
                 } else {
-                    
+
                     SinglePieChartView(
                         entries: viewModel.dataEntriesDepense,
-                        title: String(localized : "Expenses"))
+                        title: String(localized : "Expenses"),
+                        onSelectSlice: { label in
+                            printTag("Expense slice selected: \(label ?? "nil")")
+                            withAnimation {
+                                selectedRubrique = label
+                                selectedTransactionType = .expense
+                            }
+                            printTag("State after expense selection - Rubrique: \(selectedRubrique ?? "nil"), Type: \(String(describing: selectedTransactionType))")
+                        },
+                        onClearSelection: {
+                            printTag("Selection cleared")
+                            selectedRubrique = nil
+                            selectedTransactionType = nil
+                        }
+                    )
                     .frame(width: 600, height: 400)
                     .padding()
                 }
@@ -66,16 +127,54 @@ struct RubriquePie: View {
                 } else {
                     SinglePieChartView(
                         entries: viewModel.dataEntriesRecette,
-                        title: String(localized : "Receipts"))
+                        title: String(localized : "Receipts"),
+                        onSelectSlice: { label in
+                            printTag("Income slice selected: \(label ?? "nil")")
+                            withAnimation {
+                                selectedRubrique = label
+                                selectedTransactionType = .income
+                            }
+                            printTag("State after income selection - Rubrique: \(selectedRubrique ?? "nil"), Type: \(String(describing: selectedTransactionType))")
+                        },
+                        onClearSelection: {
+                            printTag("Selection cleared")
+                            selectedRubrique = nil
+                            selectedTransactionType = nil
+                        }
+                    )
                     .frame(width: 600, height: 400)
                     .padding()
                 }
             }
             GroupBox(label: Label("Filter by period", systemImage: "calendar")) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("From \(formattedDate(from: selectedStart)) to \(formattedDate(from: selectedEnd))")
-                        .font(.callout)
-                        .foregroundColor(.secondary)
+                    HStack {
+                        Text("From \(formattedDate(from: selectedStart)) to \(formattedDate(from: selectedEnd))")
+                            .font(.callout)
+                            .foregroundColor(.secondary)
+
+                        if let rubrique = selectedRubrique, let type = selectedTransactionType {
+                            Spacer()
+                            HStack {
+                                let typeLabel = type == .expense ? "Expense" : "Income"
+                                Text("\(typeLabel): \(rubrique)")
+                                    .font(.callout)
+                                    .foregroundColor(type == .expense ? .red : .green)
+                                Button(action: {
+                                    selectedRubrique = nil
+                                    selectedTransactionType = nil
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.secondary)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background((type == .expense ? Color.red : Color.green).opacity(0.1))
+                            .cornerRadius(8)
+                        }
+                    }
                     
                     RangeSlider(
                         lowerValue: $selectedStart,
@@ -97,7 +196,11 @@ struct RubriquePie: View {
                 }
                 .padding(.top, 4)
                 .padding(.horizontal)
-                TransactionListContainer(dashboard: $dashboard)
+                TransactionListContainer(
+                    dashboard: $dashboard,
+                    filteredTransactions: selectedRubrique != nil ? filteredTransactions : nil
+                )
+                .id("\(selectedRubrique ?? "all")_\(selectedTransactionType == .expense ? "expense" : selectedTransactionType == .income ? "income" : "none")")
             }
         }
         .onAppear {

@@ -138,11 +138,10 @@ final class RowTemplateRelationshipStatus: NSPredicateEditorRowTemplate {
     
     override func predicate(withSubpredicates subpredicates: [NSPredicate]?) -> NSPredicate {
         
-        
         let predicate = super.predicate(withSubpredicates: subpredicates) as! NSComparisonPredicate
         let operatorType = predicate.predicateOperatorType
         let operatorName = findOperatorType(operatorType: operatorType)
-        let right = String(format: "%@", predicate.rightExpression)
+//        let right = String(format: "%@", predicate.rightExpression)
         
         let predicateFormat  = String(format : "status.name %@ \"%@\"", operatorName,  predicate.rightExpression)
         

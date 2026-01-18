@@ -26,7 +26,7 @@ struct ModePaiementView: View {
         let days = cal.dateComponents([.day], from: start, to: end).day ?? 0
         return 0...Double(max(0, days))
     }
-    
+
 
 
     @State private var selectedStart: Double = 0
@@ -35,12 +35,63 @@ struct ModePaiementView: View {
     @State private var chartView: BarChartView?
     @State private var selectedItem: DataGraph? = nil
 
-    
+    @State private var selectedPaymentMode: String? = nil
+    @State private var selectedTransactionType: TransactionType? = nil
+
+    enum TransactionType {
+        case expense
+        case income
+    }
+
+    private var filteredTransactions: [EntityTransaction] {
+        guard let selectedMode = selectedPaymentMode else {
+            return []
+        }
+
+        // If "Autres" is selected, we can't filter properly
+        if selectedMode == "Autres" {
+            return []
+        }
+
+        let filtered = viewModel.listTransactions.filter { transaction in
+            let matchesPaymentMode = transaction.paymentMode?.name == selectedMode
+
+            // Also filter by transaction type if specified
+            if let type = selectedTransactionType {
+                let isExpense = transaction.amount < 0
+                let matchesType = (type == .expense && isExpense) || (type == .income && !isExpense)
+                return matchesPaymentMode && matchesType
+            }
+
+            return matchesPaymentMode
+        }
+
+        printTag("Selected mode: \(selectedMode), Type: \(String(describing: selectedTransactionType)), Filtered count: \(filtered.count), Total: \(viewModel.listTransactions.count)")
+
+        return filtered
+    }
+
+    private var headerView: some View {
+        HStack {
+            HStack {
+                Text("ModePaiement Pie")
+                    .font(.headline)
+
+                if let mode = selectedPaymentMode, let type = selectedTransactionType {
+                    let typeLabel = type == .expense ? "Expense" : "Income"
+                    Text("[\(typeLabel): \(mode)]")
+                        .font(.caption)
+                        .foregroundColor(type == .expense ? .red : .green)
+                }
+            }
+            .padding()
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("ModePaiement Pie")
-                .font(.headline)
-                .padding()
+            
+            headerView
             
             HStack {
                 if viewModel.dataEntriesDepense.isEmpty {
@@ -52,8 +103,23 @@ struct ModePaiementView: View {
                     .frame(width: 600, height: 400)
                     .padding()
                 } else {
-                    SinglePie1ChartView(entries: viewModel.dataEntriesDepense,
-                                       title: String(localized : "Expenses"))
+                    SinglePie1ChartView(
+                        entries: viewModel.dataEntriesDepense,
+                        title: String(localized : "Expenses"),
+                        onSelectSlice: { label in
+                            printTag("Expense slice selected: \(label ?? "nil")")
+                            withAnimation {
+                                selectedPaymentMode = label
+                                selectedTransactionType = .expense
+                            }
+                            printTag("State after expense selection - Mode: \(selectedPaymentMode ?? "nil"), Type: \(String(describing: selectedTransactionType))")
+                        },
+                        onClearSelection: {
+                            printTag("Selection cleared")
+                            selectedPaymentMode = nil
+                            selectedTransactionType = nil
+                        }
+                    )
                         .frame(width: 600, height: 400)
                         .padding()
                 }
@@ -69,7 +135,21 @@ struct ModePaiementView: View {
                 } else {
                     SinglePie1ChartView(
                         entries: viewModel.dataEntriesRecette,
-                        title: String(localized : "Receipts"))
+                        title: String(localized : "Receipts"),
+                        onSelectSlice: { label in
+                            printTag("Income slice selected: \(label ?? "nil")")
+                            withAnimation {
+                                selectedPaymentMode = label
+                                selectedTransactionType = .income
+                            }
+                            printTag("State after income selection - Mode: \(selectedPaymentMode ?? "nil"), Type: \(String(describing: selectedTransactionType))")
+                        },
+                        onClearSelection: {
+                            printTag("Selection cleared")
+                            selectedPaymentMode = nil
+                            selectedTransactionType = nil
+                        }
+                    )
                         .frame(width: 600, height: 400)
                         .padding()
                 }
@@ -77,9 +157,33 @@ struct ModePaiementView: View {
             
             GroupBox(label: Label("Filter by period", systemImage: "calendar")) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("From \(formattedDate(from: selectedStart)) to \(formattedDate(from: selectedEnd))")
-                        .font(.callout)
-                        .foregroundColor(.secondary)
+                    HStack {
+                        Text("From \(formattedDate(from: selectedStart)) to \(formattedDate(from: selectedEnd))")
+                            .font(.callout)
+                            .foregroundColor(.secondary)
+
+                        if let mode = selectedPaymentMode, let type = selectedTransactionType {
+                            Spacer()
+                            HStack {
+                                let typeLabel = type == .expense ? "Expense" : "Income"
+                                Text("\(typeLabel): \(mode)")
+                                    .font(.callout)
+                                    .foregroundColor(type == .expense ? .red : .green)
+                                Button(action: {
+                                    selectedPaymentMode = nil
+                                    selectedTransactionType = nil
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.secondary)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background((type == .expense ? Color.red : Color.green).opacity(0.1))
+                            .cornerRadius(8)
+                        }
+                    }
 
                     RangeSlider(
                         lowerValue: $selectedStart,
@@ -101,7 +205,11 @@ struct ModePaiementView: View {
                 }
                 .padding(.top, 4)
                 .padding(.horizontal)
-                TransactionListContainer(dashboard: $dashboard)
+                TransactionListContainer(
+                    dashboard: $dashboard,
+                    filteredTransactions: selectedPaymentMode != nil ? filteredTransactions : nil
+                )
+                .id("\(selectedPaymentMode ?? "all")_\(selectedTransactionType == .expense ? "expense" : selectedTransactionType == .income ? "income" : "none")")
             }
             .padding()
             Spacer()

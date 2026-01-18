@@ -85,7 +85,6 @@ struct DGBarChart2Representable: NSViewRepresentable {
         }
     }
     
-    
     func initializeLegend(_ legend: Legend) {
         
         legend.horizontalAlignment = .right
@@ -231,7 +230,6 @@ struct DGBarChart2Representable: NSViewRepresentable {
         self.chartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: labelDate)
 
         self.chartView.data = data
-
     }
 }
 

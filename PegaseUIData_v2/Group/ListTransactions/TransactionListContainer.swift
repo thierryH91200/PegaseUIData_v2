@@ -26,8 +26,10 @@ struct TransactionListContainer: View {
 
     @Binding var dashboard: DashboardState
 
+    var filteredTransactions: [EntityTransaction]?
+
     private var transactions: [EntityTransaction] {
-        ListTransactionsManager.shared.listTransactions
+        filteredTransactions ?? ListTransactionsManager.shared.listTransactions
     }
 
     var body: some View {
@@ -47,6 +49,7 @@ struct TransactionListContainer: View {
             Divider()
 
             TransactionTableView(
+                filteredTransactions: filteredTransactions,
                 dashboard: $dashboard,
                 isVisible: $dashboard.isVisible,
                 selectedTransactions: $selectedTransactions

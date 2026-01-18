@@ -19,8 +19,6 @@ struct TransactionFilterView: View {
     
     @State private var refresh = false
 
-
-
     var body: some View {
         VStack(spacing: 0) {
             // Header

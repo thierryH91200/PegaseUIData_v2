@@ -6,15 +6,12 @@
 //
 
 import SwiftUI
-import UniformTypeIdentifiers
 import Foundation
 import SwiftData
 
 struct HybridContentData100: View {
     
     @Binding var isVisible: Bool
-    @Binding var dashboard: DashboardState
-
 
     var body: some View {
         TransactionFilterView()

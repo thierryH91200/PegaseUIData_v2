@@ -27,9 +27,6 @@ struct TransactionPredicateParser {
 
         print("      [Parser] Format original: \(nsPredicate.predicateFormat)")
 
-        // Extraire l'EntityAccount si présent dans le prédicat
-//        extractAccountFromPredicate(nsPredicate)
-
         // Normaliser le format
         let format = normalizePredicateFormat(nsPredicate.predicateFormat)
         print("      [Parser] Format normalisé: \(format)")

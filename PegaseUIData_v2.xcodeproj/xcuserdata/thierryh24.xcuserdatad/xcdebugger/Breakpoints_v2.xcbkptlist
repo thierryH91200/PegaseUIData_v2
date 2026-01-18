@@ -227,8 +227,8 @@
             filePath = "PegaseUIData_v2/Group/Filter/Filter.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "20"
-            endingLineNumber = "20"
+            startingLineNumber = "17"
+            endingLineNumber = "17"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -259,8 +259,8 @@
             filePath = "PegaseUIData_v2/Group/Filter/NSPredicateEditorRow.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "149"
-            endingLineNumber = "149"
+            startingLineNumber = "148"
+            endingLineNumber = "148"
             landmarkName = "predicate(withSubpredicates:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -275,8 +275,8 @@
             filePath = "PegaseUIData_v2/Group/Filter/NSPredicateEditorRow.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "142"
-            endingLineNumber = "142"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
             landmarkName = "predicate(withSubpredicates:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -291,8 +291,8 @@
             filePath = "PegaseUIData_v2/Group/Filter/TransactionPredicateParser.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "392"
-            endingLineNumber = "392"
+            startingLineNumber = "389"
+            endingLineNumber = "389"
             landmarkName = "predicateForString(key:op:value:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -307,8 +307,8 @@
             filePath = "PegaseUIData_v2/Group/Filter/TransactionPredicateParser.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "388"
-            endingLineNumber = "388"
+            startingLineNumber = "385"
+            endingLineNumber = "385"
             landmarkName = "TransactionPredicateParser"
             landmarkType = "14">
          </BreakpointContent>
@@ -323,8 +323,8 @@
             filePath = "PegaseUIData_v2/Group/Filter/TransactionPredicateParser.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "378"
-            endingLineNumber = "378"
+            startingLineNumber = "375"
+            endingLineNumber = "375"
             landmarkName = "TransactionPredicateParser"
             landmarkType = "14">
          </BreakpointContent>
@@ -339,8 +339,8 @@
             filePath = "PegaseUIData_v2/Group/Filter/TransactionFilterView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "317"
-            endingLineNumber = "317"
+            startingLineNumber = "315"
+            endingLineNumber = "315"
             landmarkName = "loadAllTransactions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -355,10 +355,26 @@
             filePath = "PegaseUIData_v2/Group/Filter/TransactionFilterView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "108"
-            endingLineNumber = "108"
+            startingLineNumber = "106"
+            endingLineNumber = "106"
             landmarkName = "resultsList"
             landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "37ABA6D2-A190-43E0-99F6-CA827577BA65"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "PegaseUIData_v2/Group/Rapport/ModePaiementPie/ModePaiementPie3.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "7"
+            endingLineNumber = "7"
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -200,11 +200,6 @@ struct TransactionNSPredicateEditorWrapper: NSViewRepresentable {
 //        predicateEditor.rowTemplates.removeAll()
         let rowTemplates = [ templateCompoundTypes, template1, template2, template3, template4, template5, template6, template7, template8]
         
-//        predicateEditor.canRemoveAllRows = false
-//
-//        if predicateEditor.predicate == nil {
-//            predicateEditor.addRow(self)
-//        }
         return rowTemplates
     }
 }
