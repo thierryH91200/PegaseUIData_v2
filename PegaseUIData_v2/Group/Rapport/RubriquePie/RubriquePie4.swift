@@ -31,10 +31,10 @@ struct SinglePie3ChartView: NSViewRepresentable {
 
     @MainActor
     final class Coordinator: NSObject, ChartViewDelegate {
-        var parent: SinglePieChartView
+        var parent: SinglePie3ChartView
         weak var chartView: PieChartView?
 
-        init(parent: SinglePieChartView) {
+        init(parent: SinglePie3ChartView) {
             self.parent = parent
             super.init()
         }

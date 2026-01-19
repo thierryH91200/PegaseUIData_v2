@@ -40,7 +40,6 @@ struct SinglePie1ChartView: NSViewRepresentable {
         weak var chartView: PieChartView?
         private var refreshObserver: NSObjectProtocol?
 
-        
         init(parent: SinglePie1ChartView) {
             self.parent = parent
             super.init()

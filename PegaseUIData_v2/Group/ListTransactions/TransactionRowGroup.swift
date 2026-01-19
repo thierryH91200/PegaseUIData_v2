@@ -58,6 +58,11 @@ struct TransactionRowGroup: View {
     @State var name: String = "NID"
     @State private var disclosureStates: [String: Bool] = [:]
 
+    // Cache for grouped transactions to avoid recalculating on every render
+    @State private var cachedGroupedTransactions: [YearGroup] = []
+    @State private var cachedVisibleTransactions: [EntityTransaction] = []
+    @State private var lastTransactionCount: Int = 0
+
     private func isExpanded(for key: String) -> Binding<Bool> {
         Binding(
             get: { disclosureStates[key, default: false] },
@@ -70,10 +75,7 @@ struct TransactionRowGroup: View {
 
     var body: some View {
         List(selection: $selectedTransactions) {
-            let grouped = groupTransactionsByYear(transactions: transactions)
-            let visibleTransactions = grouped.flatMap { $0.monthGroups.flatMap { $0.transactions } }
-
-            ForEach(grouped, id: \.year) { yearGroup in
+            ForEach(cachedGroupedTransactions, id: \.year) { yearGroup in
                 Section(header:
                     Label("Year : \(yearGroup.year)", systemImage: "calendar")
                         .font(.headline)
@@ -83,15 +85,18 @@ struct TransactionRowGroup: View {
                     ForEach(yearGroup.monthGroups, id: \.month) { monthGroup in
                         let key = "month_\(yearGroup.year)_\(monthGroup.month)"
                         DisclosureGroup(isExpanded: isExpanded(for: key)) {
-                            ForEach(monthGroup.transactions) { transaction in
-                                TransactionRow(
-                                    transaction: transaction,
-                                    selectedTransactions: $selectedTransactions,
-                                    visibleTransactions: visibleTransactions
-                                )
-                                .foregroundColor(.black)
-                                .contentShape(Rectangle())
-                                .background(Color.clear)
+                            LazyVStack(spacing: 0) {
+                                ForEach(monthGroup.transactions) { transaction in
+                                    TransactionRow(
+                                        transaction: transaction,
+                                        selectedTransactions: $selectedTransactions,
+                                        visibleTransactions: cachedVisibleTransactions
+                                    )
+                                    .foregroundColor(.black)
+                                    .contentShape(Rectangle())
+                                    .background(Color.clear)
+                                    .id(transaction.uuid)
+                                }
                             }
                         } label: {
                             Label("Month : \(monthGroup.month)", systemImage: "calendar")
@@ -117,14 +122,25 @@ struct TransactionRowGroup: View {
                 Label("Export", systemImage: "tray.and.arrow.up")
             }
         }
-        .onAppear(perform: loadDisclosureState)
         .onAppear {
+            updateGroupedTransactionsCache()
+            loadDisclosureState()
             name = compteCurrent?.name ?? "NID"
             let key = "disclosureStates" + name
             if let savedData = UserDefaults.standard.data(forKey: key),
                let loadedStates = try? JSONDecoder().decode([String: Bool].self, from: savedData) {
                 disclosureStates = loadedStates
             }
+        }
+        .onChange(of: transactions.count) { _, newCount in
+            if newCount != lastTransactionCount {
+                updateGroupedTransactionsCache()
+                lastTransactionCount = newCount
+            }
+        }
+        .onChange(of: transactions.first?.datePointage) { _, _ in
+            // Detect changes in transaction data (not just count)
+            updateGroupedTransactionsCache()
         }
         .fileImporter(
             isPresented: $showFileImporter,
@@ -202,6 +218,13 @@ struct TransactionRowGroup: View {
     }
 
     // MARK: - Private Methods
+
+    /// Updates the cached grouped transactions to avoid recalculating on every render
+    private func updateGroupedTransactionsCache() {
+        cachedGroupedTransactions = groupTransactionsByYear(transactions: transactions)
+        cachedVisibleTransactions = cachedGroupedTransactions.flatMap { $0.monthGroups.flatMap { $0.transactions } }
+        AppLogger.transactions.debug("Updated grouped transactions cache: \(cachedGroupedTransactions.count) years, \(cachedVisibleTransactions.count) transactions")
+    }
 
     private func handleFileImport(result: Result<[URL], Error>) {
         switch result {

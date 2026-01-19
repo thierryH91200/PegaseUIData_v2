@@ -444,7 +444,7 @@ struct BatchEditFormView: View {
         )
 
         return HStack(alignment: .top, spacing: 8) {
-            Picker("Statut", selection: binding) {
+            Picker("Status", selection: binding) {
                 Text("Multiple value").tag(nil as EntityStatus?)
                 ForEach(formState.status, id: \.self) { status in
                     HStack {

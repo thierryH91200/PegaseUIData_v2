@@ -22,7 +22,6 @@ import OSLog
 struct TransactionListContainer: View {
 
     @State private var selectedTransactions: Set<UUID> = []
-    @State private var refresh = false
 
     @Binding var dashboard: DashboardState
 
@@ -55,7 +54,6 @@ struct TransactionListContainer: View {
                 selectedTransactions: $selectedTransactions
             )
             .padding()
-            .id(refresh)
             .task {
                 await performInitialTask()
             }
@@ -66,27 +64,12 @@ struct TransactionListContainer: View {
                 resetDatabase()
             }
             .onReceive(NotificationCenter.default.publisher(for: .transactionsAddEdit)) { _ in
-                AppLogger.transactions.debug("transactionsAddEdit notification received")
-
-                _ = ListTransactionsManager.shared.getAllData()
-                withAnimation {
-                    selectedTransactions.removeAll()
-                }
-                updateSummary()
+                handleTransactionUpdate(source: "transactionsAddEdit")
             }
             .onReceive(NotificationCenter.default.publisher(for: .transactionsImported)) { _ in
-                AppLogger.transactions.debug("transactionsImported notification received")
-
-                _ = ListTransactionsManager.shared.getAllData()
-                withAnimation {
-                    selectedTransactions.removeAll()
-                }
-                updateSummary()
+                handleTransactionUpdate(source: "transactionsImported")
             }
             .onReceive(NotificationCenter.default.publisher(for: .transactionsSelectionChanged)) { _ in
-                withAnimation {
-                    refresh.toggle()
-                }
                 updateSummary()
             }
             .onAppear {
@@ -100,6 +83,16 @@ struct TransactionListContainer: View {
     }
 
     // MARK: - Private Methods
+
+    /// Consolidated handler for transaction updates to reduce duplicate code
+    private func handleTransactionUpdate(source: String) {
+        AppLogger.transactions.debug("\(source) notification received")
+        _ = ListTransactionsManager.shared.getAllData()
+        withAnimation {
+            selectedTransactions.removeAll()
+        }
+        updateSummary()
+    }
 
     private func updateSummary() {
         dashboard.executed = calculateExecuted()

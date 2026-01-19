@@ -33,11 +33,11 @@
 			</dict>
 			<dict>
 				<key>nameView</key>
-				<string>Site Web de la banque</string>
+				<string>Filtre</string>
 				<key>icon</key>
 				<string>checkmark.seal.fill</string>
 				<key>name</key>
-				<string>Site Web de la banque</string>
+				<string>Filtre</string>
 				<key>id</key>
 				<string>178EB508-A5C6-4392-8E45-EB6964F8C830</string>
 			</dict>

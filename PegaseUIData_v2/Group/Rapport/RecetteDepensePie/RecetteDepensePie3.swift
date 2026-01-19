@@ -54,9 +54,6 @@ struct RecetteDepensePie: View {
 
             return matchesPaymentMode
         }
-
-//        printTag("Selected mode: \(selectedMode), Type: \(String(describing: selectedTransactionType)), Filtered count: \(filtered.count), Total: \(viewModel.listTransactions.count)")
-
         return filtered
     }
 
@@ -101,15 +98,12 @@ struct RecetteDepensePie: View {
                     entries: viewModel.dataEntriesDepense,
                     title: String(localized : "Expenses"),
                     onSelectSlice: { label in
-//                        printTag("Expense slice selected: \(label ?? "nil")")
                         withAnimation {
                             selectedPaymentMode = label
                             selectedTransactionType = .expense
                         }
-//                      printTag("State after expense selection - Mode: \(selectedPaymentMode ?? "nil"), Type: \(String(describing: selectedTransactionType))")
                     },
                     onClearSelection: {
-//                      printTag("Selection cleared")
                         selectedPaymentMode = nil
                         selectedTransactionType = nil
                     }
@@ -136,15 +130,12 @@ struct RecetteDepensePie: View {
                     entries: viewModel.dataEntriesRecette,
                     title: String(localized : "Receipts"),
                     onSelectSlice: { label in
-//                      printTag("Income slice selected: \(label ?? "nil")")
                         withAnimation {
                             selectedPaymentMode = label
                             selectedTransactionType = .income
                         }
-//                      printTag("State after income selection - Mode: \(selectedPaymentMode ?? "nil"), Type: \(String(describing: selectedTransactionType))")
                     },
                     onClearSelection: {
-//                      printTag("Selection cleared")
                         selectedPaymentMode = nil
                         selectedTransactionType = nil
                     }

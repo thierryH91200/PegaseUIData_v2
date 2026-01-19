@@ -60,7 +60,7 @@ struct TransactionFilterView: View {
     private var headerView: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Filtrage des transactions")
+                Text("Transaction filteringTransaction filtering")
                     .font(.headline)
 
                 if let predicate = viewModel.currentPredicate {
@@ -82,7 +82,7 @@ struct TransactionFilterView: View {
                     .font(.headline)
 
                 if viewModel.isFiltered {
-                    Text("sur \(viewModel.totalCount) total")
+                    Text("on \(viewModel.totalCount) total")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -147,12 +147,10 @@ struct TransactionRowView: View {
                 Text(transaction.dateOperationString)
                     .font(.caption)
                     .foregroundColor(.secondary)
-
-                if transaction.dateOperation != transaction.datePointage {
-                    Text("P: \(transaction.datePointageString)")
-                        .font(.caption2)
-                        .foregroundColor(.orange)
-                }
+                
+                Text(transaction.datePointageString)
+                    .font(.caption2)
+                    .foregroundColor(.orange)
             }
 
             Divider()
@@ -170,10 +168,15 @@ struct TransactionRowView: View {
                             .foregroundColor(.secondary)
                     }
                 }
+                HStack {
+                    Text(transaction.paymentModeString)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text(transaction.bankStatementString)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
 
-                Text(transaction.paymentModeString)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
 
             Spacer()

@@ -96,7 +96,7 @@ struct RubriquePie: View {
                     .padding()
                 } else {
 
-                    SinglePieChartView(
+                    SinglePie3ChartView(
                         entries: viewModel.dataEntriesDepense,
                         title: String(localized : "Expenses"),
                         onSelectSlice: { label in
@@ -125,7 +125,7 @@ struct RubriquePie: View {
                     .frame(width: 600, height: 400)
                     .padding()
                 } else {
-                    SinglePieChartView(
+                    SinglePie3ChartView(
                         entries: viewModel.dataEntriesRecette,
                         title: String(localized : "Receipts"),
                         onSelectSlice: { label in

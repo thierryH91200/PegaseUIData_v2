@@ -34,12 +34,14 @@ struct TransactionTableView: View {
     @Binding var selectedTransactions: Set<UUID>
     @State private var information: AttributedString = ""
 
-    @State private var refresh = false
     @State private var currentSectionIndex: Int = 0
 
     @State var soldeBanque = 0.0
     @State var soldeReel = 0.0
     @State var soldeFinal = 0.0
+
+    // Cache for balance calculation to avoid recalculating on every render
+    @State private var balanceNeedsRecalculation = true
 
     // Clipboard state for copy/cut/paste
     @State private var clipboardTransactions: [EntityTransaction] = []
@@ -58,33 +60,38 @@ struct TransactionTableView: View {
                 AppLogger.transactions.debug("transactionsAddEdit notification received")
 
                 _ = ListTransactionsManager.shared.getAllData()
-                withAnimation {
-                    refresh.toggle()
-                }
+                balanceNeedsRecalculation = true
             }
             .onReceive(NotificationCenter.default.publisher(for: .transactionsImported)) { _ in
                 AppLogger.transactions.debug("transactionsImported notification received")
 
                 _ = ListTransactionsManager.shared.getAllData()
-                withAnimation {
-                    refresh.toggle()
-                }
+                balanceNeedsRecalculation = true
             }
             .onChange(of: currentAccountManager.currentAccountID) { old, new in
                 AppLogger.account.debug("Account change detected: \(String(describing: new))")
                 _ = ListTransactionsManager.shared.getAllData()
-
-                withAnimation {
-                    refresh.toggle()
-                }
+                balanceNeedsRecalculation = true
             }
             .onChange(of: selectedTransactions) { _, _ in
                 AppLogger.ui.debug("selectionDidChange called")
                 selectionDidChange()
             }
             .onAppear() {
-                balanceCalculation()
+                if balanceNeedsRecalculation {
+                    balanceCalculation()
+                    balanceNeedsRecalculation = false
+                }
                 selectionDidChange()
+            }
+            .onChange(of: transactions.count) { _, _ in
+                balanceNeedsRecalculation = true
+            }
+            .onChange(of: balanceNeedsRecalculation) { _, needsRecalc in
+                if needsRecalc {
+                    balanceCalculation()
+                    balanceNeedsRecalculation = false
+                }
             }
             // Clipboard handlers
             .onReceive(NotificationCenter.default.publisher(for: .copySelectedTransactions)) { _ in
@@ -156,7 +163,6 @@ struct TransactionTableView: View {
                 }
                 .listStyle(.plain)
                 .frame(minWidth: 800, maxWidth: 1200)
-                .id(refresh)
             }
             .background(Color.white)
         }
@@ -352,9 +358,6 @@ struct TransactionTableView: View {
         _ = ListTransactionsManager.shared.getAllData()
         clipboardTransactions = []
         isCutOperation = false
-
-        withAnimation {
-            refresh.toggle()
-        }
+        balanceNeedsRecalculation = true
     }
 }
