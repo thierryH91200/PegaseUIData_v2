@@ -279,6 +279,47 @@ final class RowTemplateRelationshipMode: NSPredicateEditorRowTemplate {
     }
 }
 
+// MARK: - Bank Statement
+// func init()
+// func init(leftExpressions: [NSExpression])
+// func predicate
+final class RowTemplateRelationshipBankStatement: NSPredicateEditorRowTemplate {
+
+    override init() {
+        super.init()
+    }
+
+    init(leftExpressions: [NSExpression]) {
+        let operators: [NSComparisonPredicate.Operator] = RowTemplateRelationshipBankStatement.numberOperators
+        var operatorsNSNumber: [NSNumber] = []
+        for o in operators { operatorsNSNumber.append( NSNumber(value: o.rawValue) ) }
+
+        super.init(leftExpressions: leftExpressions ,
+                   rightExpressionAttributeType: .doubleAttributeType,
+                   modifier: .direct,
+                   operators: operatorsNSNumber,
+                   options: 0)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func predicate(withSubpredicates subpredicates: [NSPredicate]?) -> NSPredicate {
+
+        let predicate = super.predicate(withSubpredicates: subpredicates) as! NSComparisonPredicate
+        let operatorType = predicate.predicateOperatorType
+        let operatorName = findOperatorType(operatorType: operatorType)
+
+        let rightExpression = predicate.rightExpression
+
+        let predicateFormat  = String(format : "bankStatement %@ %@", operatorName, rightExpression)
+        let newPredicate = NSPredicate(format: predicateFormat)
+
+        return newPredicate
+    }
+}
+
 //// MARK: - Date
 //// func init()
 //// func init(leftExpressions: [NSExpression], leftEntity : String)

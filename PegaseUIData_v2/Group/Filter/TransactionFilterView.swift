@@ -60,7 +60,7 @@ struct TransactionFilterView: View {
     private var headerView: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Transaction filteringTransaction filtering")
+                Text("Filtrage des transactions")
                     .font(.headline)
 
                 if let predicate = viewModel.currentPredicate {
@@ -82,7 +82,7 @@ struct TransactionFilterView: View {
                     .font(.headline)
 
                 if viewModel.isFiltered {
-                    Text("on \(viewModel.totalCount) total")
+                    Text("sur \(viewModel.totalCount) total")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -98,7 +98,8 @@ struct TransactionFilterView: View {
                 .help("Effacer le filtre")
             }
         }
-        .padding()
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
     }
 
     private var resultsList: some View {
@@ -106,9 +107,13 @@ struct TransactionFilterView: View {
             if viewModel.filteredTransactions.isEmpty {
                 emptyStateView
             } else {
-                List {
-                    ForEach(viewModel.filteredTransactions) { transaction in
-                        TransactionRowView(transaction: transaction)
+                VStack(spacing: 0) {
+                    Header()
+                    Divider()
+                    List {
+                        ForEach(viewModel.filteredTransactions) { transaction in
+                            TransactionRowView(transaction: transaction)
+                        }
                     }
                 }
             }
@@ -136,7 +141,84 @@ struct TransactionFilterView: View {
 }
 
 // MARK: - Transaction Row View
+struct Header: View {
 
+    var body: some View {
+        HStack(spacing: 12) {
+            // Date
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Date Operation")
+                    .font(.caption2)
+                    .foregroundColor(.primary)
+
+                Text("Date Pointage")
+                    .font(.caption2)
+                    .foregroundColor(.primary)
+            }
+
+            Divider()
+
+            // Details
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Status")
+                    .font(.caption)
+                    .foregroundColor(.primary)
+
+                Text("Check Number")
+                    .font(.caption2)
+                    .foregroundColor(.primary)
+            }
+            .frame(width: 100, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Payment Mode")
+                    .font(.caption)
+                    .foregroundColor(.primary)
+                Text("Bank Statement")
+                    .font(.caption2)
+                    .foregroundColor(.primary)
+            }
+            .frame(width: 100, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Rubric")
+                    .font(.caption)
+                    .foregroundColor(.primary)
+                Text("Category")
+                    .font(.caption2)
+                    .foregroundColor(.primary)
+            }
+            .frame(width: 100, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Libelle")
+                    .font(.caption)
+                    .foregroundColor(.primary)
+                Text("Amount")
+                    .font(.caption2)
+                    .foregroundColor(.primary)
+            }
+            .frame(width: 200, alignment: .leading)
+
+            Spacer()
+
+            // Amount
+            Text("Amount")
+                .font(.caption)
+                .foregroundColor(.primary)
+                .frame(width: 100, alignment: .leading)
+        }
+        .padding(.vertical, 4)
+        .padding(.horizontal, 4)
+        .background(Color.gray.opacity(0.1))
+        .frame(height: 30)
+
+
+    }
+}
+
+
+// MARK: - Transaction Row View
 struct TransactionRowView: View {
     let transaction: EntityTransaction
 
@@ -152,39 +234,60 @@ struct TransactionRowView: View {
                     .font(.caption2)
                     .foregroundColor(.orange)
             }
-
+            
             Divider()
-
+            
             // Details
             VStack(alignment: .leading, spacing: 4) {
-                HStack {
+                VStack {
                     Text(transaction.statusString)
                         .font(.subheadline)
                         .foregroundColor(.primary)
-
+                    
                     if !transaction.checkNumber.isEmpty {
                         Text("• \(transaction.checkNumber)")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                 }
-                HStack {
-                    Text(transaction.paymentModeString)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(transaction.bankStatementString)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
             }
-
+            .frame(width: 100, alignment: .leading)
+            VStack {
+                Text(transaction.paymentModeString)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(transaction.bankStatementString)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .frame(width: 100, alignment: .leading)
+            VStack {
+                Text(transaction.sousOperations.first?.category?.rubric?.name ?? "")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(transaction.sousOperations.first?.category?.name ?? "")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .frame(width: 100, alignment: .leading)
+            VStack {
+                Text(transaction.sousOperations.first?.libelle ?? "")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(formatPrice(transaction.sousOperations.first?.amount ?? 0.0))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .frame(width: 200, alignment: .leading)
             Spacer()
-
+            
             // Amount
-            Text(transaction.amountString)
-                .font(.headline)
-                .foregroundColor(transaction.amount >= 0 ? .green : .red)
+            VStack {
+                Text(transaction.amountString)
+                    .font(.headline)
+                    .foregroundColor(transaction.amount >= 0 ? .green : .red)
+            }
+            .frame(width: 100, alignment: .leading)
         }
         .padding(.vertical, 4)
     }
@@ -239,31 +342,41 @@ final class TransactionFilterViewModel: ObservableObject {
             print("   → Conversion en SwiftData Predicate...")
             let swiftDataPredicate = TransactionPredicateParser.swiftDataPredicate(from: finalPredicate)
 
-            if swiftDataPredicate == nil {
-                print("   ⚠️ Conversion a retourné nil, chargement avec prédicat compte uniquement")
-                // Fallback: utiliser seulement le prédicat compte
+            // Fetch
+            print("   → Fetch en cours...")
+
+            // Si le prédicat SwiftData est nil (SUBQUERY non supporté), faire le filtrage en mémoire
+            if swiftDataPredicate == nil && finalPredicate != nil {
+                print("   ⚠️ Prédicat non supporté par SwiftData, post-filtrage en mémoire...")
+                let allDescriptor = FetchDescriptor<EntityTransaction>(
+                    sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
+                )
+                let allTransactions = try modelContext.fetch(allDescriptor)
+
+                // Filtrer en mémoire avec NSPredicate.evaluate
+                filteredTransactions = allTransactions.filter { transaction in
+                    finalPredicate!.evaluate(with: transaction)
+                }
+                print("   ✅ Post-filtrage réussi: \(filteredTransactions.count) résultats sur \(allTransactions.count)")
+            } else if let swiftDataPredicate {
+                // Utiliser le SwiftData Predicate si disponible
+                print("   ✅ Prédicat SwiftData créé")
+                print("   → Création du FetchDescriptor...")
+                let descriptor = FetchDescriptor<EntityTransaction>(
+                    predicate: swiftDataPredicate,
+                    sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
+                )
+                filteredTransactions = try modelContext.fetch(descriptor)
+                print("   ✅ Fetch réussi: \(filteredTransactions.count) résultats")
+            } else {
+                // Aucun prédicat
+                print("   → Chargement sans filtre")
                 let descriptor = FetchDescriptor<EntityTransaction>(
                     sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
                 )
-                filteredTransactions = try  modelContext.fetch(descriptor)
-                currentPredicate = predicate
-                isFiltered = predicate != nil
-                return
+                filteredTransactions = try modelContext.fetch(descriptor)
+                print("   ✅ Fetch réussi: \(filteredTransactions.count) résultats")
             }
-
-            print("   ✅ Prédicat SwiftData créé")
-
-            // Créer le FetchDescriptor
-            print("   → Création du FetchDescriptor...")
-            let descriptor = FetchDescriptor<EntityTransaction>(
-                predicate: swiftDataPredicate,
-                sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
-            )
-
-            // Fetch
-            print("   → Fetch en cours...")
-            filteredTransactions = try modelContext.fetch(descriptor)
-            print("   ✅ Fetch réussi: \(filteredTransactions.count) résultats")
 
             // Update state
             currentPredicate = predicate

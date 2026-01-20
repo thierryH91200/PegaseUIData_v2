@@ -8,7 +8,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "55023547-5EE8-4C3E-8184-EAC6D2F748AF"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PegaseUIData_v2/Content.swift"
@@ -168,7 +168,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "59C0C236-7F4A-4E28-9242-FE587CB4B373"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PegaseUIData_v2/setupForNilLibrary.swift"
@@ -184,7 +184,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "56792766-B7EB-4067-A6D8-4C8BA36AD4CB"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PegaseUIData_v2/DataBaseManager/Support/ContainerManager.swift"
@@ -291,9 +291,9 @@
             filePath = "PegaseUIData_v2/Group/Filter/TransactionPredicateParser.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "389"
-            endingLineNumber = "389"
-            landmarkName = "predicateForString(key:op:value:)"
+            startingLineNumber = "388"
+            endingLineNumber = "388"
+            landmarkName = "parseDateLiteral(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -307,10 +307,10 @@
             filePath = "PegaseUIData_v2/Group/Filter/TransactionPredicateParser.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "385"
-            endingLineNumber = "385"
-            landmarkName = "TransactionPredicateParser"
-            landmarkType = "14">
+            startingLineNumber = "384"
+            endingLineNumber = "384"
+            landmarkName = "parseDateLiteral(_:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -323,10 +323,10 @@
             filePath = "PegaseUIData_v2/Group/Filter/TransactionPredicateParser.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "375"
-            endingLineNumber = "375"
-            landmarkName = "TransactionPredicateParser"
-            landmarkType = "14">
+            startingLineNumber = "374"
+            endingLineNumber = "374"
+            landmarkName = "parseDate(_:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -339,9 +339,9 @@
             filePath = "PegaseUIData_v2/Group/Filter/TransactionFilterView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "318"
-            endingLineNumber = "318"
-            landmarkName = "loadAllTransactions()"
+            startingLineNumber = "396"
+            endingLineNumber = "396"
+            landmarkName = "applyPredicate(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -381,7 +381,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "7047600F-F84A-4EDA-B0BC-61919AFC2E04"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PegaseUIData_v2/Group/Filter/TransactionFilterView.swift"
@@ -407,6 +407,22 @@
             endingLineNumber = "10"
             landmarkName = "unknown"
             landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "58744D88-F3AE-4941-85AE-9C922167136F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "PegaseUIData_v2/Group/Filter/TransactionPredicateParser.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "362"
+            endingLineNumber = "362"
+            landmarkName = "parseDate(_:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

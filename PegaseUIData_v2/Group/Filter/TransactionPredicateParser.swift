@@ -27,8 +27,29 @@ struct TransactionPredicateParser {
 
         print("      [Parser] Format original: \(nsPredicate.predicateFormat)")
 
+        // Extraire les arguments si présents (pour gérer %@)
+        var arguments: [Any] = []
+        if let compoundPredicate = nsPredicate as? NSCompoundPredicate {
+            // Pour les prédicats composés, parser récursivement
+            for subPredicate in compoundPredicate.subpredicates {
+                if let comparison = subPredicate as? NSComparisonPredicate {
+                    extractArguments(from: comparison, into: &arguments)
+                }
+            }
+        } else if let comparison = nsPredicate as? NSComparisonPredicate {
+            extractArguments(from: comparison, into: &arguments)
+        }
+
         // Normaliser le format
-        let format = normalizePredicateFormat(nsPredicate.predicateFormat)
+        var format = normalizePredicateFormat(nsPredicate.predicateFormat)
+
+        // Remplacer les %@ par les valeurs réelles
+        for arg in arguments {
+            if let stringValue = arg as? String {
+                format = format.replacingOccurrences(of: "%@", with: "\"\(stringValue)\"", options: [], range: format.range(of: "%@"))
+            }
+        }
+
         print("      [Parser] Format normalisé: \(format)")
 
         // Enlever les parenthèses externes si présentes
@@ -52,6 +73,15 @@ struct TransactionPredicateParser {
         let result = combineTokens(tokens)
         print("      [Parser] Résultat: \(result != nil ? "✅ Succès" : "❌ Échec")")
         return result
+    }
+
+    /// Extrait les arguments d'un NSComparisonPredicate
+    private static func extractArguments(from comparison: NSComparisonPredicate, into arguments: inout [Any]) {
+        // Extraire la valeur de droite si c'est une constante
+        if comparison.rightExpression.expressionType == .constantValue,
+           let value = comparison.rightExpression.constantValue {
+            arguments.append(value)
+        }
     }
 
     // MARK: - Normalization
@@ -199,13 +229,19 @@ struct TransactionPredicateParser {
 
     /// Parse une expression binaire (key op value)
     private static func predicateForBinary(_ expr: String) -> Predicate<EntityTransaction>? {
-        
+
         let account = CurrentAccountManager.shared.getAccount()
         guard let account else { return nil }
         lhsAccount = account.uuid
 
         let s = trimOuterParens(expr)
         print("         [Binary] Expression: \(s)")
+
+        // Détecter les SUBQUERY
+        if s.uppercased().hasPrefix("SUBQUERY(") {
+            print("         [Binary] → Détection SUBQUERY")
+            return predicateForSubquery(s)
+        }
 
         // Trouver l'opérateur
         let ops = [">=", "<=", "==", "!=", ">", "<"]
@@ -504,6 +540,320 @@ struct TransactionPredicateParser {
         case "!=": return #Predicate<EntityTransaction> { entity in entity.account.uuid != accountUUID }
         default: return nil
         }
+    }
+
+    // MARK: - SUBQUERY Support
+
+    /// Parse et convertit un SUBQUERY en Predicate
+    /// Format: SUBQUERY(collection, $var, condition).@count > 0
+    private static func predicateForSubquery(_ expr: String) -> Predicate<EntityTransaction>? {
+        print("         [SUBQUERY] Parsing: \(expr)")
+
+        // Parser le SUBQUERY
+        guard let subqueryComponents = parseSubquery(expr) else {
+            print("         [SUBQUERY] ❌ Impossible de parser le SUBQUERY")
+            return nil
+        }
+
+        print("         [SUBQUERY] Collection: \(subqueryComponents.collection)")
+        print("         [SUBQUERY] Variable: \(subqueryComponents.variable)")
+        print("         [SUBQUERY] Condition: \(subqueryComponents.condition)")
+        print("         [SUBQUERY] Comparator: \(subqueryComponents.comparator)")
+
+        // Construire le prédicat selon la collection et la condition
+        return buildSubqueryPredicate(
+            collection: subqueryComponents.collection,
+            variable: subqueryComponents.variable,
+            condition: subqueryComponents.condition,
+            comparator: subqueryComponents.comparator
+        )
+    }
+
+    /// Structure pour stocker les composants d'un SUBQUERY
+    private struct SubqueryComponents {
+        let collection: String
+        let variable: String
+        let condition: String
+        let comparator: String // ex: "> 0", "== 0", etc.
+    }
+
+    /// Parse les composants d'un SUBQUERY
+    /// Format: SUBQUERY(sousOperations, $sousOperation, $sousOperation.category.rubric.name == %@).@count > 0
+    private static func parseSubquery(_ expr: String) -> SubqueryComponents? {
+        // Extraire le contenu entre SUBQUERY(...) et .@count
+        guard let subqueryStart = expr.range(of: "SUBQUERY(", options: .caseInsensitive),
+              let countStart = expr.range(of: ").@count", options: .caseInsensitive) else {
+            return nil
+        }
+
+        let subqueryContent = String(expr[subqueryStart.upperBound..<countStart.lowerBound])
+        let comparatorPart = String(expr[countStart.upperBound...]).trimmingCharacters(in: .whitespaces)
+
+        // Parser le contenu du SUBQUERY: collection, variable, condition
+        let parts = splitSubqueryContent(subqueryContent)
+        guard parts.count == 3 else { return nil }
+
+        return SubqueryComponents(
+            collection: parts[0].trimmingCharacters(in: .whitespaces),
+            variable: parts[1].trimmingCharacters(in: .whitespaces),
+            condition: parts[2].trimmingCharacters(in: .whitespaces),
+            comparator: comparatorPart
+        )
+    }
+
+    /// Sépare le contenu du SUBQUERY en tenant compte des parenthèses et virgules
+    private static func splitSubqueryContent(_ content: String) -> [String] {
+        var parts: [String] = []
+        var current = ""
+        var level = 0
+
+        for char in content {
+            if char == "(" {
+                level += 1
+                current.append(char)
+            } else if char == ")" {
+                level -= 1
+                current.append(char)
+            } else if char == "," && level == 0 {
+                parts.append(current)
+                current = ""
+            } else {
+                current.append(char)
+            }
+        }
+
+        if !current.isEmpty {
+            parts.append(current)
+        }
+
+        return parts
+    }
+
+    /// Construit un Predicate à partir des composants du SUBQUERY
+    private static func buildSubqueryPredicate(
+        collection: String,
+        variable: String,
+        condition: String,
+        comparator: String
+    ) -> Predicate<EntityTransaction>? {
+
+        // Extraire la valeur de comparaison depuis la condition
+        // Format typique: $sousOperation.category.rubric.name == "NomRubrique"
+        guard let value = extractValueFromCondition(condition) else {
+            print("         [SUBQUERY] ❌ Impossible d'extraire la valeur de la condition")
+            return nil
+        }
+
+        print("         [SUBQUERY] Valeur extraite: '\(value)'")
+
+        // Construire le prédicat selon la collection
+        switch collection {
+        case "sousOperations":
+            return buildSousOperationsSubquery(condition: condition, value: value, comparator: comparator)
+        default:
+            print("         [SUBQUERY] ❌ Collection non supportée: \(collection)")
+            return nil
+        }
+    }
+
+    /// Extrait la valeur depuis une condition (après ==, !=, IS, IS NOT, etc.)
+    private static func extractValueFromCondition(_ condition: String) -> String? {
+        let conditionUpper = condition.uppercased()
+
+        // Essayer d'abord les opérateurs en plusieurs mots (IS NOT avant IS)
+        let wordOps = [" IS NOT ", " IS "]
+        for op in wordOps {
+            if let range = conditionUpper.range(of: op) {
+                var value = String(condition[range.upperBound...]).trimmingCharacters(in: .whitespaces)
+
+                // Enlever les quotes
+                if (value.hasPrefix("\"") && value.hasSuffix("\"")) ||
+                   (value.hasPrefix("'") && value.hasSuffix("'")) {
+                    value = String(value.dropFirst().dropLast())
+                }
+
+                return value
+            }
+        }
+
+        // Puis les opérateurs standards
+        let ops = ["==", "!=", ">=", "<=", ">", "<"]
+        for op in ops {
+            if let range = condition.range(of: " \(op) ") {
+                var value = String(condition[range.upperBound...]).trimmingCharacters(in: .whitespaces)
+
+                // Enlever les quotes
+                if (value.hasPrefix("\"") && value.hasSuffix("\"")) ||
+                   (value.hasPrefix("'") && value.hasSuffix("'")) {
+                    value = String(value.dropFirst().dropLast())
+                }
+
+                return value
+            }
+        }
+
+        return nil
+    }
+
+    /// Construit un prédicat pour filtrer sur sousOperations
+    private static func buildSousOperationsSubquery(
+        condition: String,
+        value: String,
+        comparator: String
+    ) -> Predicate<EntityTransaction>? {
+
+        // Détecter le type de condition et l'opérateur
+        let conditionUpper = condition.uppercased()
+        let isNegated = conditionUpper.contains(" IS NOT ") || conditionUpper.contains(" != ")
+
+        // Détecter le type d'opérateur de chaîne
+        let stringOperator: String
+        if conditionUpper.contains(" BEGINSWITH ") {
+            stringOperator = "beginsWith"
+        } else if conditionUpper.contains(" ENDSWITH ") {
+            stringOperator = "endsWith"
+        } else if conditionUpper.contains(" CONTAINS ") {
+            stringOperator = "contains"
+        } else {
+            stringOperator = "equals"
+        }
+
+        if condition.contains(".category.rubric.name") {
+            // Filtre sur la rubrique
+            print("         [SUBQUERY] → Filtre sur rubrique: '\(value)' (negated: \(isNegated), operator: \(stringOperator))")
+            return buildRubricPredicate(rubricName: value, comparator: comparator)
+        } else if condition.contains(".category.name") {
+            // Filtre sur la catégorie
+            print("         [SUBQUERY] → Filtre sur catégorie: '\(value)' (negated: \(isNegated), operator: \(stringOperator))")
+            return buildCategoryPredicate(categoryName: value, comparator: comparator)
+        } else if condition.contains(".libelle") {
+            // Filtre sur le libellé - passer l'info de négation et l'opérateur
+            print("         [SUBQUERY] → Filtre sur libellé: '\(value)' (negated: \(isNegated), operator: \(stringOperator))")
+            return buildLibellePredicate(libelle: value, comparator: comparator, isNegated: isNegated, stringOperator: stringOperator)
+        } else if condition.contains(".amount") {
+            // Filtre sur le montant
+            guard let amount = Double(value) else { return nil }
+            print("         [SUBQUERY] → Filtre sur montant: \(amount) (negated: \(isNegated))")
+            return buildAmountPredicate(amount: amount, comparator: comparator)
+        }
+
+        return nil
+    }
+
+    /// Construit un prédicat pour filtrer sur la rubrique
+    private static func buildRubricPredicate(rubricName: String, comparator: String) -> Predicate<EntityTransaction>? {
+        // Capturer lhsAccount dans une variable locale pour éviter les problèmes de capture
+        let accountUUID = lhsAccount
+
+        // .@count > 0 signifie "contient au moins un élément qui satisfait la condition"
+        if comparator.starts(with: ">") || comparator.starts(with: "!= 0") {
+            // IMPORTANT: Éviter le chaînage optionnel car SwiftData/CoreData ne supporte pas TERNARY en SQL
+            // On doit filtrer les entités en mémoire après le fetch
+            print("         [SUBQUERY] ⚠️ Filtre sur rubrique nécessite un post-filtrage en mémoire")
+            return nil  // Pas supporté directement par SwiftData
+        } else if comparator.starts(with: "== 0") {
+            print("         [SUBQUERY] ⚠️ Filtre sur rubrique nécessite un post-filtrage en mémoire")
+            return nil  // Pas supporté directement par SwiftData
+        }
+
+        return nil
+    }
+
+    /// Construit un prédicat pour filtrer sur la catégorie
+    private static func buildCategoryPredicate(categoryName: String, comparator: String) -> Predicate<EntityTransaction>? {
+        let accountUUID = lhsAccount
+
+        if comparator.starts(with: ">") || comparator.starts(with: "!= 0") {
+            return #Predicate<EntityTransaction> { transaction in
+                transaction.account.uuid == accountUUID &&
+                transaction.sousOperations.contains(where: { sousOperation in
+                    sousOperation.category?.name == categoryName
+                })
+            }
+        } else if comparator.starts(with: "== 0") {
+            return #Predicate<EntityTransaction> { transaction in
+                transaction.account.uuid == accountUUID &&
+                !transaction.sousOperations.contains(where: { sousOperation in
+                    sousOperation.category?.name == categoryName
+                })
+            }
+        }
+
+        return nil
+    }
+
+    /// Construit un prédicat pour filtrer sur le libellé
+    private static func buildLibellePredicate(libelle: String, comparator: String, isNegated: Bool = false, stringOperator: String = "contains") -> Predicate<EntityTransaction>? {
+        let accountUUID = lhsAccount
+
+        // IMPORTANT: hasPrefix et hasSuffix ne sont pas supportés par SwiftData #Predicate
+        // On retourne nil pour forcer le filtrage en mémoire via NSPredicateManualEvaluator
+        if stringOperator == "beginsWith" || stringOperator == "endsWith" {
+            print("         [SUBQUERY] ⚠️ Opérateur \(stringOperator) non supporté par SwiftData, post-filtrage en mémoire requis")
+            return nil
+        }
+
+        if comparator.starts(with: ">") || comparator.starts(with: "!= 0") {
+            // Si IS NOT, on cherche les transactions dont AUCUNE sous-opération ne correspond
+            if isNegated {
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    !transaction.sousOperations.contains(where: { sousOperation in
+                        sousOperation.libelle == libelle
+                    })
+                }
+            } else {
+                // Comportement selon l'opérateur de chaîne
+                switch stringOperator {
+                case "contains":
+                    return #Predicate<EntityTransaction> { transaction in
+                        transaction.account.uuid == accountUUID &&
+                        transaction.sousOperations.contains(where: { sousOperation in
+                            sousOperation.libelle?.contains(libelle) ?? false
+                        })
+                    }
+                default: // "equals"
+                    return #Predicate<EntityTransaction> { transaction in
+                        transaction.account.uuid == accountUUID &&
+                        transaction.sousOperations.contains(where: { sousOperation in
+                            sousOperation.libelle == libelle
+                        })
+                    }
+                }
+            }
+        } else if comparator.starts(with: "== 0") {
+            return #Predicate<EntityTransaction> { transaction in
+                transaction.account.uuid == accountUUID &&
+                !transaction.sousOperations.contains(where: { sousOperation in
+                    sousOperation.libelle?.contains(libelle) ?? false
+                })
+            }
+        }
+
+        return nil
+    }
+
+    /// Construit un prédicat pour filtrer sur le montant des sous-opérations
+    private static func buildAmountPredicate(amount: Double, comparator: String) -> Predicate<EntityTransaction>? {
+        let accountUUID = lhsAccount
+
+        if comparator.starts(with: ">") || comparator.starts(with: "!= 0") {
+            return #Predicate<EntityTransaction> { transaction in
+                transaction.account.uuid == accountUUID &&
+                transaction.sousOperations.contains(where: { sousOperation in
+                    sousOperation.amount == amount
+                })
+            }
+        } else if comparator.starts(with: "== 0") {
+            return #Predicate<EntityTransaction> { transaction in
+                transaction.account.uuid == accountUUID &&
+                !transaction.sousOperations.contains(where: { sousOperation in
+                    sousOperation.amount == amount
+                })
+            }
+        }
+
+        return nil
     }
 }
 

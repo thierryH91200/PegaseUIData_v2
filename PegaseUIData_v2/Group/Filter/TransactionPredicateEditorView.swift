@@ -186,20 +186,21 @@ struct TransactionNSPredicateEditorWrapper: NSViewRepresentable {
         
         let templateCompoundTypes = NSPredicateEditorRowTemplate( compoundTypes: [.and, .or, .not] )
 
-        let template1 = RowTemplateRelationshipDate(leftExpressions: [NSExpression(forKeyPath: "Date Operation")], leftEntity: "dateOperation")
-        let template2 = RowTemplateRelationshipDate(leftExpressions: [NSExpression(forKeyPath: "Date Pointage")], leftEntity: "datePointage")
+        let template1 = RowTemplateRelationshipDate(leftExpressions: [NSExpression(forKeyPath: String(localized: "Date Operation"))], leftEntity: "dateOperation")
+        let template2 = RowTemplateRelationshipDate(leftExpressions: [NSExpression(forKeyPath: String(localized: "Date Pointage"))], leftEntity: "datePointage")
         
-        let template3 = RowTemplateRelationshipStatus(leftExpressions: [NSExpression(forKeyPath: "Status")], leftEntity: "statut")
-        let template4 = RowTemplateRelationshipMode(leftExpressions: [NSExpression(forKeyPath: "Mode")], leftEntity: "paymentMode")
+        let template3 = RowTemplateRelationshipStatus(leftExpressions: [NSExpression(forKeyPath: String(localized: "Status"))], leftEntity: "statut")
+        let template4 = RowTemplateRelationshipMode(leftExpressions: [NSExpression(forKeyPath: String(localized: "Mode"))], leftEntity: "paymentMode")
         
-        let template5 = RowTemplateRelationshipLibelle(leftExpressions: [NSExpression(forKeyPath: "Libelle")])
-        let template6 = RowTemplateRelationshipRubrique(leftExpressions: [NSExpression(forKeyPath: "Rubric")])
-        let template7 = RowTemplateRelationshipCategory(leftExpressions: [NSExpression(forKeyPath: "Category")])
-        let template8 = RowTemplateRelationshipMontant(leftExpressions: [NSExpression(forKeyPath: "Montant")])
+        let template5 = RowTemplateRelationshipLibelle(leftExpressions: [NSExpression(forKeyPath: String(localized: "Libelle"))])
+        let template6 = RowTemplateRelationshipRubrique(leftExpressions: [NSExpression(forKeyPath: String(localized: "Rubric"))])
+        let template7 = RowTemplateRelationshipCategory(leftExpressions: [NSExpression(forKeyPath: String(localized: "Category"))])
+        let template8 = RowTemplateRelationshipMontant(leftExpressions: [NSExpression(forKeyPath: String(localized: "Amount"))])
+        let template9 = RowTemplateRelationshipBankStatement(leftExpressions: [NSExpression(forKeyPath: String(localized: "Bank Statement"))])
 
 //        predicateEditor.rowTemplates.removeAll()
-        let rowTemplates = [ templateCompoundTypes, template1, template2, template3, template4, template5, template6, template7, template8]
-        
+        let rowTemplates = [ templateCompoundTypes, template1, template2, template3, template4, template5, template6, template7, template8, template9]
+
         return rowTemplates
     }
 }
