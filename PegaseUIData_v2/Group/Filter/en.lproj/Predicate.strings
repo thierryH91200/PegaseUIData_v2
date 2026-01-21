@@ -1,56 +1,89 @@
 
 /*
  Predicate.strings
- THPredicateEditorSwift
- 
+ PegaseUIData_v2
+
  Created by thierryH24 on 21/04/2018.
  Copyright © 2018 thierryH24. All rights reserved.
  */
 
-// MARK: - Document
+// MARK: - Types Composés (Et/Ou/Non)
 
-"%[Any]@ of the following are true" = "%[Any]@ of the following are true";
-"%[All]@ of the following are true" = "%[All]@ of the following are true";
-"%[None]@ of the following are true" = "%[None]@ of the following are true";
+"%[Any]@ of the following are true" = "%[Une]@ des conditions suivantes est vraie";
+"%[All]@ of the following are true" = "%[Toutes]@ les conditions sont vraies";
+"%[None]@ of the following are true" = "%[Aucune]@ des conditions suivantes n'est vraie";
 
-"dateOperation" = "date operation";
-"%[dateOperation]@ %[is]@ %@" = "%1$[dateOfBirth]@ %2$[is]@ %3$@";
-"%[dateOperation]@ %[is less than]@ %@" = "%1$[dateOfBirth]@ %2$[is less than]@ %3$@";
-"%[dateOperation]@ %[is less than or equal to]@ %@" = "%1$[dateOfBirth]@ %2$[is less than or equal to]@ %3$@";
-"%[dateOperation]@ %[is greater than]@ %@" = "%1$[dateOfBirth]@ %2$[is greater than]@ %3$@";
-"%[dateOperation]@ %[is greater than or equal to]@ %@" = "%1$[dateOfBirth]@ %2$[is greater than or equal to]@ %3$@";
+// MARK: - Date Operation
 
-"datePointage" = "date pointage";
-"%[datePointage]@ %[is]@ %@" = "%1$[datePointage]@ %2$[is]@ %3$@";
-"%[datePointage]@ %[is less than]@ %@" = "%1$[datePointage]@ %2$[is less than]@ %3$@";
-"%[datePointage]@ %[is less than or equal to]@ %@" = "%1$[datePointage]@ %2$[is less than or equal to]@ %3$@";
-"%[datePointage]@ %[is greater than]@ %@" = "%1$[datePointage]@ %2$[is greater than]@ %3$@";
-"%[datePointage]@ %[is greater than or equal to]@ %@" = "%1$[datePointage]@ %2$[is greater than or equal to]@ %3$@";
+"Date Operation" = "Date de l'opération";
+"%[Date Operation]@ %[is]@ %@" = "%1$[Date Operation]@ %2$[est]@ %3$@";
+"%[Date Operation]@ %[is not]@ %@" = "%1$[Date Operation]@ %2$[n'est pas]@ %3$@";
+"%[Date Operation]@ %[is less than]@ %@" = "%1$[Date Operation]@ %2$[est antérieure à]@ %3$@";
+"%[Date Operation]@ %[is greater than]@ %@" = "%1$[Date Operation]@ %2$[est postérieure à]@ %3$@";
 
-"Status" = "Status";
-"%[Status]@ %[is]@ %[Mexico]@" = "%1$[Status]@ %2$[is]@ %3$[Mexico]@";
-"%[Status]@ %[is]@ %[Canada]@" = "%1$[Status]@ %2$[is]@ %3$[Canada]@";
-"%[Status]@ %[is]@ %[Brazil]@" = "%1$[Status]@ %2$[is]@ %3$[Brazil]@";
-"%[Status]@ %[is not]@ %[Mexico]@" = "%1$[Status]@ %2$[is not]@ %3$[Mexico]@";
-"%[Status]@ %[is not]@ %[Canada]@" = "%1$[Status]@ %2$[is not]@ %3$[Canada]@";
-"%[Status]@ %[is not]@ %[Brazil]@" = "%1$[Status]@ %2$[is not]@ %3$[Brazil]@";
+// MARK: - Date Pointage
 
+"Date Pointage" = "Date de pointage";
+"%[Date Pointage]@ %[is]@ %@" = "%1$[Date Pointage]@ %2$[est]@ %3$@";
+"%[Date Pointage]@ %[is not]@ %@" = "%1$[Date Pointage]@ %2$[n'est pas]@ %3$@";
+"%[Date Pointage]@ %[is less than]@ %@" = "%1$[Date Pointage]@ %2$[est antérieure à]@ %3$@";
+"%[Date Pointage]@ %[is greater than]@ %@" = "%1$[Date Pointage]@ %2$[est postérieure à]@ %3$@";
 
-"Mode" = "Mode";
-"%[Mode]@ %[is]@ %[Mexico]@" = "%1$[Mode]@ %2$[is]@ %3$[Mexico]@";
-"%[Mode]@ %[is not]@ %[Mexico]@" = "%1$[Mode]@ %2$[is not]@ %3$[Mexico]@";
+// MARK: - Statut
 
-"%[Mode]@ %[is]@ %[Canada]@" = "%1$[Mode]@ %2$[is]@ %3$[Canada]@";
-"%[Mode]@ %[is not]@ %[Canada]@" = "%1$[Mode]@ %2$[is not]@ %3$[Canada]@";
+"Status" = "Statut";
+"%[Status]@ %[is]@ %@" = "%1$[Status]@ %2$[est]@ %3$@";
+"%[Status]@ %[is not]@ %@" = "%1$[Status]@ %2$[n'est pas]@ %3$@";
 
-"%[Mode]@ %[is]@ %[Brazil]@" = "%1$[Mode]@ %2$[is]@ %3$[Brazil]@";
-"%[Mode]@ %[is not]@ %[Brazil]@" = "%1$[Mode]@ %2$[is not]@ %3$[Brazil]@";
+// MARK: - Mode
+"Mode" = "Mode de paiement";
+"%[Mode]@ %[is]@ %@" = "%1$[Mode]@ %2$[est]@ %3$@";
+"%[Mode]@ %[is not]@ %@" = "%1$[Mode]@ %2$[n'est pas]@ %3$@";
 
-"amount" = "amount";
-"%[amount]@ %[is]@ %@" = "%1$[amount]@ %2$[is]@ %3$@";
-"%[amount]@ %[is not]@ %@" = "%1$[amount]@ %2$[is not]@ %3$@";
-"%[amount]@ %[is less than]@ %@" = "%1$[amount]@ %2$[is less than]@ %3$@";
-"%[amount]@ %[is less than or equal to]@ %@" = "%1$[amount]@ %2$[is less than or equal to]@ %3$@";
-"%[amount]@ %[is greater than]@ %@" = "%1$[amount]@ %2$[eis greater thane]@ %3$@";
-"%[amount]@ %[is greater than or equal to]@ %@" = "%1$[amount]@ %2$[is greater than or equal to]@ %3$@";
+// MARK: - Libellé
+
+"Libelle" = "Libellé";
+"%[Libelle]@ %[is]@ %@" = "%1$[Libelle]@ %2$[est]@ %3$@";
+"%[Libelle]@ %[is not]@ %@" = "%1$[Libelle]@ %2$[n'est pas]@ %3$@";
+"%[Libelle]@ %[begins with]@ %@" = "%1$[Libelle]@ %2$[commence par]@ %3$@";
+"%[Libelle]@ %[ends with]@ %@" = "%1$[Libelle]@ %2$[se termine par]@ %3$@";
+"%[Libelle]@ %[contains]@ %@" = "%1$[Libelle]@ %2$[contient]@ %3$@";
+"%[Libelle]@ %[matches]@ %@" = "%1$[Libelle]@ %2$[correspond à]@ %3$@";
+"%[Libelle]@ %[like]@ %@" = "%1$[Libelle]@ %2$[ressemble à]@ %3$@";
+
+// MARK: - Rubrique
+"Rubric" = "Rubrique";
+"%[Rubric]@ %[is]@ %@" = "%1$[Rubric]@ %2$[est]@ %3$@";
+"%[Rubric]@ %[is not]@ %@" = "%1$[Rubric]@ %2$[n'est pas]@ %3$@";
+
+// MARK: - Catégorie
+
+"Category" = "Catégorie";
+"%[Category]@ %[is]@ %@" = "%1$[Category]@ %2$[est]@ %3$@";
+"%[Category]@ %[is not]@ %@" = "%1$[Category]@ %2$[n'est pas]@ %3$@";
+"%[Category]@ %[begins with]@ %@" = "%1$[Category]@ %2$[commence par]@ %3$@";
+"%[Category]@ %[ends with]@ %@" = "%1$[Category]@ %2$[se termine par]@ %3$@";
+"%[Category]@ %[contains]@ %@" = "%1$[Category]@ %2$[contient]@ %3$@";
+"%[Category]@ %[matches]@ %@" = "%1$[Category]@ %2$[correspond à]@ %3$@";
+"%[Category]@ %[like]@ %@" = "%1$[Category]@ %2$[ressemble à]@ %3$@";
+
+// MARK: - Montant
+
+"Amount" = "Montant";
+"%[Amount]@ %[is]@ %@" = "%1$[Montant]@ %2$[est égal à]@ %3$@";
+"%[Amount]@ %[is not]@ %@" = "%1$[Montant]@ %2$[n'est pas égal à]@ %3$@";
+"%[Amount]@ %[is less than]@ %@" = "%1$[Montant]@ %2$[est inférieur à]@ %3$@";
+"%[Amount]@ %[is less than or equal to]@ %@" = "%1$[Montant]@ %2$[est inférieur ou égal à]@ %3$@";
+"%[Amount]@ %[is greater than]@ %@" = "%1$[Montant]@ %2$[est supérieur à]@ %3$@";
+"%[Amount]@ %[is greater than or equal to]@ %@" = "%1$[Montant]@ %2$[est supérieur ou égal à]@ %3$@";
+
+// MARK: - Relevé bancaire
+
+"Bank Statement" = "Relevé bancaire";
+"%[Bank Statement]@ %[is]@ %@" = "%1$[Relevé bancaire]@ %2$[est égal à]@ %3$@";
+"%[Bank Statement]@ %[is not]@ %@" = "%1$[Relevé bancaire]@ %2$[n'est pas égal à]@ %3$@";
+"%[Bank Statement]@ %[is less than]@ %@" = "%1$[Relevé bancaire]@ %2$[est inférieur à]@ %3$@";
+"%[Bank Statement]@ %[is less than or equal to]@ %@" = "%1$[Relevé bancaire]@ %2$[est inférieur ou égal à]@ %3$@";
+"%[Bank Statement]@ %[is greater than]@ %@" = "%1$[Relevé bancaire]@ %2$[est supérieur à]@ %3$@";
+"%[Bank Statement]@ %[is greater than or equal to]@ %@" = "%1$[BRelevé bancaire]@ %2$[est supérieur ou égal à]@ %3$@";
 

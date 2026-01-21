@@ -731,10 +731,21 @@ struct TransactionPredicateParser {
             print("         [SUBQUERY] → Filtre sur libellé: '\(value)' (negated: \(isNegated), operator: \(stringOperator))")
             return buildLibellePredicate(libelle: value, comparator: comparator, isNegated: isNegated, stringOperator: stringOperator)
         } else if condition.contains(".amount") {
-            // Filtre sur le montant
+            // Filtre sur le montant - extraire l'opérateur de la condition
             guard let amount = Double(value) else { return nil }
-            print("         [SUBQUERY] → Filtre sur montant: \(amount) (negated: \(isNegated))")
-            return buildAmountPredicate(amount: amount, comparator: comparator)
+
+            // Détecter l'opérateur dans la condition
+            let ops = ["==", "!=", ">=", "<=", ">", "<"]
+            var amountOperator = "=="
+            for op in ops {
+                if condition.contains(" \(op) ") {
+                    amountOperator = op
+                    break
+                }
+            }
+
+            print("         [SUBQUERY] → Filtre sur montant: \(amount) (operator: \(amountOperator))")
+            return buildAmountPredicate(amount: amount, operator: amountOperator, comparator: comparator)
         }
 
         return nil
@@ -834,22 +845,80 @@ struct TransactionPredicateParser {
     }
 
     /// Construit un prédicat pour filtrer sur le montant des sous-opérations
-    private static func buildAmountPredicate(amount: Double, comparator: String) -> Predicate<EntityTransaction>? {
+    private static func buildAmountPredicate(amount: Double, operator op: String, comparator: String) -> Predicate<EntityTransaction>? {
         let accountUUID = lhsAccount
 
         if comparator.starts(with: ">") || comparator.starts(with: "!= 0") {
-            return #Predicate<EntityTransaction> { transaction in
-                transaction.account.uuid == accountUUID &&
-                transaction.sousOperations.contains(where: { sousOperation in
-                    sousOperation.amount == amount
-                })
+            // .@count > 0 signifie "au moins une sousOperation satisfait la condition"
+            switch op {
+            case "==":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    transaction.sousOperations.contains(where: { $0.amount == amount })
+                }
+            case "!=":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    transaction.sousOperations.contains(where: { $0.amount != amount })
+                }
+            case ">":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    transaction.sousOperations.contains(where: { $0.amount > amount })
+                }
+            case "<":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    transaction.sousOperations.contains(where: { $0.amount < amount })
+                }
+            case ">=":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    transaction.sousOperations.contains(where: { $0.amount >= amount })
+                }
+            case "<=":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    transaction.sousOperations.contains(where: { $0.amount <= amount })
+                }
+            default:
+                return nil
             }
         } else if comparator.starts(with: "== 0") {
-            return #Predicate<EntityTransaction> { transaction in
-                transaction.account.uuid == accountUUID &&
-                !transaction.sousOperations.contains(where: { sousOperation in
-                    sousOperation.amount == amount
-                })
+            // .@count == 0 signifie "aucune sousOperation ne satisfait la condition"
+            switch op {
+            case "==":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    !transaction.sousOperations.contains(where: { $0.amount == amount })
+                }
+            case "!=":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    !transaction.sousOperations.contains(where: { $0.amount != amount })
+                }
+            case ">":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    !transaction.sousOperations.contains(where: { $0.amount > amount })
+                }
+            case "<":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    !transaction.sousOperations.contains(where: { $0.amount < amount })
+                }
+            case ">=":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    !transaction.sousOperations.contains(where: { $0.amount >= amount })
+                }
+            case "<=":
+                return #Predicate<EntityTransaction> { transaction in
+                    transaction.account.uuid == accountUUID &&
+                    !transaction.sousOperations.contains(where: { $0.amount <= amount })
+                }
+            default:
+                return nil
             }
         }
 

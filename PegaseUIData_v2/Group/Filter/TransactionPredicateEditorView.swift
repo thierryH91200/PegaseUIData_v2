@@ -107,6 +107,10 @@ struct TransactionNSPredicateEditorWrapper: NSViewRepresentable {
         let predicateEditor = NSPredicateEditor()
         predicateEditor.translatesAutoresizingMaskIntoConstraints = true
         predicateEditor.autoresizingMask = [.width]
+        
+        // Charger les traductions depuis Predicate.strings
+        loadPredicateLocalizations(for: predicateEditor)
+
 
         // Configuration des templates de prédicat pour EntityTransaction
         let templates =  defaultPredicateTemplates()
@@ -183,25 +187,62 @@ struct TransactionNSPredicateEditorWrapper: NSViewRepresentable {
     // MARK: - Predicate Templates for EntityTransaction
 
     func defaultPredicateTemplates() -> [NSPredicateEditorRowTemplate] {
-        
+
         let templateCompoundTypes = NSPredicateEditorRowTemplate( compoundTypes: [.and, .or, .not] )
 
-        let template1 = RowTemplateRelationshipDate(leftExpressions: [NSExpression(forKeyPath: String(localized: "Date Operation"))], leftEntity: "dateOperation")
-        let template2 = RowTemplateRelationshipDate(leftExpressions: [NSExpression(forKeyPath: String(localized: "Date Pointage"))], leftEntity: "datePointage")
-        
-        let template3 = RowTemplateRelationshipStatus(leftExpressions: [NSExpression(forKeyPath: String(localized: "Status"))], leftEntity: "statut")
-        let template4 = RowTemplateRelationshipMode(leftExpressions: [NSExpression(forKeyPath: String(localized: "Mode"))], leftEntity: "paymentMode")
-        
-        let template5 = RowTemplateRelationshipLibelle(leftExpressions: [NSExpression(forKeyPath: String(localized: "Libelle"))])
-        let template6 = RowTemplateRelationshipRubrique(leftExpressions: [NSExpression(forKeyPath: String(localized: "Rubric"))])
-        let template7 = RowTemplateRelationshipCategory(leftExpressions: [NSExpression(forKeyPath: String(localized: "Category"))])
-        let template8 = RowTemplateRelationshipMontant(leftExpressions: [NSExpression(forKeyPath: String(localized: "Amount"))])
-        let template9 = RowTemplateRelationshipBankStatement(leftExpressions: [NSExpression(forKeyPath: String(localized: "Bank Statement"))])
+        let template1 = RowTemplateRelationshipDate(leftExpressions: [NSExpression(forKeyPath: "Date Operation")], leftEntity: "dateOperation")
+        let template2 = RowTemplateRelationshipDate(leftExpressions: [NSExpression(forKeyPath: "Date Pointage")], leftEntity: "datePointage")
+
+        let template3 = RowTemplateRelationshipStatus(leftExpressions: [NSExpression(forKeyPath: "Status")], leftEntity: "statut")
+        let template4 = RowTemplateRelationshipMode(leftExpressions: [NSExpression(forKeyPath: "Mode")], leftEntity: "paymentMode")
+
+        let template5 = RowTemplateRelationshipLibelle(leftExpressions: [NSExpression(forKeyPath: "Libelle")])
+        let template6 = RowTemplateRelationshipRubrique(leftExpressions: [NSExpression(forKeyPath: "Rubric")])
+        let template7 = RowTemplateRelationshipCategory(leftExpressions: [NSExpression(forKeyPath: "Category")])
+        let template8 = RowTemplateRelationshipMontant(leftExpressions: [NSExpression(forKeyPath: "Amount")])
+        let template9 = RowTemplateRelationshipBankStatement(leftExpressions: [NSExpression(forKeyPath: "Bank Statement")])
 
 //        predicateEditor.rowTemplates.removeAll()
         let rowTemplates = [ templateCompoundTypes, template1, template2, template3, template4, template5, template6, template7, template8, template9]
 
         return rowTemplates
     }
+    
+    // MARK: - Localization Support
+
+    /// Charge les traductions depuis le fichier Predicate.strings
+    private func loadPredicateLocalizations(for predicateEditor: NSPredicateEditor) {
+        // Essayer de charger le fichier Predicate.strings depuis le bundle
+        guard let stringsFile = Bundle.main.path(forResource: "Predicate", ofType: "strings") else {
+            print("⚠️ Fichier Predicate.strings introuvable dans le bundle")
+            return
+        }
+
+        do {
+            // Lire le contenu du fichier avec l'encodage UTF-16
+            let strings = try String(contentsOfFile: stringsFile, encoding: .utf16)
+
+            // Convertir en Data pour PropertyListSerialization
+            guard let data = strings.data(using: .utf8) else {
+                print("⚠️ Impossible de convertir Predicate.strings en Data")
+                return
+            }
+
+            // Désérialiser le format .strings en dictionnaire
+            if let formattingDictionary = try PropertyListSerialization.propertyList(
+                from: data,
+                options: [],
+                format: nil
+            ) as? [String: String] {
+                // Appliquer le dictionnaire de formatage au predicateEditor
+                predicateEditor.formattingDictionary = formattingDictionary
+                print("✅ Traductions NSPredicateEditor chargées avec succès")
+            }
+
+        } catch {
+            print("⚠️ Erreur lors du chargement de Predicate.strings : \(error)")
+        }
+    }
+
 }
 

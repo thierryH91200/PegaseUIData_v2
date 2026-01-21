@@ -218,16 +218,21 @@ final class RowTemplateRelationshipMontant: NSPredicateEditorRowTemplate {
     }
     
     override func predicate(withSubpredicates subpredicates: [NSPredicate]?) -> NSPredicate {
-        
+
         let predicate = super.predicate(withSubpredicates: subpredicates) as! NSComparisonPredicate
         let operatorType = predicate.predicateOperatorType
         let operatorName = findOperatorType(operatorType: operatorType)
-        
-        let rightExpression = predicate.rightExpression
-        
-        let predicateFormat  = String(format : "SUBQUERY(sousOperations, $sousOperation, $sousOperation.amount %@ %@).@count > 0", operatorName, rightExpression)
+
+        // Extraire la valeur numérique depuis rightExpression
+        guard let constantValue = predicate.rightExpression.constantValue as? Double else {
+            print("⚠️ Amount: Impossible d'extraire constantValue")
+            return NSPredicate(value: false)
+        }
+
+        let predicateFormat  = String(format : "SUBQUERY(sousOperations, $sousOperation, $sousOperation.amount %@ %f).@count > 0", operatorName, constantValue)
+        print("✅ Amount predicate format: \(predicateFormat)")
         let newPredicate = NSPredicate(format: predicateFormat)
-        
+
         return newPredicate
     }
 }

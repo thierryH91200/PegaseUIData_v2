@@ -353,9 +353,9 @@ final class TransactionFilterViewModel: ObservableObject {
                 )
                 let allTransactions = try modelContext.fetch(allDescriptor)
 
-                // Filtrer en mémoire avec NSPredicate.evaluate
+                // Filtrer en mémoire avec NSPredicateManualEvaluator
                 filteredTransactions = allTransactions.filter { transaction in
-                    finalPredicate!.evaluate(with: transaction)
+                    NSPredicateManualEvaluator.evaluate(predicate: finalPredicate!, transaction: transaction)
                 }
                 print("   ✅ Post-filtrage réussi: \(filteredTransactions.count) résultats sur \(allTransactions.count)")
             } else if let swiftDataPredicate {
