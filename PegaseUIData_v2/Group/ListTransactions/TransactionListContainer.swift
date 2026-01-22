@@ -55,12 +55,12 @@ struct TransactionListContainer: View {
 
             Divider()
             
-            TransactionTableView(
-                filteredTransactions: filteredTransactions,
-                dashboard: $dashboard,
-                isVisible: $dashboard.isVisible,
-                selectedTransactions: $selectedTransactions
-            )
+//            TransactionTableView(
+//                filteredTransactions: filteredTransactions,
+//                dashboard: $dashboard,
+//                isVisible: $dashboard.isVisible,
+//                selectedTransactions: $selectedTransactions
+//            )
 
 
             TransactionTableViewModern(

@@ -26,7 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @objc func openPreferences() {
-        PreferencesWindowController.shared.showWindow()
+        PreferencesWindowController.shared?.showWindow()
     }
     func applicationShouldTerminateAfterLastWindowClosed (_ sender: NSApplication) -> Bool {
         return true

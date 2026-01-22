@@ -13,21 +13,32 @@ import Combine
 
 
 class PreferencesWindowController: NSWindowController, NSWindowDelegate {
-    static let shared = PreferencesWindowController()
-    
-    private init() {
+    static var shared: PreferencesWindowController?
+    private var authManager: AuthenticationManager
+
+    init(authManager: AuthenticationManager) {
+        self.authManager = authManager
         // Créer la fenêtre de préférences avec SwiftUI comme contenu
-        let preferencesView = PreferencesView()
+        let preferencesView = PreferencesView(authManager: authManager)
         let hostingController = NSHostingController(rootView: preferencesView)
-        
+
         let window = NSWindow(contentViewController: hostingController)
         window.title = "Preferences"
         window.setContentSize(NSSize(width: 400, height: 300))
         window.styleMask = [.titled, .closable, .miniaturizable]
         window.isReleasedWhenClosed = false // Garde la fenêtre en mémoire après la fermeture
-        
+
         super.init(window: window)
         window.delegate = self
+
+        // Définir comme singleton
+        PreferencesWindowController.shared = self
+    }
+
+    static func initialize(authManager: AuthenticationManager) {
+        if shared == nil {
+            shared = PreferencesWindowController(authManager: authManager)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -44,8 +55,9 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
     }
 }
 
-
 struct PreferencesView: View {
+    @ObservedObject var authManager: AuthenticationManager
+
     var body: some View {
         TabView {
             GeneralSettingsView()
@@ -57,9 +69,13 @@ struct PreferencesView: View {
                 .tabItem {
                     Label("Eyes", systemImage: "eye")
                 }
+            SecuritySettingsView(authManager: authManager)
+                .tabItem {
+                    Label("Authorization", systemImage: "touchid")
+            }
         }
         .padding()
-        .frame(width: 450, height: 250) // Taille de la fenêtre de préférences
+        .frame(width: 450, height: 350) // Taille de la fenêtre de préférences
     }
 }
 

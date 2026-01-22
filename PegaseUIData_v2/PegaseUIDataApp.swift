@@ -12,10 +12,13 @@ import Combine
 import AppKit
 import UniformTypeIdentifiers
 
+
 // MARK: - App principale
 @main
 struct DatabaseManagerApp: App {
     
+    @StateObject private var authManager = AuthenticationManager()
+
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var containerManager = ContainerManager()
@@ -23,14 +26,42 @@ struct DatabaseManagerApp: App {
 
     init() {
         ColorTransformer.register()
+        // Initialiser PreferencesWindowController avec authManager
+        let authMgr = AuthenticationManager()
+        _authManager = StateObject(wrappedValue: authMgr)
+        PreferencesWindowController.initialize(authManager: authMgr)
     }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(containerManager)
+            if authManager.isUnlocked {
+                ContentView()
+                    .environmentObject(authManager)
+                    .environmentObject(containerManager)
+
+            } else {
+                LockScreenView(authManager: authManager)
+                    .onAppear {
+                        // Demander authentification au lancement
+                        authManager.authenticate()
+                    }
+            }
         }
         .commands {
+            CommandGroup(after: .appSettings) {
+                Button("Verrouiller l'application") {
+                    authManager.lock()
+                }
+                .keyboardShortcut("L", modifiers: [.command, .shift])
+            }
+
+            CommandGroup(after: .appSettings) {
+                Button("Verrouiller l'application") {
+                    authManager.lock()
+                }
+                .keyboardShortcut("L", modifiers: [.command, .shift])
+            }
+
             CommandGroup(replacing: .appInfo) {
                 Button("About \(Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "l’app")") {
                     openWindow(id: "about")
@@ -38,7 +69,7 @@ struct DatabaseManagerApp: App {
             }
             CommandGroup(replacing: .appSettings) {
                 Button("Settings") {
-                    PreferencesWindowController.shared.showWindow()
+                    PreferencesWindowController.shared?.showWindow()
                 }
             }
 

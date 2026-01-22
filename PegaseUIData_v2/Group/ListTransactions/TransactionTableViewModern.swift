@@ -45,7 +45,7 @@ struct TransactionTableViewModern: View {
     @State private var clipboardTransactions: [EntityTransaction] = []
     @State private var isCutOperation = false
 
-    // État pour afficher le popover des détails
+    // État pour afficher le popover des détails (lecture seule)
     @State private var showTransactionDetail = false
     @State private var detailTransactionIndex: Int = 0
 
@@ -77,12 +77,8 @@ struct TransactionTableViewModern: View {
             statusBarSection
         }
         .navigationTitle("Compte : \(compteCurrent?.name ?? "Aucun compte")")
-        .popover(isPresented: $showTransactionDetail, arrowEdge: .top) {
-            TransactionDetailView(
-                currentSectionIndex: detailTransactionIndex,
-                selectedTransaction: $selectedTransactions
-            )
-            .frame(minWidth: 400, minHeight: 300)
+        .sheet(isPresented: $showTransactionDetail) {
+            transactionDetailPopover
         }
         .popover(isPresented: $showBankStatementPopover, arrowEdge: .trailing) {
             bankStatementPopoverContent
@@ -105,6 +101,9 @@ struct TransactionTableViewModern: View {
         .onChange(of: transactions.count) { _, _ in
             updateGroupedData()
             updateDashboard()
+        }
+        .onChange(of: selectedTransactions) { _, newSelection in
+            updateTransactionManager(with: newSelection)
         }
         // Clipboard handlers
         .onReceive(NotificationCenter.default.publisher(for: .copySelectedTransactions)) { _ in
@@ -296,6 +295,19 @@ struct TransactionTableViewModern: View {
         .background(Color(NSColor.controlBackgroundColor))
     }
 
+    private var transactionDetailPopover: some View {
+        Group {
+            if let index = ListTransactionsManager.shared.listTransactions.firstIndex(where: { $0.id == ListTransactionsManager.shared.listTransactions[detailTransactionIndex].id }) {
+                TransactionDetailView(currentSectionIndex: index, selectedTransaction: $selectedTransactions)
+                    .frame(minWidth: 400, minHeight: 300)
+            } else {
+                Text("Erreur : Transaction non trouvée dans la liste.")
+                    .foregroundColor(.red)
+                    .padding()
+            }
+        }
+    }
+
     private var bankStatementPopoverContent: some View {
         VStack(spacing: 12) {
             Text("Créer un relevé")
@@ -482,6 +494,32 @@ struct TransactionTableViewModern: View {
         }
     }
 
+    private func updateTransactionManager(with selection: Set<UUID>) {
+        AppLogger.ui.debug("🔄 updateTransactionManager appelé avec \(selection.count) sélection(s)")
+
+        let selectedTransactionsList = transactions.filter { selection.contains($0.uuid) }
+
+        transactionManager.selectedTransactions = selectedTransactionsList
+        AppLogger.ui.debug("✅ transactionManager.selectedTransactions mis à jour: \(selectedTransactionsList.count) transaction(s)")
+
+        if let firstUUID = selection.first,
+           let firstTransaction = transactions.first(where: { $0.uuid == firstUUID }) {
+            transactionManager.selectedTransaction = firstTransaction
+            transactionManager.isCreationMode = false
+
+            AppLogger.ui.debug("✅ Transaction sélectionnée : \(firstTransaction.sousOperations.first?.libelle ?? "—")")
+            AppLogger.ui.debug("✅ isCreationMode = false")
+        } else {
+            transactionManager.selectedTransaction = nil
+            transactionManager.isCreationMode = true
+            AppLogger.ui.debug("⚠️ Aucune transaction sélectionnée, mode création activé")
+        }
+
+        // Notifier que la sélection a changé
+        NotificationCenter.default.post(name: .transactionsSelectionChanged, object: nil)
+        AppLogger.ui.debug("📢 Notification .transactionsSelectionChanged envoyée")
+    }
+
     private func updateDashboard() {
         guard let initCompte = InitAccountManager.shared.getAllData() else {
             AppLogger.data.warning("Aucune donnée de compte initial trouvée")
@@ -530,7 +568,10 @@ struct TransactionTableViewModern: View {
         }
 
         try? ListTransactionsManager.shared.save()
-        handleDataChange()
+
+        // Mettre à jour sans reconstruire les groupes pour éviter le scroll
+        _ = ListTransactionsManager.shared.getAllData()
+        updateDashboard()
 
         AppLogger.transactions.info("Statut mis à jour vers '\(statusName)' pour \(selected.count) transaction(s)")
     }
@@ -544,7 +585,10 @@ struct TransactionTableViewModern: View {
         }
 
         try? ListTransactionsManager.shared.save()
-        handleDataChange()
+
+        // Mettre à jour sans reconstruire les groupes pour éviter le scroll
+        _ = ListTransactionsManager.shared.getAllData()
+        updateDashboard()
 
         AppLogger.transactions.info("Mode de paiement mis à jour vers '\(modeName)' pour \(selected.count) transaction(s)")
     }
@@ -557,7 +601,10 @@ struct TransactionTableViewModern: View {
         }
 
         try? ListTransactionsManager.shared.save()
-        handleDataChange()
+
+        // Mettre à jour sans reconstruire les groupes pour éviter le scroll
+        _ = ListTransactionsManager.shared.getAllData()
+        updateDashboard()
 
         AppLogger.transactions.info("Relevé bancaire mis à jour vers '\(statement)' pour \(selected.count) transaction(s)")
     }
