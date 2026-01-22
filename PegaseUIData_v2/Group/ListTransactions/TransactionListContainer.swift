@@ -19,6 +19,14 @@ import OSLog
 /// - Demo data loading (DEBUG only)
 /// - Balance calculation based on transaction status
 /// - Real-time updates via NotificationCenter
+///
+//            TransactionTableView(
+//filteredTransactions: filteredTransactions,
+//dashboard: $dashboard,
+//isVisible: $dashboard.isVisible,
+//selectedTransactions: $selectedTransactions
+//)
+
 struct TransactionListContainer: View {
 
     @State private var selectedTransactions: Set<UUID> = []
@@ -46,11 +54,18 @@ struct TransactionListContainer: View {
             #endif
 
             Divider()
-
+            
             TransactionTableView(
                 filteredTransactions: filteredTransactions,
                 dashboard: $dashboard,
                 isVisible: $dashboard.isVisible,
+                selectedTransactions: $selectedTransactions
+            )
+
+
+            TransactionTableViewModern(
+                filteredTransactions: filteredTransactions,
+                dashboard: $dashboard,
                 selectedTransactions: $selectedTransactions
             )
             .padding()

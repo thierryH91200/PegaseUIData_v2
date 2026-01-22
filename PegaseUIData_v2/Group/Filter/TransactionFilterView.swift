@@ -155,9 +155,11 @@ struct Header: View {
                     .font(.caption2)
                     .foregroundColor(.primary)
             }
-
+            .frame(width: 100, alignment: .leading)
             Divider()
-
+                .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
+                .background(Color.gray)    // couleur du trait
+                .opacity(0.8)              // un peu plus visible
             // Details
             VStack(alignment: .leading, spacing: 0) {
                 Text("Status")
@@ -169,6 +171,10 @@ struct Header: View {
                     .foregroundColor(.primary)
             }
             .frame(width: 100, alignment: .leading)
+            Divider()
+                .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
+                .background(Color.gray)    // couleur du trait
+                .opacity(0.8)              // un peu plus visible
 
             VStack(alignment: .leading, spacing: 0) {
                 Text("Payment Mode")
@@ -179,6 +185,10 @@ struct Header: View {
                     .foregroundColor(.primary)
             }
             .frame(width: 100, alignment: .leading)
+            Divider()
+                .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
+                .background(Color.gray)    // couleur du trait
+                .opacity(0.8)              // un peu plus visible
 
             VStack(alignment: .leading, spacing: 0) {
                 Text("Rubric")
@@ -189,6 +199,10 @@ struct Header: View {
                     .foregroundColor(.primary)
             }
             .frame(width: 100, alignment: .leading)
+            Divider()
+                .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
+                .background(Color.gray)    // couleur du trait
+                .opacity(0.8)              // un peu plus visible
 
             VStack(alignment: .leading, spacing: 0) {
                 Text("Libelle")
@@ -199,6 +213,10 @@ struct Header: View {
                     .foregroundColor(.primary)
             }
             .frame(width: 200, alignment: .leading)
+            Divider()
+                .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
+                .background(Color.gray)    // couleur du trait
+                .opacity(0.8)              // un peu plus visible
 
             Spacer()
 
@@ -213,10 +231,8 @@ struct Header: View {
         .background(Color.gray.opacity(0.1))
         .frame(height: 30)
 
-
     }
 }
-
 
 // MARK: - Transaction Row View
 struct TransactionRowView: View {
@@ -231,12 +247,15 @@ struct TransactionRowView: View {
                     .foregroundColor(.secondary)
                 
                 Text(transaction.datePointageString)
-                    .font(.caption2)
-                    .foregroundColor(.orange)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
-            
+            .frame(width: 87, alignment: .leading)
             Divider()
-            
+                .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
+                .background(Color.gray)    // couleur du trait
+                .opacity(0.8)              // un peu plus visible
+
             // Details
             VStack(alignment: .leading, spacing: 4) {
                 VStack {
@@ -252,6 +271,11 @@ struct TransactionRowView: View {
                 }
             }
             .frame(width: 100, alignment: .leading)
+            Divider()
+                .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
+                .background(Color.gray)    // couleur du trait
+                .opacity(0.8)              // un peu plus visible
+
             VStack {
                 Text(transaction.paymentModeString)
                     .font(.caption)
@@ -261,6 +285,11 @@ struct TransactionRowView: View {
                     .foregroundColor(.secondary)
             }
             .frame(width: 100, alignment: .leading)
+            Divider()
+                .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
+                .background(Color.gray)    // couleur du trait
+                .opacity(0.8)              // un peu plus visible
+
             VStack {
                 Text(transaction.sousOperations.first?.category?.rubric?.name ?? "")
                     .font(.caption)
@@ -270,6 +299,11 @@ struct TransactionRowView: View {
                     .foregroundColor(.secondary)
             }
             .frame(width: 100, alignment: .leading)
+            Divider()
+                .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
+                .background(Color.gray)    // couleur du trait
+                .opacity(0.8)              // un peu plus visible
+
             VStack {
                 Text(transaction.sousOperations.first?.libelle ?? "")
                     .font(.caption)
@@ -279,8 +313,12 @@ struct TransactionRowView: View {
                     .foregroundColor(.secondary)
             }
             .frame(width: 200, alignment: .leading)
+            Divider()
+                .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
+                .background(Color.gray)    // couleur du trait
+                .opacity(0.8)              // un peu plus visible
+
             Spacer()
-            
             // Amount
             VStack {
                 Text(transaction.amountString)
