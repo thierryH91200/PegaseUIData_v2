@@ -245,7 +245,6 @@ struct IconPickerGrid: View {
     }
 }
 
-
 struct GroupAccountFormView: View {
     
     @Environment(\.dismiss) private var dismiss
@@ -312,7 +311,7 @@ struct GroupAccountFormView: View {
     
     private func save() {
         if isModeCreate { // Création
-            AccountFolderManager.shared.create(
+            _ = AccountFolderManager.shared.create(
                 name: name,
                 nameImage: nameImage)
         } else { // Modification

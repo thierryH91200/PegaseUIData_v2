@@ -27,7 +27,7 @@ struct TransactionTableViewModern: View {
 
     var filteredTransactions: [EntityTransaction]?
     
-    private var transactions: [EntityTransaction] {
+    var transactions: [EntityTransaction] {
         filteredTransactions ?? ListTransactionsManager.shared.listTransactions
     }
 
@@ -36,14 +36,14 @@ struct TransactionTableViewModern: View {
 
     @State private var sortOrder = [KeyPathComparator(\EntityTransaction.dateOperation, order: .reverse)]
     @State private var searchText = ""
-    @State private var groupedData: [TransactionYearGroup] = []
+    @State var groupedData: [TransactionYearGroup] = []
 
     // État de disclosure pour mémoriser les groupes ouverts/fermés
-    @State private var disclosureStates: [String: Bool] = [:]
+    @State var disclosureStates: [String: Bool] = [:]
 
     // État du presse-papiers
-    @State private var clipboardTransactions: [EntityTransaction] = []
-    @State private var isCutOperation = false
+    @State var clipboardTransactions: [EntityTransaction] = []
+    @State var isCutOperation = false
 
     // État pour afficher le popover des détails (lecture seule)
     @State private var showTransactionDetail = false
@@ -520,7 +520,7 @@ struct TransactionTableViewModern: View {
         AppLogger.ui.debug("📢 Notification .transactionsSelectionChanged envoyée")
     }
 
-    private func updateDashboard() {
+    func updateDashboard() {
         guard let initCompte = InitAccountManager.shared.getAllData() else {
             AppLogger.data.warning("Aucune donnée de compte initial trouvée")
             return
@@ -546,222 +546,11 @@ struct TransactionTableViewModern: View {
         AppLogger.data.debug("Tableau de bord mis à jour - Banque : \(dashboard.executed), Réel : \(dashboard.engaged), Final : \(dashboard.planned)")
     }
 
-    private func handleDataChange() {
+    func handleDataChange() {
         _ = ListTransactionsManager.shared.getAllData()
         updateGroupedData()
         updateDashboard()
     }
 
-    // MARK: - Actions
-
-    private func createNewTransaction() {
-        transactionManager.isCreationMode = true
-        transactionManager.selectedTransaction = nil
-    }
-
-    private func updateStatus(for uuids: Set<UUID>, to statusName: String) {
-        guard let status = StatusManager.shared.find(name: statusName) else { return }
-        let selected = transactions.filter { uuids.contains($0.uuid) }
-
-        for transaction in selected {
-            transaction.status = status
-        }
-
-        try? ListTransactionsManager.shared.save()
-
-        // Mettre à jour sans reconstruire les groupes pour éviter le scroll
-        _ = ListTransactionsManager.shared.getAllData()
-        updateDashboard()
-
-        AppLogger.transactions.info("Statut mis à jour vers '\(statusName)' pour \(selected.count) transaction(s)")
-    }
-
-    private func updatePaymentMode(for uuids: Set<UUID>, to modeName: String) {
-        guard let mode = PaymentModeManager.shared.find(name: modeName) else { return }
-        let selected = transactions.filter { uuids.contains($0.uuid) }
-
-        for transaction in selected {
-            transaction.paymentMode = mode
-        }
-
-        try? ListTransactionsManager.shared.save()
-
-        // Mettre à jour sans reconstruire les groupes pour éviter le scroll
-        _ = ListTransactionsManager.shared.getAllData()
-        updateDashboard()
-
-        AppLogger.transactions.info("Mode de paiement mis à jour vers '\(modeName)' pour \(selected.count) transaction(s)")
-    }
-
-    private func updateBankStatement(for uuids: Set<UUID>, to statement: String) {
-        let selected = transactions.filter { uuids.contains($0.uuid) }
-
-        for transaction in selected {
-            transaction.bankStatement = Double(statement) ?? 0.0
-        }
-
-        try? ListTransactionsManager.shared.save()
-
-        // Mettre à jour sans reconstruire les groupes pour éviter le scroll
-        _ = ListTransactionsManager.shared.getAllData()
-        updateDashboard()
-
-        AppLogger.transactions.info("Relevé bancaire mis à jour vers '\(statement)' pour \(selected.count) transaction(s)")
-    }
-
-    private func duplicateTransactions(_ uuids: Set<UUID>) {
-        let selected = transactions.filter { uuids.contains($0.uuid) }
-
-        guard let targetAccount = CurrentAccountManager.shared.getAccount() else {
-            AppLogger.transactions.error("Aucun compte cible pour l'opération de duplication")
-            return
-        }
-
-        for transaction in selected {
-            var newTransaction = EntityTransaction()
-            newTransaction.dateOperation = transaction.dateOperation
-            newTransaction.datePointage = transaction.datePointage
-            newTransaction.status = transaction.status
-            newTransaction.paymentMode = transaction.paymentMode
-            newTransaction.checkNumber = transaction.checkNumber
-            newTransaction.bankStatement = transaction.bankStatement
-            newTransaction.account = targetAccount
-
-            for item in transaction.sousOperations {
-                let sousOperation = EntitySousOperation()
-                sousOperation.libelle = item.libelle
-                sousOperation.amount = item.amount
-                sousOperation.category = item.category
-
-                newTransaction = ListTransactionsManager.shared.addSousTransaction(transaction: newTransaction, sousTransaction: sousOperation)
-            }
-        }
-
-        try? ListTransactionsManager.shared.save()
-        handleDataChange()
-
-        AppLogger.transactions.info("Dupliqué \(selected.count) transaction(s)")
-    }
-
-    private func deleteTransactions(_ uuids: Set<UUID>) {
-        let selected = transactions.filter { uuids.contains($0.uuid) }
-
-        for transaction in selected {
-            ListTransactionsManager.shared.delete(entity: transaction)
-        }
-
-        try? ListTransactionsManager.shared.save()
-        selectedTransactions.removeAll()
-        handleDataChange()
-
-        AppLogger.transactions.info("Supprimé \(selected.count) transaction(s)")
-    }
-
-    private func copySelected() {
-        clipboardTransactions = transactions.filter { selectedTransactions.contains($0.uuid) }
-        isCutOperation = false
-        AppLogger.ui.info("Copié \(clipboardTransactions.count) transaction(s)")
-    }
-
-    private func cutSelected() {
-        clipboardTransactions = transactions.filter { selectedTransactions.contains($0.uuid) }
-        isCutOperation = true
-        AppLogger.ui.info("Coupé \(clipboardTransactions.count) transaction(s)")
-    }
-
-    private func pasteTransactions() {
-        guard let targetAccount = CurrentAccountManager.shared.getAccount() else {
-            AppLogger.transactions.error("Aucun compte cible pour l'opération de collage")
-            return
-        }
-
-        for transaction in clipboardTransactions {
-            let status = StatusManager.shared.find(name: transaction.status!.name)
-            let paymentMode = PaymentModeManager.shared.find(name: transaction.paymentMode!.name)
-
-            var newTransaction = EntityTransaction()
-            newTransaction.dateOperation = transaction.dateOperation
-            newTransaction.datePointage = transaction.datePointage
-            newTransaction.status = status
-            newTransaction.paymentMode = paymentMode
-            newTransaction.checkNumber = transaction.checkNumber
-            newTransaction.bankStatement = transaction.bankStatement
-            newTransaction.account = targetAccount
-
-            for item in transaction.sousOperations {
-                let sousOperation = EntitySousOperation()
-                let category = CategoryManager.shared.find(name: item.category!.name)
-                sousOperation.libelle = item.libelle
-                sousOperation.amount = item.amount
-                sousOperation.category = category
-
-                newTransaction = ListTransactionsManager.shared.addSousTransaction(transaction: newTransaction, sousTransaction: sousOperation)
-            }
-        }
-
-        if isCutOperation {
-            for transaction in clipboardTransactions {
-                ListTransactionsManager.shared.delete(entity: transaction)
-            }
-        }
-
-        try? ListTransactionsManager.shared.save()
-        clipboardTransactions = []
-        isCutOperation = false
-        handleDataChange()
-
-        AppLogger.transactions.info("Collé \(clipboardTransactions.count) transaction(s)")
-    }
-
-    // MARK: - Disclosure State Management
-
-    private func saveDisclosureState() {
-        guard let accountName = compteCurrent?.name else { return }
-        let key = "disclosureStatesModern_" + accountName
-        if let data = try? JSONEncoder().encode(disclosureStates) {
-            UserDefaults.standard.set(data, forKey: key)
-        }
-    }
-
-    private func loadDisclosureState() {
-        guard let accountName = compteCurrent?.name else { return }
-        let key = "disclosureStatesModern_" + accountName
-        if let savedData = UserDefaults.standard.data(forKey: key),
-           let loadedStates = try? JSONDecoder().decode([String: Bool].self, from: savedData) {
-            disclosureStates = loadedStates
-        } else {
-            // Par défaut, tous les groupes sont ouverts
-            for group in groupedData {
-                let monthKey = "month_\(group.year)_\(group.month ?? 0)"
-                disclosureStates[monthKey] = true
-            }
-        }
-    }
-
-    private func toggleDisclosure(for key: String) {
-        disclosureStates[key] = !(disclosureStates[key] ?? false)
-        saveDisclosureState()
-    }
-
-    private func isExpanded(for key: String) -> Bool {
-        return disclosureStates[key] ?? true
-    }
-}
-
-// MARK: - Types de Support
-
-/// Groupe hiérarchique pour l'organisation des transactions par année/mois
-struct TransactionYearGroup: Identifiable {
-    let id: UUID
-    let displayName: String
-    let year: Int
-    let month: Int?
-    var monthGroups: [TransactionYearGroup]?
-    var transactions: [EntityTransaction]?
-
-    var transaction: EntityTransaction? {
-        // Retourne la transaction seulement si ce n'est pas un groupe (a des transactions)
-        return transactions?.first
-    }
-}
+ }
 
