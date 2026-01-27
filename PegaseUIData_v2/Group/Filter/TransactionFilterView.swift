@@ -60,7 +60,7 @@ struct TransactionFilterView: View {
     private var headerView: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Filtrage des transactions")
+                Text("Transaction filtering")
                     .font(.headline)
 
                 if let predicate = viewModel.currentPredicate {

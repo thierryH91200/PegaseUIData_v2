@@ -38,7 +38,11 @@ extension TransactionTableViewModern {
             transaction.status = status
         }
 
-        try? ListTransactionsManager.shared.save()
+        do {
+            try ListTransactionsManager.shared.save()
+        } catch {
+            printTag("Erreur sauvegarde: \(error.localizedDescription)", flag: true)
+        }
 
         // Mettre à jour sans reconstruire les groupes pour éviter le scroll
         _ = ListTransactionsManager.shared.getAllData()

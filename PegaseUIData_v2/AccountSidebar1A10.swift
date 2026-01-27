@@ -103,8 +103,7 @@ struct AccountRow: View {
     let account: EntityAccount?
     let isSelected: Bool
     
-    @State private var isAddDialogPresented = false
-    @State private var isEditDialogPresented = false
+    @State private var isPresented = false
     @State private var selectedAccount : EntityAccount?
 
     // MARK: - Computed properties optimisées
@@ -156,21 +155,12 @@ struct AccountRow: View {
 //        .onDelete {
 ////            deleteAccount()
 //        }
-        .sheet(isPresented: $isAddDialogPresented)
+        .sheet(isPresented: $isPresented)
         {
             AccountFormView(
-                isPresented: $isAddDialogPresented,
+                isPresented: $isPresented,
                 isModeCreate: $isModeCreate,
-                account: nil)
-        }
-
-        .sheet(isPresented: $isEditDialogPresented)
-        {
-            AccountFormView(
-                isPresented: .constant(true),
-                isModeCreate: $isModeCreate,
-                account: account
-            )
+                account: isModeCreate ? nil : selectedAccount)
         }
     }
     
@@ -217,7 +207,7 @@ struct AccountRow: View {
                 isModeCreate = true
                 selectedAccount = nil
                 DispatchQueue.main.async {
-                    isAddDialogPresented = true
+                    isPresented = true
                 }
             } label: {
                 Label("Add account", systemImage: "arrow.right.circle")
@@ -227,7 +217,7 @@ struct AccountRow: View {
                 isModeCreate = false
                 selectedAccount = account
                 DispatchQueue.main.async {
-                    isEditDialogPresented = true
+                    isPresented = true
                 }
             } label: {
                 Label("Edit account", systemImage: "pencil")
@@ -253,8 +243,8 @@ struct Bouton: View {
 
     @State private var selectedOption = "Options"
 
-    @State private var isShowAccountFormView = false
-    @State private var isShowGroupFormView = false
+    @State private var isPresentedccount = false
+    @State private var isPresentedGroup = false
     @State private var isModeCreate = false
     
     var body: some View {
@@ -268,13 +258,13 @@ struct Bouton: View {
             Spacer()
             Menu {
                 Button(action: {
-                    isShowGroupFormView = true
+                    isPresentedGroup = true
                     isModeCreate = true
                 }) {
                     Label(String(localized:"Add Group Account"), systemImage: "info.circle")
                 }
                 Button(action: {
-                    isShowGroupFormView = true
+                    isPresentedGroup = true
                     isModeCreate = false
                 }) {
                     Label("Edit Group Account", systemImage: "info.circle")
@@ -282,14 +272,14 @@ struct Bouton: View {
                 Divider()
                 
                 Button(action: {
-                    isShowAccountFormView = true
+                    isPresentedccount = true
                     isModeCreate = true
                 }) {
                     Label("Add account", systemImage: "info.circle")
                 }
 
                 Button(action: {
-                    isShowAccountFormView = true
+                    isPresentedccount = true
                     isModeCreate = false
                 }) {
                     Label("Edit account", systemImage: "info.circle")
@@ -308,27 +298,20 @@ struct Bouton: View {
         }
         .padding(.horizontal)
         .padding(.bottom, 10)
-//        .sheet(isPresented: $isAddShowAccountFormView , onDismiss: {setupDataManager()})
-//        {
-//            AccountFormView(
-//                isPresented: $isShowAccountFormView,
-//                isModeCreate: $isModeCreate,
-//                account: selectedAccount)
-//        }
 
-        .sheet(isPresented: $isShowAccountFormView , onDismiss: {setupDataManager()})
+        .sheet(isPresented: $isPresentedccount , onDismiss: {setupDataManager()})
         {
             AccountFormView(
-                isPresented: $isShowAccountFormView,
+                isPresented: $isPresentedccount,
                 isModeCreate: $isModeCreate,
-                account: selectedAccount)
+                account: isModeCreate ? nil : selectedAccount)
         }
-        .sheet(isPresented: $isShowGroupFormView , onDismiss: {setupDataManager()})
+        .sheet(isPresented: $isPresentedGroup , onDismiss: {setupDataManager()})
         {
             GroupAccountFormView(
-                isPresented: $isShowGroupFormView,
+                isPresented: $isPresentedGroup,
                 isModeCreate: $isModeCreate,
-                accountFolder: nil)
+                accountFolder: isModeCreate ? nil : selectedAccount?.folder)
         }
     }
     

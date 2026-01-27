@@ -27,8 +27,7 @@ struct CheckView: View {
         return checkBooks.first(where: { $0.id == id })
     }
 
-    @State private var isAddDialogPresented = false
-    @State private var isEditDialogPresented = false
+    @State private var isPresented = false
     @State private var isModeCreate = false
     
     var canUndo : Bool? {
@@ -78,7 +77,7 @@ struct CheckView: View {
             // Boutons d'action
             HStack {
                 Button(action: {
-                    isAddDialogPresented = true
+                    isPresented = true
                     isModeCreate = true
                 }) {
                     Label("Add", systemImage: "plus")
@@ -89,7 +88,7 @@ struct CheckView: View {
                 }
                 
                 Button(action: {
-                    isEditDialogPresented = true
+                    isPresented = true
                     isModeCreate = false
                 }) {
                     Label("Edit", systemImage: "pencil")
@@ -144,19 +143,12 @@ struct CheckView: View {
             }
             
             // Feuilles modales pour l'ajout/modification
-            .sheet(isPresented: $isEditDialogPresented, onDismiss: {setupDataManager()})
+            .sheet(isPresented: $isPresented, onDismiss: {setupDataManager()})
             {
                 CheckBookFormView(
-                    isPresented: $isEditDialogPresented,
+                    isPresented: $isPresented,
                     isModeCreate: $isModeCreate,
-                    checkBook: selectedCheckBook)
-            }
-            .sheet(isPresented: $isAddDialogPresented , onDismiss: {setupDataManager()})
-            {
-                CheckBookFormView(
-                    isPresented: $isAddDialogPresented,
-                    isModeCreate: $isModeCreate,
-                    checkBook: nil)
+                    checkBook: isModeCreate ? nil : selectedCheckBook)
             }
             .padding()
             Spacer()

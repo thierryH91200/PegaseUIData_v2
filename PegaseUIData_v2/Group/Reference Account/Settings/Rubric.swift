@@ -38,11 +38,9 @@ struct RubricView: View {
     @State private var selectedCategory: EntityCategory?
     @State private var selectedRubric: EntityRubric?
     
-    @State private var isAddDialogRubricPresented = false
-    @State private var isEditDialogRubricPresented = false
-    @State private var isAddDialogCategoryPresented = false
-    @State private var isEditDialogCategoryPresented = false
-    @State private var modeCreate = false
+    @State private var isPresentedRubric = false
+    @State private var isPresentedCategory = false
+    @State private var isModeCreate = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -93,12 +91,12 @@ struct RubricView: View {
                 
                 HStack {
                     Button(action: {
-                        modeCreate = true
+                        isModeCreate = true
                         if selectedRubric != nil {
-                            isAddDialogRubricPresented = true
+                            isPresentedRubric = true
                         }
                         else {
-                            isAddDialogCategoryPresented = true
+                            isPresentedCategory = true
                         }
                     }) {
                         let label = selectedRubric != nil ? String(localized:"Add Rubric") : String(localized:"Add Category")
@@ -111,12 +109,12 @@ struct RubricView: View {
                     }
                     
                     Button(action: {
-                        modeCreate = false
+                        isModeCreate = false
                         if selectedRubric != nil {
-                            isEditDialogRubricPresented = true
+                            isPresentedRubric = true
                         }
                         else {
-                            isEditDialogCategoryPresented = true
+                            isPresentedCategory = true
                         }
 
                     }) {
@@ -155,22 +153,18 @@ struct RubricView: View {
             .position(x: geometry.size.width / 2, y: 0)
             .offset(y: 350) // Ajustez cette valeur selon vos besoins
             
-            .sheet(isPresented: $isAddDialogRubricPresented) {
-                RubricFormView(isPresented: $isAddDialogRubricPresented, isMode: $modeCreate, rubric: nil)
+            .sheet(isPresented: $isPresentedRubric) {
+                RubricFormView(isPresented: $isPresentedRubric,
+                               isMode: $isModeCreate,
+                               rubric: isModeCreate ? nil : selectedRubric)
             }
-            .sheet(isPresented: $isEditDialogRubricPresented) {
-                RubricFormView(isPresented: $isEditDialogRubricPresented, isMode: $modeCreate, rubric: selectedRubric)
-            }
-            .sheet(isPresented: $isAddDialogCategoryPresented) {
-                CategoryFormView(isPresented: $isAddDialogCategoryPresented, isModeCreate: $modeCreate, rubric: nil, category: nil)
-            }
-            .sheet(isPresented: $isEditDialogCategoryPresented) {
+            .sheet(isPresented: $isPresentedCategory) {
                 let rubric = selectedCategory?.rubric
-                CategoryFormView(
-                    isPresented: $isEditDialogCategoryPresented,
-                    isModeCreate: $modeCreate,
-                    rubric: rubric,
-                    category: selectedCategory)
+
+                CategoryFormView(isPresented: $isPresentedCategory,
+                                 isModeCreate: $isModeCreate,
+                                 rubric: isModeCreate ? nil : rubric,
+                                 category: isModeCreate ? nil : selectedCategory,)
             }
         }
     }
@@ -232,15 +226,15 @@ struct RubricView: View {
             }
             .contextMenu {
                 Button(action: {
-                    isAddDialogRubricPresented = true
-                    modeCreate = true
+                    isPresentedRubric = true
+                    isModeCreate = true
                 }) {
                     Label("Add the rubric", systemImage: "plus")
                 }
                 
                 Button(action: {
-                    isEditDialogRubricPresented = true
-                    modeCreate = false
+                    isPresentedRubric = true
+                    isModeCreate = false
                 }) {
                     Label("Edit the rubric", systemImage: "pencil")
                 }
@@ -274,15 +268,15 @@ struct RubricView: View {
         }
         .contextMenu {  // Ajout du menu contextuel
             Button(action: {
-                isAddDialogCategoryPresented = true
-                modeCreate = true
+                isPresentedRubric = true
+                isModeCreate = true
             }) {
                 Label("Add the category", systemImage: "plus")
             }
             
             Button(action: {
-                isEditDialogCategoryPresented = true
-                modeCreate = false
+                isPresentedCategory = true
+                isModeCreate = false
             }) {
                 Label("Edit the category", systemImage: "pencil")
             }

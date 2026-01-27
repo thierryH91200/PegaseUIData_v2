@@ -62,8 +62,7 @@ struct Scheduler: View {
         undoManager?.canRedo ?? false
     }
     
-    @State private var isAddDialogPresented = false
-    @State private var isEditDialogPresented = false
+    @State private var isPresented = false
 
     @State private var isModeCreate = false
         
@@ -146,7 +145,7 @@ struct Scheduler: View {
             
             HStack {
                 Button(action: {
-                    isAddDialogPresented = true
+                    isPresented = true
                     isModeCreate = true
                 }) {
                     Label(String(localized:"Add", table:"Scheduler"), systemImage: "plus")
@@ -158,7 +157,7 @@ struct Scheduler: View {
                 
                 Button(action: {
                     affectSelect()
-                    isEditDialogPresented = true
+                    isPresented = true
                     isModeCreate = false
                 }) {
                     Label(String(localized:"Edit", table:"Scheduler"), systemImage: "pencil")
@@ -228,16 +227,10 @@ struct Scheduler: View {
             UpcomingRemindersView(upcoming: upcoming)
             Spacer()
         }
-        .sheet(isPresented: $isAddDialogPresented, onDismiss: {setupDataManager()}) {
-            SchedulerFormView(isPresented: $isAddDialogPresented,
+        .sheet(isPresented: $isPresented, onDismiss: {setupDataManager()}) {
+            SchedulerFormView(isPresented: $isPresented,
                               isModeCreate: $isModeCreate,
-                              scheduler: nil,
-                              selectedTypeIndex: indexForSelectedType())
-        }
-        .sheet(isPresented: $isEditDialogPresented, onDismiss: {setupDataManager()}) {
-            SchedulerFormView(isPresented: $isEditDialogPresented,
-                              isModeCreate: $isModeCreate,
-                              scheduler: selectedSchedule,
+                              scheduler: isModeCreate ? nil : selectedSchedule,
                               selectedTypeIndex: indexForSelectedType())
         }
     }

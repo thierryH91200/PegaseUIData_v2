@@ -24,9 +24,8 @@ struct ModePaymentView: View {
         return dataManager.modePayments.first(where: { $0.id == id })
     }
     
-    @State private var isAddDialogPresented = false
-    @State private var isEditDialogPresented = false
-    @State private var modeCreate = false
+    @State private var isPresented = false
+    @State private var isModeCreate = false
     
     var canUndo : Bool? {
         undoManager?.canUndo ?? false
@@ -101,8 +100,8 @@ struct ModePaymentView: View {
             
             HStack {
                 Button(action: {
-                    isAddDialogPresented = true
-                    modeCreate = true
+                    isPresented = true
+                    isModeCreate = true
                     
                 }) {
                     Label("Add", systemImage: "plus")
@@ -114,8 +113,8 @@ struct ModePaymentView: View {
                 
                 // Boutons d'action (Ajouter, Modifier, Supprimer)
                 Button(action: {
-                    isEditDialogPresented = true
-                    modeCreate = false
+                    isPresented = true
+                    isModeCreate = false
                 }) {
                     Label("Edit", systemImage: "pencil")
                         .actionButtonStyle(
@@ -163,15 +162,10 @@ struct ModePaymentView: View {
         .padding()
         
         // Formulaire d'ajout et de modification
-        .sheet(isPresented: $isAddDialogPresented) {
-            ModePaiementFormView(isPresented: $isAddDialogPresented,
-                                 isModeCtreate: $modeCreate,
-                                 modePaiement: nil)
-        }
-        .sheet(isPresented: $isEditDialogPresented) {
-            ModePaiementFormView(isPresented: $isEditDialogPresented,
-                                 isModeCtreate: $modeCreate,
-                                 modePaiement: selectedMode)
+        .sheet(isPresented: $isPresented) {
+            ModePaiementFormView(isPresented: $isPresented,
+                                 isModeCtreate: $isModeCreate,
+                                 modePaiement:  isModeCreate ? nil : selectedMode)
         }
     }
     
@@ -180,7 +174,6 @@ struct ModePaymentView: View {
         if currentAccountManager.getAccount() != nil {
             let allData = PaymentModeManager.shared.getAllData()
                 dataManager.modePayments = allData
-                //                dataManager.modePayments = allData
         }
     }
     

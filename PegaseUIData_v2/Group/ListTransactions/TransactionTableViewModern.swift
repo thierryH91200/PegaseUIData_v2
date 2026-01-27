@@ -167,7 +167,7 @@ struct TransactionTableViewModern: View {
             .listStyle(.inset(alternatesRowBackgrounds: true))
             .contextMenu(forSelectionType: UUID.self) { uuids in
                 if uuids.isEmpty {
-                    Button("Nouvelle Transaction") { createNewTransaction() }
+                    Button("New Transaction") { createNewTransaction() }
                 } else {
                     transactionContextMenu(for: uuids)
                 }
@@ -301,7 +301,7 @@ struct TransactionTableViewModern: View {
                 TransactionDetailView(currentSectionIndex: index, selectedTransaction: $selectedTransactions)
                     .frame(minWidth: 400, minHeight: 300)
             } else {
-                Text("Erreur : Transaction non trouvée dans la liste.")
+                Text("Error: Transaction not found in the list.")
                     .foregroundColor(.red)
                     .padding()
             }
@@ -313,7 +313,7 @@ struct TransactionTableViewModern: View {
             Text("Create a statement")
                 .font(.headline)
 
-            TextField("Numéro de relevé", text: $bankStatementInput)
+            TextField("Statement number", text: $bankStatementInput)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.horizontal)
 
@@ -346,9 +346,9 @@ struct TransactionTableViewModern: View {
         Divider()
 
         Menu("Change the Statut") {
-            Button("Prévu") { updateStatus(for: uuids, to: "Prévu") }
-            Button("En cours") { updateStatus(for: uuids, to: "En cours") }
-            Button("Réalisé") { updateStatus(for: uuids, to: "Réalisé") }
+            Button("Planned") { updateStatus(for: uuids, to: "Prévu") }
+            Button("In progress") { updateStatus(for: uuids, to: "En cours") }
+            Button("Executed") { updateStatus(for: uuids, to: "Réalisé") }
         }
 
         Menu("Change Payment Method") {
@@ -365,11 +365,11 @@ struct TransactionTableViewModern: View {
 
         Divider()
 
-        Button("Dupliquer", systemImage: "doc.on.doc") {
+        Button("Duplcate", systemImage: "doc.on.doc") {
             duplicateTransactions(uuids)
         }
 
-        Button("Supprimer", systemImage: "trash", role: .destructive) {
+        Button("Remove", systemImage: "trash", role: .destructive) {
             deleteTransactions(uuids)
         }
     }

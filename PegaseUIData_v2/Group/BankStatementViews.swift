@@ -39,8 +39,7 @@ struct BankStatementListView: View {
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
     @EnvironmentObject var dataManager: BankStatementManager
     
-    @State private var isAddDialogPresented = false
-    @State private var isEditDialogPresented = false
+    @State private var isSheetPresented = false
     @State private var isModeCreate = false
 
     @State private var selectedItem: EntityBankStatement.ID?
@@ -51,10 +50,10 @@ struct BankStatementListView: View {
         return dataManager.statements.first(where: { $0.id == id })
     }
     
-    var canUndo : Bool? {
+    var canUndo : Bool {
         undoManager?.canUndo ?? false
     }
-    var canRedo : Bool? {
+    var canRedo : Bool {
         undoManager?.canRedo ?? false
     }
     
@@ -94,7 +93,7 @@ struct BankStatementListView: View {
             HStack {
                 // Bouton pour ajouter un enregistrement
                 Button(action: {
-                    isAddDialogPresented = true
+                    isSheetPresented = true
                     isModeCreate = true
 
                 }) {
@@ -107,7 +106,7 @@ struct BankStatementListView: View {
                 
                 // Bouton pour modifier un enregistrement
                 Button(action: {
-                    isEditDialogPresented = true
+                    isSheetPresented = true
                     isModeCreate = false
 
                 }) {
@@ -172,16 +171,10 @@ struct BankStatementListView: View {
             }
         }
         
-        .sheet(isPresented: $isEditDialogPresented , onDismiss: {setupDataManager()}) {
-            StatementFormView(isPresented: $isEditDialogPresented,
+        .sheet(isPresented: $isSheetPresented , onDismiss: {setupDataManager()}) {
+            StatementFormView(isPresented: $isSheetPresented,
                               isModeCreate: $isModeCreate,
-                              statement: selectedStatement)
-        }
-        
-        .sheet(isPresented: $isAddDialogPresented , onDismiss: {setupDataManager()}) {
-            StatementFormView(isPresented: $isAddDialogPresented,
-                              isModeCreate: $isModeCreate,
-                              statement: nil )
+                              statement: isModeCreate ? nil : selectedStatement)
         }
     }
     
@@ -316,7 +309,8 @@ struct StatementFormView: View {
     @StateObject private var viewModel = StatementFormViewModel()
     
     @State private var dragOver = false
-    
+    @State private var validationError: String?
+
     var body: some View {
         NavigationStack {
             Form {
@@ -340,6 +334,13 @@ struct StatementFormView: View {
                         .textFieldStyle(.roundedBorder)
                 }
                 
+                if let error = validationError {
+                    Section {
+                        Text(error)
+                            .foregroundColor(.red)
+                    }
+                }
+
                 Section("Document PDF") {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8)
@@ -361,8 +362,10 @@ struct StatementFormView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        save()
-                        dismiss()
+                        if validate() {
+                            save()
+                            dismiss()
+                        }
                     }
                 }
             }
@@ -379,6 +382,37 @@ struct StatementFormView: View {
         }
     }
     
+    private func validate() -> Bool {
+        // Vérifier que le numéro est un entier valide
+        if viewModel.num.isEmpty || Int(viewModel.num) == nil {
+            validationError = String(localized:"The number must be a valid integer.")
+            return false
+        }
+
+        // Vérifier que les soldes sont des nombres valides
+        let soldes = [
+            ("Initial balance", viewModel.startSolde),
+            ("Inter balance", viewModel.interSolde),
+            ("Final balance", viewModel.endSolde),
+            ("CB Balance", viewModel.cbSolde)
+        ]
+        for (label, value) in soldes {
+            if !value.isEmpty && cleanDouble(from: value) == 0 && value != "0" {
+                validationError = String(localized: "\(label) : Invalid numeric value.")
+                return false
+            }
+        }
+
+        // Vérifier la cohérence des dates
+        if viewModel.startDate > viewModel.endDate {
+            validationError = String(localized:"The start date must be earlier than the end date.")
+            return false
+        }
+
+        validationError = nil
+        return true
+    }
+
     private func save() {
         // Determine target entity: reuse existing or create a new one
         let entityBankStatement: EntityBankStatement = {
