@@ -39,8 +39,6 @@ struct BankStatementListView: View {
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
     @EnvironmentObject var dataManager: BankStatementManager
     
-    @State private var bankStatements: [EntityBankStatement] = []
-        
     @State private var isAddDialogPresented = false
     @State private var isEditDialogPresented = false
     @State private var isModeCreate = false
@@ -50,7 +48,7 @@ struct BankStatementListView: View {
     
     var selectedStatement: EntityBankStatement? {
         guard let id = selectedItem else { return nil }
-        return bankStatements.first(where: { $0.id == id })
+        return dataManager.statements.first(where: { $0.id == id })
     }
     
     var canUndo : Bool? {
@@ -59,15 +57,6 @@ struct BankStatementListView: View {
     var canRedo : Bool? {
         undoManager?.canRedo ?? false
     }
-    
-    @State private var dragOver = false
-    
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .none
-        return formatter
-    }()
     
     var body: some View {
         NavigationSplitView(columnVisibility: .constant(.all)) {
@@ -85,10 +74,6 @@ struct BankStatementListView: View {
                 .onAppear {
                     setupDataManager()
                 }
-                .onDisappear {
-                    bankStatements.removeAll()
-                }
-
                 .onReceive(NotificationCenter.default.publisher(for: .NSUndoManagerDidUndoChange)) { _ in
                     refreshData()
                 }
@@ -97,17 +82,6 @@ struct BankStatementListView: View {
                     refreshData()
                 }
 
-            
-                .onChange(of: selectedItem) { oldValue, newValue in
-                    if let selected = newValue {
-                        bankStatements =  dataManager.statements
-                        selectedItem = selected
-                        
-                    } else {
-                        selectedItem = nil
-                    }
-                }
-            
                 .onChange(of: currentAccountManager.getAccount()) { old, newAccount in
                     
                     if newAccount != nil {
@@ -212,20 +186,19 @@ struct BankStatementListView: View {
     }
     
     private func setupDataManager() {
-        
         if currentAccountManager.getAccount() != nil {
-            dataManager.statements = BankStatementManager.shared.getAllData()!
+            dataManager.statements = dataManager.getAllData() ?? []
         }
     }
 
     private func delete() {
         
         if let id = selectedItem,
-           let item = bankStatements.first(where: { $0.id == id }) {
+           let item = dataManager.statements.first(where: { $0.id == id }) {
             
             lastDeletedID = item.uuid
             
-            BankStatementManager.shared.delete(entity: item, undoManager: undoManager)
+            dataManager.delete(entity: item, undoManager: undoManager)
             DispatchQueue.main.async {
                 selectedItem = nil
                 lastDeletedID = nil
@@ -237,7 +210,7 @@ struct BankStatementListView: View {
     }
     
     private func refreshData() {
-        dataManager.statements = BankStatementManager.shared.getAllData() ?? [ ]
+        dataManager.statements = dataManager.getAllData() ?? []
     }
 }
 

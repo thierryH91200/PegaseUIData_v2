@@ -179,21 +179,21 @@ struct TransactionTableViewModern: View {
         HStack(spacing: 0) {
             Text("Date Pointage").bold().frame(width: ColumnWidths.datePointage, alignment: .leading)
             Divider().frame(width: 2)
-            Text("Date Opération").bold().frame(width: ColumnWidths.dateOperation, alignment: .leading)
+            Text("Date Operation").bold().frame(width: ColumnWidths.dateOperation, alignment: .leading)
             Divider().frame(width: 2)
-            Text("Libellé").bold().frame(width: ColumnWidths.libelle, alignment: .leading)
+            Text("Comment").bold().frame(width: ColumnWidths.libelle, alignment: .leading)
             Divider().frame(width: 2)
-            Text("Rubrique").bold().frame(width: ColumnWidths.rubrique, alignment: .leading)
+            Text("Rubric").bold().frame(width: ColumnWidths.rubrique, alignment: .leading)
             Divider().frame(width: 2)
-            Text("Catégorie").bold().frame(width: ColumnWidths.categorie, alignment: .leading)
+            Text("Catégory").bold().frame(width: ColumnWidths.categorie, alignment: .leading)
             Divider().frame(width: 2)
             Text("Relevé/Chèque").bold().frame(width: ColumnWidths.releve + ColumnWidths.cheque, alignment: .leading)
             Divider().frame(width: 2)
             Text("Statut").bold().frame(width: ColumnWidths.statut, alignment: .leading)
             Divider().frame(width: 2)
-            Text("Mode Paiement").bold().frame(width: ColumnWidths.modePaiement, alignment: .leading)
+            Text("Payment method").bold().frame(width: ColumnWidths.modePaiement, alignment: .leading)
             Divider().frame(width: 2)
-            Text("Montant").bold().frame(width: ColumnWidths.montant, alignment: .trailing)
+            Text("Amount").bold().frame(width: ColumnWidths.montant, alignment: .trailing)
             Divider().frame(width: 2)
             Text("Solde").bold().frame(width: ColumnWidths.montant, alignment: .trailing)
         }
@@ -310,7 +310,7 @@ struct TransactionTableViewModern: View {
 
     private var bankStatementPopoverContent: some View {
         VStack(spacing: 12) {
-            Text("Créer un relevé")
+            Text("Create a statement")
                 .font(.headline)
 
             TextField("Numéro de relevé", text: $bankStatementInput)
@@ -318,7 +318,7 @@ struct TransactionTableViewModern: View {
                 .padding(.horizontal)
 
             HStack {
-                Button("Annuler") {
+                Button("Cancel") {
                     showBankStatementPopover = false
                 }
                 Button("OK") {
@@ -335,7 +335,7 @@ struct TransactionTableViewModern: View {
 
     @ViewBuilder
     private func transactionContextMenu(for uuids: Set<UUID>) -> some View {
-        Button("Afficher les Détails") {
+        Button("Show Details") {
             if let first = uuids.first,
                let index = ListTransactionsManager.shared.listTransactions.firstIndex(where: { $0.uuid == first }) {
                 detailTransactionIndex = index
@@ -345,20 +345,20 @@ struct TransactionTableViewModern: View {
 
         Divider()
 
-        Menu("Changer le Statut") {
+        Menu("Change the Statut") {
             Button("Prévu") { updateStatus(for: uuids, to: "Prévu") }
             Button("En cours") { updateStatus(for: uuids, to: "En cours") }
             Button("Réalisé") { updateStatus(for: uuids, to: "Réalisé") }
         }
 
-        Menu("Changer le Mode de Paiement") {
+        Menu("Change Payment Method") {
             ForEach(PaymentModeManager.shared.getAllNames(), id: \.self) { mode in
                 Button(mode) { updatePaymentMode(for: uuids, to: mode) }
             }
         }
 
-        Menu("Relevé Bancaire") {
-            Button("Nouveau relevé…") {
+        Menu("Bank statement") {
+            Button("New bank statement") {
                 showBankStatementPopover = true
             }
         }
@@ -425,9 +425,9 @@ struct TransactionTableViewModern: View {
         formatter.numberStyle = .currency
         formatter.locale = Locale.current
 
-        let info = AttributedString("Sélectionné \(count) transaction(s). ")
+        let info = AttributedString("Sélection \(count) transaction(s). ")
 
-        var expenseAttr = AttributedString("Dépenses : \(formatter.string(from: expense as NSNumber) ?? "€0.00")")
+        var expenseAttr = AttributedString("Expenses : \(formatter.string(from: expense as NSNumber) ?? "€0.00")")
         expenseAttr.foregroundColor = .red
 
         var incomeAttr = AttributedString(", Revenus : \(formatter.string(from: income as NSNumber) ?? "€0.00")")
