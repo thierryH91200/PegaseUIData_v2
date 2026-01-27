@@ -45,7 +45,7 @@ struct SecuritySettingsView: View {
                     }
                 }
 
-                Text("L'application se verrouillera automatiquement après la période d'inactivité sélectionnée.")
+                Text("The application will automatically lock after the selected period of inactivity.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -54,7 +54,7 @@ struct SecuritySettingsView: View {
                 Button(action: {
                     authManager.lock()
                 }) {
-                    Label("Verrouiller maintenant", systemImage: "lock.fill")
+                    Label("Lock now", systemImage: "lock.fill")
                 }
                 .keyboardShortcut("L", modifiers: [.command, .shift])
             }

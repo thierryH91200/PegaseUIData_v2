@@ -205,7 +205,7 @@ struct Header: View {
                 .opacity(0.8)              // un peu plus visible
 
             VStack(alignment: .leading, spacing: 0) {
-                Text("Libelle")
+                Text("Comment")
                     .font(.caption)
                     .foregroundColor(.primary)
                 Text("Amount")

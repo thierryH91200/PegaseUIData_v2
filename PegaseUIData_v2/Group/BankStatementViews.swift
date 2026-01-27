@@ -70,7 +70,8 @@ struct BankStatementListView: View {
     }()
     
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: .constant(.all)) {
+            VStack {
             if let account = CurrentAccountManager.shared.getAccount() {
                 Text("Account: \(account.name)")
                     .font(.headline)
@@ -187,7 +188,8 @@ struct BankStatementListView: View {
 
             }
             Spacer()
-            
+            }
+            .navigationSplitViewColumnWidth(min: 700, ideal: 900, max: 1200)
         } detail: {
             if let statement = selectedStatement {
                 StatementDetailView(statement: statement)

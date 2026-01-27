@@ -20,7 +20,7 @@ struct SubOperationDialog: View {
     
     @State private var comment           : String = ""
     @State private var selectedRubric    : EntityRubric?
-    @State private var selectedCategorie : EntityCategory?
+    @State private var selectedCategory : EntityCategory?
     @State private var amount            : String = ""
     
     @State private var isShowingDialog: Bool = false
@@ -56,19 +56,19 @@ struct SubOperationDialog: View {
                         // Met à jour la liste des catégories en fonction de la rubrique sélectionnée
                         entityCategorie = newRubric.categorie.sorted { $0.name < $1.name }
                         // Réinitialise la sélection de catégorie si elle ne fait plus partie des catégories disponibles
-                        if let selected = selectedCategorie,
+                        if let selected = selectedCategory,
                            !entityCategorie.contains(where: { $0 == selected }) {
-                            selectedCategorie = entityCategorie.first
+                            selectedCategory = entityCategorie.first
                         }
                     } else {
                         entityCategorie = []
-                        selectedCategorie = nil
+                        selectedCategory = nil
                     }
                 }
             }
             
             FormField(label: String(localized:"Category")) {
-                Picker("", selection: $selectedCategorie) {
+                Picker("", selection: $selectedCategory) {
                     ForEach(entityCategorie, id: \.self) { category in
                         Text(category.name).tag(category)
                     }
@@ -146,7 +146,7 @@ struct SubOperationDialog: View {
                 
                 if transactionManager.isCreationMode == false {
                     comment = subOperation?.libelle ?? ""
-                    selectedCategorie = subOperation?.category
+                    selectedCategory = subOperation?.category
                     selectedRubric = subOperation?.category?.rubric
                     
                     if let sum = subOperation?.amount {
@@ -182,7 +182,7 @@ struct SubOperationDialog: View {
     
     private func updateSousOperation(_ item: EntitySousOperation) {
         item.libelle = comment
-        item.category = selectedCategorie
+        item.category = selectedCategory
 
         if let value = Double(amount) {
             let signedValue = isSigne ? value : -value
@@ -209,7 +209,7 @@ struct SubOperationDialog: View {
             selectedRubric = entityRubric[rubricIndex]
             entityCategorie = entityRubric[rubricIndex].categorie.sorted { $0.name < $1.name }
             if let categoryIndex = entityCategorie.firstIndex(where: { $0 === preference.category }) {
-                selectedCategorie = entityCategorie[categoryIndex]
+                selectedCategory = entityCategorie[categoryIndex]
             }
             isSigne = preference.signe
         }
