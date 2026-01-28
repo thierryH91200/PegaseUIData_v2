@@ -18,7 +18,6 @@ protocol TeeasuryManaging {
     func updateChartData()
 }
 
-
 class TresuryLineViewModel: ObservableObject, TeeasuryManaging {
     
     @Published var listTransactions: [EntityTransaction] = []

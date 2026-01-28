@@ -212,7 +212,11 @@ struct OperationDialogView: View {
         }
 
         resetListTransactions()
-        NotificationCenter.default.post(name: .transactionsAddEdit, object: nil)
+        if transactionManager.isCreationMode {
+            NotificationCenter.default.post(name: .transactionsAddEdit, object: nil)
+        } else {
+            NotificationCenter.default.post(name: .transactionsEdited, object: nil)
+        }
     }
     
     func contextSaveEdition() {

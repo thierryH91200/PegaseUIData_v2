@@ -347,7 +347,6 @@ struct TableView: View {
             entityTransaction.addSubOperation(sousOperation)
             context.insert(entityTransaction)
         }
-        
         try? context.save()
     }
 }

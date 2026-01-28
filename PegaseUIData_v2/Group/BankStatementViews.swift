@@ -11,6 +11,7 @@ import UniformTypeIdentifiers
 import PDFKit
 import Combine
 
+
 struct BankStatementView: View {
     
     @Binding var isVisible: Bool
@@ -21,13 +22,16 @@ struct BankStatementView: View {
             .environmentObject(dataManager)
         
             .padding()
-            .task {
-                await performFalseTask()
+//            .task {
+//                await performFalseTask()
+//            }
+            .onAppear {
+                isVisible = false
             }
     }
     private func performFalseTask() async {
         // Exécuter une tâche asynchrone (par exemple, un délai)
-        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconde de délai
+//        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconde de délai
         isVisible = false
     }
 }

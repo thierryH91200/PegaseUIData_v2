@@ -25,10 +25,10 @@ struct StatusPickerView: View {
             }
             .pickerStyle(.menu)
             .labelsHidden()
+            .frame(minWidth: 150)
             Spacer()
         }
         .frame(maxWidth: .infinity)
-
     }
 }
 

@@ -450,12 +450,12 @@ struct DGLineChartRepresentable: NSViewRepresentable {
     func initGraph(on chartView: LineChartView) {
         
         // MARK: General
-        chartView.dragEnabled = true
+        chartView.dragEnabled = false
         chartView.setScaleEnabled(false)
         chartView.doubleTapToZoomEnabled = false
         chartView.pinchZoomEnabled = false
         chartView.drawGridBackgroundEnabled = false
-        chartView.highlightPerDragEnabled = true
+//        chartView.highlightPerDragEnabled = true
         chartView.highlightPerTapEnabled = true
         chartView.noDataText = String(localized:"No chart data available.")
         

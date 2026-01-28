@@ -76,7 +76,7 @@ struct TransactionTableViewModern: View {
             // Barre de statut avec statistiques
             statusBarSection
         }
-        .navigationTitle("Compte : \(compteCurrent?.name ?? "Aucun compte")")
+        .navigationTitle("Account : \(compteCurrent?.name ?? "No account")")
         .sheet(isPresented: $showTransactionDetail) {
             transactionDetailPopover
         }
@@ -94,6 +94,11 @@ struct TransactionTableViewModern: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .transactionsImported)) { _ in
             handleDataChange()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .transactionsEdited)) { _ in
+            // Édition seule : mise à jour des données sans reconstruire les groupes (pas de scroll)
+            _ = ListTransactionsManager.shared.getAllData()
+            updateDashboard()
         }
         .onChange(of: currentAccountManager.currentAccountID) { _, _ in
             handleDataChange()

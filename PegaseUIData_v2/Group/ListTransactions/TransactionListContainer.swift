@@ -55,23 +55,15 @@ struct TransactionListContainer: View {
 
             Divider()
             
-//            TransactionTableView(
-//                filteredTransactions: filteredTransactions,
-//                dashboard: $dashboard,
-//                isVisible: $dashboard.isVisible,
-//                selectedTransactions: $selectedTransactions
-//            )
-
-
             TransactionTableViewModern(
                 filteredTransactions: filteredTransactions,
                 dashboard: $dashboard,
                 selectedTransactions: $selectedTransactions
             )
             .padding()
-            .task {
-                await performInitialTask()
-            }
+//            .task {
+//                await performInitialTask()
+//            }
             .onReceive(NotificationCenter.default.publisher(for: .loadDemoRequested)) { _ in
                 loadDemoData()
             }
@@ -88,6 +80,7 @@ struct TransactionListContainer: View {
                 updateSummary()
             }
             .onAppear {
+                dashboard.isVisible = true
                 setupKeyboardShortcuts()
             }
             .onAppear(perform: updateSummary)
