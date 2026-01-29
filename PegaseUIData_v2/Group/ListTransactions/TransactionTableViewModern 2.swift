@@ -83,6 +83,21 @@ extension TransactionTableViewModern {
 
         AppLogger.transactions.info("Relevé bancaire mis à jour vers '\(statement)' pour \(selected.count) transaction(s)")
     }
+    func updatePointingDate(for uuids: Set<UUID>, to date: Date) {
+        let selected = transactions.filter { uuids.contains($0.uuid) }
+
+        for transaction in selected {
+            transaction.datePointage = date
+        }
+
+        try? ListTransactionsManager.shared.save()
+
+        // Mettre à jour sans reconstruire les groupes pour éviter le scroll
+        _ = ListTransactionsManager.shared.getAllData()
+        updateDashboard()
+
+        AppLogger.transactions.info("Pointing date mis à jour vers '\(date)' pour \(selected.count) transaction(s)")
+    }
 
     func duplicateTransactions(_ uuids: Set<UUID>) {
         let selected = transactions.filter { uuids.contains($0.uuid) }

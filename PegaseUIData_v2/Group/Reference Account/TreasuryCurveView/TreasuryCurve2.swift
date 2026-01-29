@@ -144,10 +144,10 @@ struct TreasuryCurve: View {
         allTransactions = ListTransactionsManager.shared
             .getAllData()
             .filter { $0.account == account }
-            .sorted { $0.dateOperation < $1.dateOperation }
+            .sorted { $0.datePointage < $1.datePointage }
 
-        guard let first = allTransactions.first?.dateOperation,
-              let last = allTransactions.last?.dateOperation else {
+        guard let first = allTransactions.first?.datePointage,
+              let last = allTransactions.last?.datePointage else {
             return
         }
 
@@ -158,6 +158,8 @@ struct TreasuryCurve: View {
         selectedEnd = max(1, durationDays)
 
         viewModel.listTransactions = allTransactions
+        viewModel.firstDate = Calendar.current.startOfDay(for: first).timeIntervalSince1970
+        viewModel.lastDate = Calendar.current.startOfDay(for: last).timeIntervalSince1970
         viewModel.lowerValue = selectedStart
         viewModel.upperValue = selectedEnd
         viewModel.updateChartData()
@@ -175,7 +177,7 @@ struct TreasuryCurve: View {
         let endDate = Calendar.current.date(byAdding: .day, value: Int(endOffset), to: minDate) ?? maxDate
 
         filteredTransactions = allTransactions.filter {
-            $0.dateOperation >= startDate && $0.dateOperation <= endDate
+            $0.datePointage >= startDate && $0.datePointage <= endDate
         }
 
         viewModel.lowerValue = startOffset

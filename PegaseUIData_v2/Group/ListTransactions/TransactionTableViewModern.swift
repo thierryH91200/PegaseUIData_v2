@@ -51,7 +51,9 @@ struct TransactionTableViewModern: View {
 
     // État pour le popover de relevé bancaire
     @State private var showBankStatementPopover = false
+    @State private var showPointingDate = false
     @State private var bankStatementInput = ""
+    @State private var pointingDate = Date()
 
     var compteCurrent: EntityAccount? {
         CurrentAccountManager.shared.getAccount()
@@ -94,6 +96,11 @@ struct TransactionTableViewModern: View {
             updateDashboard()
             loadDisclosureState()
         }
+        .popover(isPresented: $showPointingDate, arrowEdge: .trailing) {
+            pointingDateContent
+        }
+        .frame(minWidth: 1000, minHeight: 600)
+
         .onReceive(NotificationCenter.default.publisher(for: .transactionsAddEdit)) { _ in
             handleDataChange()
         }
@@ -233,7 +240,7 @@ struct TransactionTableViewModern: View {
             Text("Solde").bold().frame(width: ColumnWidths.montant, alignment: .trailing)
         }
         .padding(.vertical, 6)
-        .padding(.horizontal, 8)
+        .padding(.horizontal, 4)
         .background(Color.gray.opacity(0.1))
         .frame(height: 44)
     }
@@ -367,6 +374,34 @@ struct TransactionTableViewModern: View {
         .padding()
         .frame(width: 250)
     }
+    
+    private var pointingDateContent: some View {
+        VStack(spacing: 12) {
+            Text("Change Pointing Date")
+                .font(.headline)
+
+            DatePicker("Pointage Date", selection: $pointingDate, displayedComponents: .date)
+                .padding(.horizontal)
+
+            HStack {
+                Button("Cancel") {
+                    showPointingDate = false
+                }
+                Button("OK") {
+                    updatePointingDate(for: selectedTransactions, to: pointingDate)
+                    showPointingDate = false
+                }
+                .keyboardShortcut(.defaultAction)
+            }
+            .padding(.top, 8)
+        }
+        .padding()
+        .onAppear {
+            let selected = transactions.filter { selectedTransactions.contains($0.uuid) }
+            pointingDate = selected.first?.datePointage ?? Date()
+        }
+        .frame(width: 250)
+    }
 
     @ViewBuilder
     private func transactionContextMenu(for uuids: Set<UUID>) -> some View {
@@ -392,9 +427,15 @@ struct TransactionTableViewModern: View {
             }
         }
 
-        Menu("Bank statement") {
+        Menu("Change Bank statement") {
             Button("New bank statement") {
                 showBankStatementPopover = true
+            }
+        }
+
+        Menu("Change Pointing Date") {
+            Button("Pointing Date") {
+                showPointingDate = true
             }
         }
 

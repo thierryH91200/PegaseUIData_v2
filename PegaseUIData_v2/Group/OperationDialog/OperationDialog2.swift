@@ -384,6 +384,7 @@ struct BatchEditFormView: View {
         return formatter
     }
     
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Multiple modifications")

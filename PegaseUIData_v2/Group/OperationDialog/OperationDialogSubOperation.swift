@@ -96,16 +96,17 @@ struct SubOperationDialog: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .font(.system(size: 20))
                     .foregroundColor(isSigne ? .green : .red)
-                
+                    .onChange(of: amount) { _, newValue in
+                        if newValue.contains(",") {
+                            amount = newValue.replacingOccurrences(of: ",", with: ".")
+                        }
+                    }
                     .accessibilityLabel(String(localized: "Amount field"))
                     .accessibilityHint(String(localized: "Enter the amount for this sub-operation"))
                     .accessibilityValue(amount.isEmpty ? String(localized: "No amount entered") :
                                             amount)
             }
             .padding(.bottom)
-            .onAppear {
-                
-            }
             
             HStack {
                 Button(action: {

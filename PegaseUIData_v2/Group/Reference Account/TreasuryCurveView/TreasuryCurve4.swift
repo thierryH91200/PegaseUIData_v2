@@ -403,13 +403,10 @@ struct DGLineChartRepresentable: NSViewRepresentable {
         marker.interval = hourSeconds
 
         // MARK: Datasets
-        
-        let label = [String(localized:"Planned"),
-                     String(localized:"In progress"),
-                     String(localized:"Executed")   ]
-        let set1 = setDataSet(values: values0, label: label[0], color: #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1))
-        let set2 = setDataSet(values: values1, label: label[1], color: #colorLiteral(red: 0.5058823824, green: 0.3372549117, blue: 0.06666667014, alpha: 1))
-        let set3 = setDataSet(values: values2, label: label[2], color: #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1))
+        // values0 = soldeRealise, values1 = soldeEngage, values2 = soldePrevu
+        let set1 = setDataSet(values: values0, label: String(localized:"Executed"), color: #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1))
+        let set2 = setDataSet(values: values1, label: String(localized:"In progress"), color: #colorLiteral(red: 0.5058823824, green: 0.3372549117, blue: 0.06666667014, alpha: 1))
+        let set3 = setDataSet(values: values2, label: String(localized:"Planned"), color: #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1))
 
         let dataSet = LineChartData(dataSets: [set1, set2, set3])
         dataSet.setValueTextColor(.black)
@@ -426,6 +423,11 @@ struct DGLineChartRepresentable: NSViewRepresentable {
         pFormatter.numberStyle = .currency
         pFormatter.maximumFractionDigits = 2
         
+        let formatter = NumberFormatter()
+            formatter.numberStyle = .currency
+            formatter.locale = Locale.current
+
+        
         dataSet = LineChartDataSet(entries: values, label: label)
         dataSet.axisDependency = .left
         dataSet.mode = .stepped
@@ -433,8 +435,7 @@ struct DGLineChartRepresentable: NSViewRepresentable {
         dataSet.lineWidth = 2.0
         
         dataSet.drawCirclesEnabled = false
-        dataSet.drawValuesEnabled = true
-        dataSet.valueFormatter = DefaultValueFormatter(formatter: pFormatter  )
+        dataSet.drawValuesEnabled = false
         
         dataSet.drawFilledEnabled = false //true
         dataSet.fillAlpha = 0.26
@@ -446,6 +447,14 @@ struct DGLineChartRepresentable: NSViewRepresentable {
         dataSet.colors = [color]
         return dataSet
     }
+    
+    func formatPrice(_ amount: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = Locale.current
+        return formatter.string(from: NSNumber(value: amount)) ?? "\(amount)"
+    }
+
     
     func initGraph(on chartView: LineChartView) {
         
@@ -484,6 +493,7 @@ struct DGLineChartRepresentable: NSViewRepresentable {
         leftAxis.granularityEnabled   = true
         leftAxis.yOffset              = -9.0
         leftAxis.labelTextColor       = .labelColor
+        leftAxis.valueFormatter       = CurrencyAxisValueFormatter()
         
         // MARK: rightAxis
         chartView.rightAxis.enabled = false
@@ -557,29 +567,28 @@ struct DGLineChartRepresentable: NSViewRepresentable {
             for tx in dayTransactions {
                 switch tx.status?.type {
                 case .planned:
-                    prevu += tx.amount
+                    soldePrevu += tx.amount
                 case .inProgress:
-                    engage += tx.amount
+                    soldeEngage += tx.amount
                 case .executed:
                     soldeRealise += tx.amount
                 case .none:
-                    let _ = 0.0
+                    break
                 }
             }
 
-            soldePrevu  += soldeRealise + engage + prevu
-            soldeEngage += soldeRealise + engage
-            
-            prevu  = 0.0
-            engage = 0.0
+            // soldeEngage inclut soldeRealise + les "en cours"
+            // soldePrevu inclut soldeEngage + les "prévu"
+            let engageTotal = soldeRealise + soldeEngage
+            let prevuTotal = engageTotal + soldePrevu
 
-//            printTag("n°\(offset)    \(soldePrevu)  \(soldeEngage)  \(soldeRealise)", flag: true)
-            
+//            printTag("n°\(offset)    \(prevuTotal)  \(engageTotal)  \(soldeRealise)", flag: true)
+
             dataTresorerie = DataTresorerie(
                 x            : Double(offset),
                 soldeRealise : soldeRealise,
-                soldeEngage  : soldeEngage,
-                soldePrevu   : soldePrevu
+                soldeEngage  : engageTotal,
+                soldePrevu   : prevuTotal
             )
             dataGraph.append(dataTresorerie)
         }
@@ -611,5 +620,21 @@ struct DGLineChartRepresentable: NSViewRepresentable {
 //        return (startDate, endDate)
 //    }
 
+}
+
+// MARK: - Currency Formatter pour l'axe Y
+class CurrencyAxisValueFormatter: AxisValueFormatter {
+
+    private let formatter: NumberFormatter = {
+        let fmt = NumberFormatter()
+        fmt.numberStyle = .currency
+        fmt.locale = Locale.current
+        fmt.maximumFractionDigits = 0
+        return fmt
+    }()
+
+    func stringForValue(_ value: Double, axis: AxisBase?) -> String {
+        return formatter.string(from: NSNumber(value: value)) ?? "\(Int(value))"
+    }
 }
 

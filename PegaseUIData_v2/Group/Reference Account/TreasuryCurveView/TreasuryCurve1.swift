@@ -37,10 +37,10 @@ struct TreasuryCurveView: View {
         }
         .onAppear {
             dashboard.isVisible = true
-            transactions = ListTransactionsManager.shared.getAllData().sorted(by: { $0.dateOperation < $1.dateOperation })
+            transactions = ListTransactionsManager.shared.getAllData().sorted(by: { $0.datePointage < $1.datePointage })
 
             // init des valeurs
-            if let first = transactions.first?.dateOperation, let last = transactions.last?.dateOperation {
+            if let first = transactions.first?.datePointage, let last = transactions.last?.datePointage {
                 let days = last.timeIntervalSince(first) / 86400
                 lowerValue = 0
                 upperValue = days

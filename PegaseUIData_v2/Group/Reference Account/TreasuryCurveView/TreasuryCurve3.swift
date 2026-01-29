@@ -64,41 +64,51 @@ class TresuryLineViewModel: ObservableObject, TeeasuryManaging {
         guard !listTransactions.isEmpty else {
             DispatchQueue.main.async { self.dataGraph = dataGraph }
             return }
-        
+
         let calendar = Calendar.current
-        let grouped = Dictionary(grouping: listTransactions, by: { calendar.startOfDay(for: $0.datePointage) })
-        
+
+        // Trier les transactions par datePointage pour un calcul cumulatif correct
+        let sortedTransactions = listTransactions.sorted { $0.datePointage < $1.datePointage }
+
+        // Trouver la première date
+        guard let firstTransaction = sortedTransactions.first else { return }
+        let baseDate = calendar.startOfDay(for: firstTransaction.datePointage)
+
+        // Grouper par jour
+        let grouped = Dictionary(grouping: sortedTransactions, by: { calendar.startOfDay(for: $0.datePointage) })
+
         let startOffset = Int(lowerValue)
         let endOffset = Int(upperValue)
-        
+
         let initAccount = InitAccountManager.shared.getAllData()
         var soldeRealise = initAccount?.realise ?? 0
         var soldePrevu = initAccount?.prevu ?? 0
         var soldeEngage = initAccount?.engage ?? 0
-        
+
         for offset in startOffset...endOffset {
-            let dayDate = Date(timeIntervalSince1970: firstDate + Double(offset) * hourSeconds)
+            // Utiliser Calendar pour ajouter des jours (cohérent avec startOfDay)
+            guard let dayDate = calendar.date(byAdding: .day, value: offset, to: baseDate) else { continue }
             let dayTransactions = grouped[dayDate] ?? []
-            
-            var prevu = 0.0
-            var engage = 0.0
-            
+
             for tx in dayTransactions {
                 switch tx.status?.type {
-                case .planned: prevu += tx.amount
-                case .inProgress: engage += tx.amount
+                case .planned: soldePrevu += tx.amount
+                case .inProgress: soldeEngage += tx.amount
                 case .executed: soldeRealise += tx.amount
                 case .none: break
                 }
             }
-            soldePrevu += soldeRealise + engage + prevu
-            soldeEngage += soldeRealise + engage
-            
+
+            // soldeEngage inclut soldeRealise + les "en cours"
+            // soldePrevu inclut soldeEngage + les "prévu"
+            let engageTotal = soldeRealise + soldeEngage
+            let prevuTotal = engageTotal + soldePrevu
+
             dataGraph.append(DataTresorerie(
                 x: Double(offset),
                 soldeRealise: soldeRealise,
-                soldeEngage: soldeEngage,
-                soldePrevu: soldePrevu
+                soldeEngage: engageTotal,
+                soldePrevu: prevuTotal
             ))
         }
         DispatchQueue.main.async {

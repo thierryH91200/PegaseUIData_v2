@@ -80,7 +80,10 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
         // Création du prédicat pour filtrer les transactions par compte
         let currentAccountID = currentAccount.uuid
         let predicate = #Predicate<EntityTransaction> { $0.account.uuid == currentAccountID }
-        let sort = [ SortDescriptor(\EntityTransaction.datePointage, order: ascending ? .forward : .reverse) ]
+        let sort = [
+            SortDescriptor(\EntityTransaction.datePointage, order: ascending ? .forward : .reverse),
+            SortDescriptor(\EntityTransaction.dateOperation, order: ascending ? .forward : .reverse)
+        ]
 
         // Création du FetchDescriptor avec les tri par datePointage et dateOperation
         let fetchDescriptor = FetchDescriptor<EntityTransaction>(
@@ -90,6 +93,12 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
         do {
             // Récupération des entités depuis le contexte
             listTransactions = try modelContext?.fetch(fetchDescriptor) ?? []
+            print("date   sepa")
+            for listTransaction in listTransactions {
+                print(listTransaction.datePointage, "    ", listTransaction.status?.name)
+            }
+            print("fin date")
+
         } catch {
             printTag("Erreur lors de la récupération des données avec SwiftData : \(error)", flag: true)
             return []
