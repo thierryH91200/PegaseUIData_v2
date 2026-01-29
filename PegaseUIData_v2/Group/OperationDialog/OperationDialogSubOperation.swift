@@ -12,8 +12,8 @@ import SwiftData
 struct SubOperationDialog: View {
     
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var formState: TransactionFormState
     
+    @EnvironmentObject var formState: TransactionFormState
     @EnvironmentObject var transactionManager: TransactionSelectionManager
     
     @Binding var subOperation: EntitySousOperation?
@@ -83,6 +83,7 @@ struct SubOperationDialog: View {
                         .fill(isSigne ? .green : .red)
                         .frame(width: 30, height: 30)
                     
+                    
                     Image(systemName: isSigne ? "plus" : "minus")
                         .foregroundColor(.white)
                         .font(.system(size: 16, weight: .bold))
@@ -102,6 +103,9 @@ struct SubOperationDialog: View {
                                             amount)
             }
             .padding(.bottom)
+            .onAppear {
+                
+            }
             
             HStack {
                 Button(action: {
@@ -156,8 +160,10 @@ struct SubOperationDialog: View {
                             isSigne = shouldBeExpanded
                         }
                     } else {
-                        amount = "0.0"
-                        isSigne = false
+                        if let entityPreference = PreferenceManager.shared.getAllData() {
+                            amount = "0.0"
+                            isSigne = entityPreference.signe
+                        }
                     }
                 } else {
                     configureForm()
@@ -202,8 +208,8 @@ struct SubOperationDialog: View {
     }
     
     func configureForm() {
-        let account = CurrentAccountManager.shared.getAccount()
-        self.entityPreference = PreferenceManager.shared.getAllData(for: account)
+
+        self.entityPreference = PreferenceManager.shared.getAllData()
         
         if let preference = entityPreference, let rubricIndex = entityRubric.firstIndex(where: { $0 == preference.category?.rubric }) {
             selectedRubric = entityRubric[rubricIndex]

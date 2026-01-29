@@ -52,7 +52,7 @@ enum AppLogger {
 
 /// Temporary compatibility function to replace printTag() calls
 /// TODO: Gradually replace all printTag() calls with AppLogger usage
-@available(*, deprecated, message: "Use AppLogger instead")
+//@available(*, deprecated, message: "Use AppLogger instead")
 func printTag(_ message: String, file: String = #file, function: String = #function, line: Int = #line) {
     let fileName = (file as NSString).lastPathComponent
     let logMessage = "[\(fileName):\(line)] \(function) - \(message)"

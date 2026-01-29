@@ -95,7 +95,6 @@ struct PreferenceTransactionView: View {
                 
                 VStack(alignment: .leading) {
                     Picker("Rubric", selection: $selectedRubricID) {
-//                        Text("Aucune rubrique").tag(nil as PersistentIdentifier?)
                         ForEach(entityRubric, id: \.self) {
                             Text($0.name).tag($0.persistentModelID as PersistentIdentifier?)
                         }
@@ -274,7 +273,7 @@ struct PreferenceTransactionView: View {
     // Rafraîchir les données du formulaire
     private func refreshData(for account: EntityAccount) async throws {
         guard DataContext.shared.context != nil else { return }
-        let pref = PreferenceManager.shared.getAllData(for: account)
+        let pref = PreferenceManager.shared.getAllData()
         dataManager.preferencePreferenceID = pref?.persistentModelID
         guard let entityPreference = pref else { 
             // Si pas de préférence, nettoyer les sélections

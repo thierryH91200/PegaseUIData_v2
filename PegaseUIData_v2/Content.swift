@@ -31,7 +31,7 @@ struct ContentView100: View {
     var transactions: [EntityTransaction] = []
 
     @State private var selection1: UUID?
-    @State private var selection2: String? = "Notes"
+    @State private var selection2: String? = String(localized:"Notes", table: "Menu")
     @State private var isVisible: Bool = true
     @State private var isToggle: Bool = false
 

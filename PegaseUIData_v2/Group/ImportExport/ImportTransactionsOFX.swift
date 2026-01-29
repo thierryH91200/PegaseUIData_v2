@@ -130,7 +130,7 @@ struct ImportTransactionOFXFileView: View {
             entityTransaction.checkNumber = "0"
             entityTransaction.bankStatement = 0.0
             
-            let preference = PreferenceManager.shared.getAllData(for: account)
+            let preference = PreferenceManager.shared.getAllData()
             entityTransaction.status = preference?.status
             entityTransaction.paymentMode = preference?.paymentMode
             

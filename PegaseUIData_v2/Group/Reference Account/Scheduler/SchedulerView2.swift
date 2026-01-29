@@ -76,17 +76,14 @@ struct SchedulerFormView: View {
             }
         }
         .onAppear {
-            guard let account = CurrentAccountManager.shared.getAccount() else {
-                printTag("Erreur : aucun compte courant trouvé.")
-                return
-            }
+            
             frequenceType = [
                 String(localized :"Day",table : "Account"),
                 String(localized :"Week",table : "Account"),
                 String(localized :"Month",table : "Account"),
                 String(localized :"Year",table : "Account")]
             
-            let entityPreference = PreferenceManager.shared.getAllData(for: account)
+            let entityPreference = PreferenceManager.shared.getAllData()
             entityPaymentMode = PaymentModeManager.shared.getAllData()
             entityRubric = RubricManager.shared.getAllData()
             

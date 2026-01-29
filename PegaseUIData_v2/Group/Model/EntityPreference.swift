@@ -44,7 +44,7 @@ import Combine
 protocol PreferenceManaging {
 
     func defaultPref(account: EntityAccount) -> EntityPreference?
-    func getAllData(for account: EntityAccount?) -> EntityPreference?
+    func getAllData() -> EntityPreference?
     func saveContext()
 }
 
@@ -67,7 +67,7 @@ final class PreferenceManager: PreferenceManaging {
     // MARK: - default
     @MainActor func defaultPref(account: EntityAccount) -> EntityPreference? {
         // Vérifie si une préférence existe déjà
-        if let existingPreference = getAllData(for: account) {
+        if let existingPreference = getAllData() {
             return existingPreference
         }
 
@@ -100,7 +100,9 @@ final class PreferenceManager: PreferenceManaging {
         return newPreference
     }
     
-    func getAllData(for account: EntityAccount?) -> EntityPreference? {
+    func getAllData() -> EntityPreference? {
+        
+        let account = CurrentAccountManager.shared.getAccount()
         guard let account = account else {
             printTag("Preference : Erreur : Account est nil")
             return nil

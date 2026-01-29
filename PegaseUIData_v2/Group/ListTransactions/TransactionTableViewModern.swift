@@ -59,8 +59,7 @@ struct TransactionTableViewModern: View {
 
     // Vérifie si le regroupement CB est activé dans les préférences
     var shouldGroupCarteBancaire: Bool {
-        guard let account = compteCurrent else { return false }
-        return PreferenceManager.shared.getAllData(for: account)?.groupCarteBancaire ?? false
+        return PreferenceManager.shared.getAllData()?.groupCarteBancaire ?? false
     }
 
     var selectionInfo: AttributedString {

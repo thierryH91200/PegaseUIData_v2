@@ -159,7 +159,7 @@ struct ImportTransactionFileView: View {
         
         let account = CurrentAccountManager.shared.getAccount()!
 
-        let entityPreference = PreferenceManager.shared.getAllData(for: account)
+        let entityPreference = PreferenceManager.shared.getAllData()
         
         for row in csvData.dropFirst() { // Ignorer l'en-tête
             
@@ -333,7 +333,7 @@ struct TableView: View {
             entityTransaction.checkNumber = "0"
             entityTransaction.bankStatement = 0.0
             
-            let preference = PreferenceManager.shared.getAllData(for: account)
+            let preference = PreferenceManager.shared.getAllData()
             entityTransaction.status = preference?.status
             entityTransaction.paymentMode = preference?.paymentMode
             

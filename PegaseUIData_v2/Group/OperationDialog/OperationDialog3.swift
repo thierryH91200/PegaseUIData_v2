@@ -181,96 +181,157 @@ struct TransactionFormViewModel: View {
         }
     }
     
+    private var informationHeader: some View {
+        Text("Informations")
+            .font(.headline)
+            .foregroundStyle(Color.accentColor)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    private var detailsHeader: some View {
+        Text("Details of the operation")
+            .font(.headline)
+            .foregroundStyle(Color.accentColor)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    @ViewBuilder private var separatorDots: some View {
+        HStack {
+            Spacer()
+            Text("⋯")
+                .font(.system(size: 32, weight: .bold))
+                .foregroundColor(.secondary)
+            Spacer()
+        }
+    }
+    
     var body: some View {
-
+        formContent
+            .modifier(TransactionFormModifiers(
+                viewModel: self,
+                selectedAccount: $selectedAccount,
+                selectedMode: $selectedMode,
+                selectedStatus: $selectedStatus
+            ))
+    }
+    
+    private var formContent: some View {
         Form {
-            Section {
-                Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 12) {
-                    GridRow {
-                        Text("Informations")
-                            .font(.headline)
-                            .foregroundColor(.accentColor)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    GridRow {
-                        identitySection
-                    }
-                }
+            informationSection
+            separatorDots
+            detailsSection
+        }
+    }
+    
+    private var informationSection: some View {
+        Section {
+            Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 12) {
+                GridRow { informationHeader }
+                GridRow { identitySection }
             }
+        }
+    }
+    
+    private var detailsSection: some View {
+        Section {
+            Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 12) {
+                GridRow { detailsHeader }
+                GridRow { detailSection }
+            }
+        }
+    }
+    
+    // Add a new private helper just below body to reduce closure complexity
+    func performInitialSelection() {
+        // Keep the same behavior while simplifying expressions
+        selectedAccount = linkedAccount.first(where: { $0.uuid == selectedAccount?.uuid })
+        if selectedAccount == nil { selectedAccount = nil }
 
-            HStack {
-                Spacer()
-                Text("⋯")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.secondary)
-                Spacer()
-            }
+        if let oldSelected = selectedAccount {
+            selectedAccount = linkedAccount.first(where: { $0.uuid == oldSelected.uuid })
+        }
 
-            Section {
-                Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 12) {
-                    GridRow {
-                        Text("Details of the operation")
-                            .font(.headline)
-                            .foregroundColor(.accentColor)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    GridRow {
-                        detailSection
-                    }
-                }
-            }
+        entityPreference = PreferenceManager.shared.getAllData()
+
+        if selectedAccount == nil {
+            selectedAccount = linkedAccount.first ?? compteCurrent
+        }
+
+        DispatchQueue.main.async {
+            selectedMode = entityPreference?.paymentMode
+            selectedStatus = entityPreference?.status
+            selectedBankStatement = ""
+        }
+    }
+}
+
+// MARK: - View Modifier to break up complex type-checking
+struct TransactionFormModifiers: ViewModifier {
+    let viewModel: TransactionFormViewModel
+    @Binding var selectedAccount: EntityAccount?
+    @Binding var selectedMode: EntityPaymentMode?
+    @Binding var selectedStatus: EntityStatus?
+    
+    func body(content: Content) -> some View {
+        content
+            .modifier(AppearanceModifier(viewModel: viewModel))
+            .modifier(SelectionChangeModifier(
+                selectedAccount: $selectedAccount,
+                selectedMode: $selectedMode,
+                selectedStatus: $selectedStatus,
+                viewModel: viewModel
+            ))
+    }
+}
+
+// Break up the modifiers into separate structs
+private struct AppearanceModifier: ViewModifier {
+    let viewModel: TransactionFormViewModel
+    
+    func body(content: Content) -> some View {
+        content
             .onAppear {
-                            
-                selectedAccount = linkedAccount.first(where: { $0.uuid == selectedAccount?.uuid })
-                if selectedAccount == nil {
-                    selectedAccount = nil // Pour que le Picker reconnaisse l'état initial
-                }
-
-                let account = CurrentAccountManager.shared.getAccount()
-                guard let account = account else { return }
-                if let oldSelected = selectedAccount {
-                    selectedAccount = linkedAccount.first(where: { $0.uuid == oldSelected.uuid })
-                }
-
-                entityPreference = PreferenceManager.shared.getAllData(for: account)
-                
-                //            if selectedAccount == nil, let firstAccount = linkedAccount.first {
-                //                selectedAccount = firstAccount // Initialisation avec un compte valide
-                //            }
-                
-                if selectedAccount == nil {
-                    selectedAccount = linkedAccount.first ?? compteCurrent
-                }
-                
-                DispatchQueue.main.async {
-//                    selectedMode = modes.first
-                    selectedMode = entityPreference?.paymentMode
-                    selectedStatus = entityPreference?.status
-                    selectedBankStatement = ""
-                }
+                viewModel.performInitialSelection()
             }
-            .onChange(of: selectedAccount) { old, newValue in
-//                printTag("Selected Account: \(newValue?.name ?? "nil")")
-            }
+    }
+}
+
+private struct SelectionChangeModifier: ViewModifier {
+    @Binding var selectedAccount: EntityAccount?
+    @Binding var selectedMode: EntityPaymentMode?
+    @Binding var selectedStatus: EntityStatus?
+    let viewModel: TransactionFormViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: selectedAccount) { old, newValue in }
             .onChange(of: selectedMode) { old, newValue in
-                printTag("Selected Mode: \(newValue?.name ?? "nil")")
+                printTag("Selected Mode: " + (newValue?.name ?? "nil"))
             }
+            .modifier(StatusAndAccountChangeModifier(
+                selectedAccount: $selectedAccount,
+                selectedStatus: $selectedStatus,
+                viewModel: viewModel
+            ))
+    }
+}
+
+private struct StatusAndAccountChangeModifier: ViewModifier {
+    @Binding var selectedAccount: EntityAccount?
+    @Binding var selectedStatus: EntityStatus?
+    let viewModel: TransactionFormViewModel
+    
+    func body(content: Content) -> some View {
+        content
             .onChange(of: selectedStatus) { old, newValue in
-                printTag("Selected Status: \(newValue?.name ?? "nil")")
+                printTag("Selected Status: " + (newValue?.name ?? "nil"))
             }
-            .onChange(of: compteCurrent) {old, new in
-                selectedAccount = compteCurrent
+            .onChange(of: viewModel.compteCurrent) { old, new in
+                selectedAccount = viewModel.compteCurrent
             }
-            
-            .onChange(of: linkedAccount) { old, newValue in
+            .onChange(of: viewModel.linkedAccount) { old, newValue in
                 if let oldSelected = selectedAccount {
                     selectedAccount = newValue.first(where: { $0.uuid == oldSelected.uuid })
                 }
-                return
             }
-            .onChange(of: selectedAccount) { oldValue, newValue in
-            }
-        }
     }
 }
 

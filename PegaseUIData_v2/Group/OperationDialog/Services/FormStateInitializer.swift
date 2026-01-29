@@ -29,7 +29,7 @@ struct FormStateInitializer {
         referenceData: FormReferenceData
     ) {
         guard let account = CurrentAccountManager.shared.getAccount(),
-              let preference = PreferenceManager.shared.getAllData(for: account) else {
+              let preference = PreferenceManager.shared.getAllData() else {
             return
         }
 

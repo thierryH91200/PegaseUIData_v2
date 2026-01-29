@@ -37,9 +37,7 @@ struct BankView: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
     @EnvironmentObject var dataManager: BankDataManager
-
-//    @Query private var banqueInfos: [EntityBanqueInfo]
-    
+   
     var body: some View {
         VStack(spacing: 30) {
             if let account = CurrentAccountManager.shared.getAccount() {

@@ -68,7 +68,7 @@ struct TransactionFilterView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else {
-                    Text("Aucun filtre appliqué")
+                    Text("No filter applied")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -78,7 +78,7 @@ struct TransactionFilterView: View {
 
             // Stats
             VStack(alignment: .trailing, spacing: 4) {
-                Text("\(viewModel.filteredTransactions.count) résultats")
+                Text("\(viewModel.filteredTransactions.count) results")
                     .font(.headline)
 
                 if viewModel.isFiltered {
@@ -95,7 +95,7 @@ struct TransactionFilterView: View {
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
-                .help("Effacer le filtre")
+                .help("Clear the filter")
             }
         }
         .padding(.horizontal, 16)
@@ -131,7 +131,7 @@ struct TransactionFilterView: View {
                 .foregroundColor(.secondary)
 
             if viewModel.isFiltered {
-                Text("Essayez d'ajuster les critères de filtre")
+                Text("Try adjusting the filter criteria")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

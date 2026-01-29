@@ -119,6 +119,7 @@ struct OperationDialogView: View {
     }
     
     private func handleCancel() {
+        resetListTransactions()
         transactionManager.selectedTransaction = nil
         transactionManager.selectedTransactions.removeAll()
         transactionManager.isCreationMode = true
@@ -268,8 +269,7 @@ struct OperationDialogView: View {
         
     func resetListTransactions() {
         
-        let account = CurrentAccountManager.shared.getAccount()
-        let entityPreference = PreferenceManager.shared.getAllData(for: account)
+        let entityPreference = PreferenceManager.shared.getAllData()
 
         formState.currentTransaction = nil
         formState.currentSousTransaction = nil

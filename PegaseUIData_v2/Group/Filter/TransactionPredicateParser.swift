@@ -754,7 +754,7 @@ struct TransactionPredicateParser {
     /// Construit un prédicat pour filtrer sur la rubrique
     private static func buildRubricPredicate(rubricName: String, comparator: String) -> Predicate<EntityTransaction>? {
         // Capturer lhsAccount dans une variable locale pour éviter les problèmes de capture
-        let accountUUID = lhsAccount
+//        let accountUUID = lhsAccount
 
         // .@count > 0 signifie "contient au moins un élément qui satisfait la condition"
         if comparator.starts(with: ">") || comparator.starts(with: "!= 0") {
