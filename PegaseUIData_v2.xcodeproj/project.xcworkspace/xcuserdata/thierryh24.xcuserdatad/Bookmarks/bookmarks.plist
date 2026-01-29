@@ -10,15 +10,15 @@
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>30</string>
+					<string>8</string>
 					<key>EndingLineNumber</key>
 					<string>264</string>
 					<key>StartingColumnNumber</key>
-					<string>9</string>
+					<string>8</string>
 					<key>StartingLineNumber</key>
 					<string>264</string>
 					<key>Timestamp</key>
-					<string>791282900.099273</string>
+					<string>791299244.452033</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -34,15 +34,15 @@
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>resetListTransactions</string>
+				<string></string>
 				<key>leading</key>
-				<string>    }
-        
-    func </string>
+				<string>        transaction?.checkNumber = String(formState.checkNumber)
+        transaction?.account = account
+        </string>
 				<key>trailing</key>
-				<string>() {
-        
-        let account = CurrentAccountManager.shared.getAccount()
+				<string>
+        formState.currentTransaction = transaction
+    }
 </string>
 			</dict>
 			<key>type</key>

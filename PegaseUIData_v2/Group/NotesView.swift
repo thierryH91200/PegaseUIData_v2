@@ -18,12 +18,13 @@ struct NotesView: View {
             .environmentObject(dataManager)
 
             .padding()
-//            .task {
-//                await performFalseTask()
-//            }
-            .onAppear {
-                isVisible = false
+            .task {
+                await performFalseTask()
             }
+            .onAppear() {
+                
+            }
+
     }
     private func performFalseTask() async {
         // Exécuter une tâche asynchrone (par exemple, un délai)

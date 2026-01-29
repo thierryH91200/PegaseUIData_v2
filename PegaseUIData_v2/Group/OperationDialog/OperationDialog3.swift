@@ -127,22 +127,24 @@ struct TransactionFormViewModel: View {
             }
             GridRow {
                 FormField(label: String(localized:"Status")) {
-                    StatusPickerView(
-                        statuses: status,
-                        selectedStatus: $selectedStatus
-                    )
-                    HelpButton {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("• **Planned**: estimated check-in date, amount subject to changee")
-                            Text("• **Committed**: estimated check-in date, modifiable amount")
-                            Text("• **Pointed**: exact date of the statement, amount not modifiable")
-                            Divider()
-                            Text("💡 **Keyboard shortcuts**: P = Planned, E = Committed, T = Pointed")
+                    HStack {
+                        StatusPickerView(
+                            statuses: status,
+                            selectedStatus: $selectedStatus
+                        )
+                        HelpButton {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("• **Planned**: estimated check-in date, amount subject to changee")
+                                Text("• **Committed**: estimated check-in date, modifiable amount")
+                                Text("• **Pointed**: exact date of the statement, amount not modifiable")
+                                Divider()
+                                Text("💡 **Keyboard shortcuts**: P = Planned, E = Committed, T = Pointed")
+                            }
+                            .font(.system(size: 12))
+                            .padding(8)
                         }
-                        .font(.system(size: 12))
-                        .padding(8)
+                        Spacer()
                     }
-
                 }
             }
             GridRow {

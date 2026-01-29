@@ -15,7 +15,7 @@ struct FormActionButtonsView: View {
 
     var body: some View {
         HStack {
-            Button("Annuler") {
+            Button("Cancel") {
                 onCancel()
             }
             .keyboardShortcut(.cancelAction)

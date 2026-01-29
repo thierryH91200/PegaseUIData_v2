@@ -48,6 +48,7 @@ struct PreferenceTransactionView: View {
     @State var selectedModeID     : PersistentIdentifier?
     
     @State private var isExpanded = false // Indicateur pour l'état de sélection du signe
+    @State private var groupCarteBancaire = false // Option regroupement CB (carte débit différé)
     @State var changeCounter = 0
 
     private func resolveStatus() -> EntityStatus? {
@@ -131,7 +132,7 @@ struct PreferenceTransactionView: View {
                     Rectangle()
                         .fill(isExpanded ? Color.red : Color.green)
                         .frame(width: 30, height: 30)
-                    
+
                     Image(systemName: isExpanded ? "minus" : "plus")
                         .foregroundColor(.white)
                         .font(.system(size: 16, weight: .bold))
@@ -141,6 +142,19 @@ struct PreferenceTransactionView: View {
                 }
             }
             .padding(.bottom)
+
+            // Option regroupement Carte Bancaire (pour cartes à débit différé)
+            Toggle(isOn: $groupCarteBancaire) {
+                HStack {
+                    Image(systemName: "creditcard.fill")
+                        .foregroundColor(.blue)
+                    Text("Group credit card transactions")
+                }
+            }
+            .toggleStyle(.switch)
+            .padding(.horizontal)
+            .help("Activate this option if you have a deferred debit card to group your credit card transactions by month.")
+
             Spacer()
         }
         .onAppear {
@@ -227,6 +241,9 @@ struct PreferenceTransactionView: View {
                           category: EntityCategory,
                           preference: EntityPreference,
                           sign: Bool) async {
+        // Mettre à jour l'option CB
+        preference.groupCarteBancaire = groupCarteBancaire
+
         Task {
             try await PreferenceManager.shared.update(status: status,
                                                        mode: mode,
@@ -276,13 +293,14 @@ struct PreferenceTransactionView: View {
         
         selectedStatusID = entityPreference.status?.persistentModelID
         selectedStatus = entityPreference.status
-        
+
         selectedModeID = entityPreference.paymentMode?.persistentModelID
         selectedMode = entityPreference.paymentMode
-        
+
         selectedRubricID = entityPreference.category?.rubric?.persistentModelID
         selectedCategoryID = entityPreference.category?.persistentModelID
         isExpanded = entityPreference.signe
+        groupCarteBancaire = entityPreference.groupCarteBancaire
         
         entityStatus = StatusManager.shared.getAllData(for: account)
         entityPaymentMode = PaymentModeManager.shared.getAllData()

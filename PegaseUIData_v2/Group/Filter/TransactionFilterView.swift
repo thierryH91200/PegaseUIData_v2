@@ -387,7 +387,7 @@ final class TransactionFilterViewModel: ObservableObject {
             if swiftDataPredicate == nil && finalPredicate != nil {
                 print("   ⚠️ Prédicat non supporté par SwiftData, post-filtrage en mémoire...")
                 let allDescriptor = FetchDescriptor<EntityTransaction>(
-                    sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
+                    sortBy: [SortDescriptor(\.datePointage, order: .reverse)]
                 )
                 let allTransactions = try modelContext.fetch(allDescriptor)
 
@@ -402,7 +402,7 @@ final class TransactionFilterViewModel: ObservableObject {
                 print("   → Création du FetchDescriptor...")
                 let descriptor = FetchDescriptor<EntityTransaction>(
                     predicate: swiftDataPredicate,
-                    sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
+                    sortBy: [SortDescriptor(\.datePointage, order: .reverse)]
                 )
                 filteredTransactions = try modelContext.fetch(descriptor)
                 print("   ✅ Fetch réussi: \(filteredTransactions.count) résultats")
@@ -410,7 +410,7 @@ final class TransactionFilterViewModel: ObservableObject {
                 // Aucun prédicat
                 print("   → Chargement sans filtre")
                 let descriptor = FetchDescriptor<EntityTransaction>(
-                    sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
+                    sortBy: [SortDescriptor(\.datePointage, order: .reverse)]
                 )
                 filteredTransactions = try modelContext.fetch(descriptor)
                 print("   ✅ Fetch réussi: \(filteredTransactions.count) résultats")
@@ -425,7 +425,7 @@ final class TransactionFilterViewModel: ObservableObject {
             print("   → Chargement avec prédicat compte uniquement")
             do {
                 let descriptor = FetchDescriptor<EntityTransaction>(
-                    sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
+                    sortBy: [SortDescriptor(\.datePointage, order: .reverse)]
                 )
                 filteredTransactions = try modelContext.fetch(descriptor)
             } catch {
@@ -444,7 +444,7 @@ final class TransactionFilterViewModel: ObservableObject {
             print("   → Tentative de chargement avec prédicat compte uniquement...")
             do {
                 let descriptor = FetchDescriptor<EntityTransaction>(
-                    sortBy: [SortDescriptor(\.dateOperation, order: .reverse)]
+                    sortBy: [SortDescriptor(\.datePointage, order: .reverse)]
                 )
                 filteredTransactions = try modelContext.fetch(descriptor)
                 print("   ✅ Chargement avec compte uniquement réussi: \(filteredTransactions.count) résultats")

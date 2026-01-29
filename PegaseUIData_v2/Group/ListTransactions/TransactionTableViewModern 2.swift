@@ -233,6 +233,7 @@ struct TransactionYearGroup: Identifiable {
     let month: Int?
     var monthGroups: [TransactionYearGroup]?
     var transactions: [EntityTransaction]?
+    var isPaymentModeGroup: Bool = false  // Indique si c'est un sous-groupe par mode de paiement
 
     var transaction: EntityTransaction? {
         // Retourne la transaction seulement si ce n'est pas un groupe (a des transactions)

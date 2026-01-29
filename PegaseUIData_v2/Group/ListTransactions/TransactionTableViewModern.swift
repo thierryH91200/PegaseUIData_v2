@@ -34,7 +34,7 @@ struct TransactionTableViewModern: View {
     @Binding var dashboard: DashboardState
     @Binding var selectedTransactions: Set<UUID>
 
-    @State private var sortOrder = [KeyPathComparator(\EntityTransaction.dateOperation, order: .reverse)]
+    @State private var sortOrder = [KeyPathComparator(\EntityTransaction.datePointage, order: .reverse)]
     @State private var searchText = ""
     @State var groupedData: [TransactionYearGroup] = []
 
@@ -55,6 +55,12 @@ struct TransactionTableViewModern: View {
 
     var compteCurrent: EntityAccount? {
         CurrentAccountManager.shared.getAccount()
+    }
+
+    // Vérifie si le regroupement CB est activé dans les préférences
+    var shouldGroupCarteBancaire: Bool {
+        guard let account = compteCurrent else { return false }
+        return PreferenceManager.shared.getAllData(for: account)?.groupCarteBancaire ?? false
     }
 
     var selectionInfo: AttributedString {
@@ -158,7 +164,32 @@ struct TransactionTableViewModern: View {
                         )
                     ) {
                         ForEach(monthGroup.monthGroups ?? []) { transactionGroup in
-                            if let transaction = transactionGroup.transaction {
+                            // Si c'est un sous-groupe "Carte Bancaire"
+                            if transactionGroup.isPaymentModeGroup {
+                                let cbKey = "cb_\(monthGroup.year)_\(monthGroup.month ?? 0)"
+                                DisclosureGroup(
+                                    isExpanded: Binding(
+                                        get: { isExpanded(for: cbKey) },
+                                        set: { _ in toggleDisclosure(for: cbKey) }
+                                    )
+                                ) {
+                                    ForEach(transactionGroup.monthGroups ?? []) { cbTransaction in
+                                        if let transaction = cbTransaction.transaction {
+                                            transactionRowContent(for: transaction)
+                                                .tag(transaction.uuid)
+                                        }
+                                    }
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "creditcard.fill")
+                                            .foregroundColor(.blue)
+                                        Text(transactionGroup.displayName)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                    }
+                                }
+                            } else if let transaction = transactionGroup.transaction {
+                                // Transaction normale (pas Carte Bancaire)
                                 transactionRowContent(for: transaction)
                                     .tag(transaction.uuid)
                             }
@@ -445,8 +476,11 @@ struct TransactionTableViewModern: View {
 
     private func updateGroupedData() {
         // Grouper les transactions par année et mois
-        // Structure à 2 niveaux : Mois > Transactions
+        // Structure à 3 niveaux pour Carte Bancaire (si activé) : Mois > Carte Bancaire > Transactions
+        // Structure à 2 niveaux pour autres : Mois > Transactions
         let calendar = Calendar.current
+        let groupCB = shouldGroupCarteBancaire  // Vérifie la préférence
+
         let grouped = Dictionary(grouping: transactions) { transaction in
             calendar.component(.year, from: transaction.dateOperation)
         }
@@ -454,7 +488,7 @@ struct TransactionTableViewModern: View {
         groupedData = grouped.keys.sorted(by: >).flatMap { year in
             let yearTransactions = grouped[year] ?? []
             let monthGrouped = Dictionary(grouping: yearTransactions) { transaction in
-                calendar.component(.month, from: transaction.dateOperation)
+                calendar.component(.month, from: transaction.datePointage)
             }
 
             // Créer un groupe pour chaque mois avec ses transactions
@@ -462,19 +496,81 @@ struct TransactionTableViewModern: View {
                 let monthName = calendar.monthSymbols[month - 1]
                 let monthTransactions = monthGrouped[month] ?? []
 
-                // Créer des wrappers pour chaque transaction individuelle
-                let transactionGroups = monthTransactions
-                    .sorted { $0.dateOperation > $1.dateOperation }
-                    .map { transaction in
-                        TransactionYearGroup(
-                            id: transaction.uuid,
-                            displayName: "",
+                var transactionGroups: [TransactionYearGroup] = []
+
+                if groupCB {
+                    // Mode avec regroupement CB activé
+                    let carteBancaireTransactions = monthTransactions.filter {
+                        $0.paymentMode?.name.lowercased().contains("carte") == true
+                    }
+                    let otherTransactions = monthTransactions.filter {
+                        $0.paymentMode?.name.lowercased().contains("carte") != true
+                    }
+
+                    // Créer le sous-groupe "Carte Bancaire" s'il y a des transactions CB
+                    if !carteBancaireTransactions.isEmpty {
+                        let cbChildren = carteBancaireTransactions
+                            .sorted { $0.datePointage > $1.datePointage }
+                            .map { transaction in
+                                TransactionYearGroup(
+                                    id: transaction.uuid,
+                                    displayName: "",
+                                    year: year,
+                                    month: month,
+                                    monthGroups: nil,
+                                    transactions: [transaction]
+                                )
+                            }
+
+                        // Calculer le total des transactions CB
+                        let cbTotal = carteBancaireTransactions.reduce(0.0) { $0 + $1.amount }
+                        let formatter = NumberFormatter()
+                        formatter.numberStyle = .currency
+                        formatter.locale = Locale.current
+                        let cbTotalFormatted = formatter.string(from: cbTotal as NSNumber) ?? "0,00 €"
+
+                        let cbGroup = TransactionYearGroup(
+                            id: UUID(),
+                            displayName: "Carte Bancaire (\(carteBancaireTransactions.count)) : \(cbTotalFormatted)",
                             year: year,
                             month: month,
-                            monthGroups: nil,
-                            transactions: [transaction]
+                            monthGroups: cbChildren,
+                            transactions: nil,
+                            isPaymentModeGroup: true
                         )
+                        transactionGroups.append(cbGroup)
                     }
+
+                    // Ajouter les autres transactions directement (sans sous-groupe)
+                    let otherGroups = otherTransactions
+                        .sorted { $0.datePointage > $1.datePointage }
+                        .map { transaction in
+                            TransactionYearGroup(
+                                id: transaction.uuid,
+                                displayName: "",
+                                year: year,
+                                month: month,
+                                monthGroups: nil,
+                                transactions: [transaction]
+                            )
+                        }
+                    transactionGroups.append(contentsOf: otherGroups)
+
+                } else {
+                    // Mode sans regroupement CB - toutes les transactions au même niveau
+                    transactionGroups = monthTransactions
+                        .sorted { $0.datePointage > $1.datePointage }
+                        .map { transaction in
+                            TransactionYearGroup(
+                                id: transaction.uuid,
+                                displayName: "",
+                                year: year,
+                                month: month,
+                                monthGroups: nil,
+                                transactions: [transaction]
+                            )
+                        }
+                }
 
                 // Groupe de mois avec ses transactions comme enfants
                 return TransactionYearGroup(
@@ -495,6 +591,15 @@ struct TransactionTableViewModern: View {
             let monthKey = "month_\(group.year)_\(group.month ?? 0)"
             if disclosureStates[monthKey] == nil {
                 disclosureStates[monthKey] = true
+            }
+            // Initialiser aussi l'état pour le sous-groupe Carte Bancaire
+            if let subGroups = group.monthGroups {
+                for subGroup in subGroups where subGroup.isPaymentModeGroup {
+                    let cbKey = "cb_\(group.year)_\(group.month ?? 0)"
+                    if disclosureStates[cbKey] == nil {
+                        disclosureStates[cbKey] = false  // Fermé par défaut
+                    }
+                }
             }
         }
     }

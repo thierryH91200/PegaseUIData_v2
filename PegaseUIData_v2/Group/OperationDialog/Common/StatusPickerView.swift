@@ -15,20 +15,16 @@ struct StatusPickerView: View {
     @Binding var selectedStatus: EntityStatus?
 
     var body: some View {
-        HStack {
-            Picker("", selection: $selectedStatus) {
-                ForEach(statuses) { status in
-                    Text(status.name)
-                        .foregroundColor(Color(status.color))
-                        .tag(status as EntityStatus?)
-                }
+        Picker("", selection: $selectedStatus) {
+            ForEach(statuses) { status in
+                Text(status.name)
+                    .foregroundColor(Color(status.color))
+                    .tag(status as EntityStatus?)
             }
-            .pickerStyle(.menu)
-            .labelsHidden()
-            .frame(minWidth: 150)
-            Spacer()
         }
-        .frame(maxWidth: .infinity)
+        .pickerStyle(.menu)
+        .labelsHidden()
+        .frame(minWidth: 150, alignment: .leading)
     }
 }
 

@@ -84,6 +84,7 @@ enum TabSelection: Hashable {
 //    case modePaiement
 //    case preference
 //}
+
 struct SettingTab: View {
     
     @StateObject private var chequeViewManager       = ChequeBookManager()

@@ -60,6 +60,48 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
         return transaction
     }
 
+    func getAllData(from startDate: Date? = nil, to endDate: Date? = nil, ascending: Bool = true) -> [EntityTransaction] {
+        let all = loadAllTransactions(ascending: ascending) // Méthode qui charge toutes les transactions
+        guard let start = startDate, let end = endDate else {
+            return all
+        }
+        return all.filter { $0.datePointage >= start && $0.datePointage <= end }
+    }
+    
+    // MARK: getAllData
+    func loadAllTransactions( ascending: Bool = true) -> [EntityTransaction] {
+
+        let currentAccount = CurrentAccountManager.shared.getAccount()
+        guard let currentAccount = currentAccount else {
+            return []
+        }
+        self.ascending = ascending
+        
+        // Création du prédicat pour filtrer les transactions par compte
+        let currentAccountID = currentAccount.uuid
+        let predicate = #Predicate<EntityTransaction> { $0.account.uuid == currentAccountID }
+        let sort = [ SortDescriptor(\EntityTransaction.datePointage, order: ascending ? .forward : .reverse) ]
+
+        // Création du FetchDescriptor avec les tri par datePointage et dateOperation
+        let fetchDescriptor = FetchDescriptor<EntityTransaction>(
+            predicate: predicate,
+            sortBy: sort )
+
+        do {
+            // Récupération des entités depuis le contexte
+            listTransactions = try modelContext?.fetch(fetchDescriptor) ?? []
+        } catch {
+            printTag("Erreur lors de la récupération des données avec SwiftData : \(error)", flag: true)
+            return []
+        }
+
+        // Ajuste les dates si le compte est en mode démo
+        if currentAccount.isDemo {
+            adjustDate(for: currentAccount)
+        }
+        return listTransactions
+    }
+
     func addSousTransaction(transaction: EntityTransaction, sousTransaction: EntitySousOperation ) -> EntityTransaction {
         
         modelContext?.insert(transaction)
@@ -122,47 +164,6 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
         }
     }
 
-    func getAllData(from startDate: Date? = nil, to endDate: Date? = nil, ascending: Bool = true) -> [EntityTransaction] {
-        let all = loadAllTransactions(ascending: ascending) // Méthode qui charge toutes les transactions
-        guard let start = startDate, let end = endDate else {
-            return all
-        }
-        return all.filter { $0.datePointage >= start && $0.datePointage <= end }
-    }
-    
-    // MARK: getAllData
-    func loadAllTransactions( ascending: Bool = true) -> [EntityTransaction] {
-
-        let currentAccount = CurrentAccountManager.shared.getAccount()
-        guard let currentAccount = currentAccount else {
-            return []
-        }
-        self.ascending = ascending
-        
-        // Création du prédicat pour filtrer les transactions par compte
-        let currentAccountID = currentAccount.uuid
-        let predicate = #Predicate<EntityTransaction> { $0.account.uuid == currentAccountID }
-        let sort = [ SortDescriptor(\EntityTransaction.datePointage, order: ascending ? .forward : .reverse) ]
-
-        // Création du FetchDescriptor avec les tri par datePointage et dateOperation
-        let fetchDescriptor = FetchDescriptor<EntityTransaction>(
-            predicate: predicate,
-            sortBy: sort )
-
-        do {
-            // Récupération des entités depuis le contexte
-            listTransactions = try modelContext?.fetch(fetchDescriptor) ?? []
-        } catch {
-            printTag("Erreur lors de la récupération des données avec SwiftData : \(error)", flag: true)
-            return []
-        }
-
-        // Ajuste les dates si le compte est en mode démo
-        if currentAccount.isDemo {
-            adjustDate(for: currentAccount)
-        }
-        return listTransactions
-    }
 
     // MARK: remove Transaction
     @MainActor

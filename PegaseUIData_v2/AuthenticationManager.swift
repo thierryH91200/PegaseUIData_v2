@@ -215,7 +215,7 @@ struct LockScreenView: View {
             Button(action: {
                 authManager.authenticate()
             }) {
-                Label("Déverrouiller", systemImage: "touchid")
+                Label("Lock", systemImage: "touchid")
                     .font(.headline)
                     .padding()
                     .background(Color.blue)

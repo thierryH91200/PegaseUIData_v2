@@ -13,12 +13,13 @@ import Combine
 
 
 @Model final class EntityPreference {
-    
+
     var signe       : Bool = true
     var status      : EntityStatus?
     var category    : EntityCategory?
     var paymentMode : EntityPaymentMode?
-      
+    var groupCarteBancaire: Bool = false  // Regrouper les transactions CB (carte débit différé)
+
     @Attribute(.unique) var uuid: UUID = UUID()
 
     @Relationship var account: EntityAccount
@@ -26,13 +27,15 @@ import Combine
     init(account: EntityAccount,
                 category: EntityCategory? = nil,
                 paymentMode: EntityPaymentMode? = nil,
-                status: EntityStatus? = nil) {
-        
+                status: EntityStatus? = nil,
+                groupCarteBancaire: Bool = false) {
+
         self.category    = category
         self.paymentMode = paymentMode
         self.status      = status
         self.signe       = true
-        
+        self.groupCarteBancaire = groupCarteBancaire
+
         self.account     = account
     }
 }
