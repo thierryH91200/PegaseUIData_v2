@@ -435,8 +435,9 @@ struct DGLineChartRepresentable: NSViewRepresentable {
         dataSet.lineWidth = 2.0
         
         dataSet.drawCirclesEnabled = false
-        dataSet.drawValuesEnabled = false
-        
+        dataSet.drawValuesEnabled = true
+//        dataSet.valueFormatter = CurrencyValueFormatter() as! any ValueFormatter
+
         dataSet.drawFilledEnabled = false //true
         dataSet.fillAlpha = 0.26
         dataSet.fillColor = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
@@ -455,7 +456,6 @@ struct DGLineChartRepresentable: NSViewRepresentable {
         return formatter.string(from: NSNumber(value: amount)) ?? "\(amount)"
     }
 
-    
     func initGraph(on chartView: LineChartView) {
         
         // MARK: General
@@ -528,9 +528,6 @@ struct DGLineChartRepresentable: NSViewRepresentable {
         var soldeRealise = initAccount?.realise ?? 0
         var soldePrevu   = initAccount?.prevu ?? 0
         var soldeEngage  = initAccount?.engage ?? 0
-
-        var prevu  = 0.0
-        var engage = 0.0
 
         let calendar = Calendar.current
         

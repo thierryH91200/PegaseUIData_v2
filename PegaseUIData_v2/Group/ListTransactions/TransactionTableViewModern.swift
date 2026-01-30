@@ -70,11 +70,6 @@ struct TransactionTableViewModern: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // En-tête avec les infos du compte
-            headerSection
-
-            Divider()
-
             // Table principale
             mainTableSection
 
@@ -132,25 +127,10 @@ struct TransactionTableViewModern: View {
         .onReceive(NotificationCenter.default.publisher(for: .pasteSelectedTransactions)) { _ in
             pasteTransactions()
         }
+        .withToastContainer()
     }
 
     // MARK: - View Components
-
-    private var headerSection: some View {
-        HStack {
-            Text("\(compteCurrent?.name ?? "No checking account")")
-                .font(.headline)
-            Image(systemName: "info.circle")
-                .foregroundColor(.accentColor)
-            Text(selectionInfo)
-                .font(.system(size: 14))
-                .lineLimit(2)
-            Spacer()
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(Color(NSColor.windowBackgroundColor))
-    }
 
     private var mainTableSection: some View {
         VStack(spacing: 0) {
@@ -238,6 +218,7 @@ struct TransactionTableViewModern: View {
             Text("Amount").bold().frame(width: ColumnWidths.montant, alignment: .trailing)
             Divider().frame(width: 2)
             Text("Solde").bold().frame(width: ColumnWidths.montant, alignment: .trailing)
+            Spacer()
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 4)
@@ -538,6 +519,22 @@ struct TransactionTableViewModern: View {
 
                 var transactionGroups: [TransactionYearGroup] = []
 
+                // Fonction de tri cohérente avec le calcul du solde
+                // (datePointage décroissant, puis dateOperation décroissant, puis createAt décroissant, puis UUID)
+                let sortForDisplay: (EntityTransaction, EntityTransaction) -> Bool = { t1, t2 in
+                    if t1.datePointage == t2.datePointage {
+                        if t1.dateOperation == t2.dateOperation {
+                            if t1.createAt == t2.createAt {
+                                // UUID comme critère final pour ordre déterministe
+                                return t1.uuid.uuidString > t2.uuid.uuidString
+                            }
+                            return t1.createAt > t2.createAt
+                        }
+                        return t1.dateOperation > t2.dateOperation
+                    }
+                    return t1.datePointage > t2.datePointage
+                }
+
                 if groupCB {
                     // Mode avec regroupement CB activé
                     let carteBancaireTransactions = monthTransactions.filter {
@@ -550,7 +547,7 @@ struct TransactionTableViewModern: View {
                     // Créer le sous-groupe "Carte Bancaire" s'il y a des transactions CB
                     if !carteBancaireTransactions.isEmpty {
                         let cbChildren = carteBancaireTransactions
-                            .sorted { $0.datePointage > $1.datePointage }
+                            .sorted(by: sortForDisplay)
                             .map { transaction in
                                 TransactionYearGroup(
                                     id: transaction.uuid,
@@ -583,7 +580,7 @@ struct TransactionTableViewModern: View {
 
                     // Ajouter les autres transactions directement (sans sous-groupe)
                     let otherGroups = otherTransactions
-                        .sorted { $0.datePointage > $1.datePointage }
+                        .sorted(by: sortForDisplay)
                         .map { transaction in
                             TransactionYearGroup(
                                 id: transaction.uuid,
@@ -599,7 +596,7 @@ struct TransactionTableViewModern: View {
                 } else {
                     // Mode sans regroupement CB - toutes les transactions au même niveau
                     transactionGroups = monthTransactions
-                        .sorted { $0.datePointage > $1.datePointage }
+                        .sorted(by: sortForDisplay)
                         .map { transaction in
                             TransactionYearGroup(
                                 id: transaction.uuid,
@@ -685,15 +682,29 @@ struct TransactionTableViewModern: View {
         dashboard.planned = dashboard.engaged + planned
 
         // Mettre à jour le solde pour chaque transaction
+        // Trier explicitement par datePointage, puis dateOperation, puis createAt, puis UUID (croissant)
+        let sortedTransactions = transactions.sorted { t1, t2 in
+            if t1.datePointage == t2.datePointage {
+                if t1.dateOperation == t2.dateOperation {
+                    if t1.createAt == t2.createAt {
+                        // UUID comme critère final pour ordre déterministe
+                        return t1.uuid.uuidString < t2.uuid.uuidString
+                    }
+                    return t1.createAt < t2.createAt
+                }
+                return t1.dateOperation < t2.dateOperation
+            }
+            return t1.datePointage < t2.datePointage
+        }
+
         let initialBalance = initCompte.prevu + initCompte.engage + initCompte.realise
         var runningBalance = initialBalance
 
-        for transaction in transactions.reversed() {
+        for transaction in sortedTransactions {
             runningBalance += transaction.amount
             transaction.solde = runningBalance
+            let libelle = transaction.sousOperations.first?.libelle ?? "—"
         }
-
-        AppLogger.data.debug("Tableau de bord mis à jour - Banque : \(dashboard.executed), Réel : \(dashboard.engaged), Final : \(dashboard.planned)")
     }
 
     func handleDataChange() {

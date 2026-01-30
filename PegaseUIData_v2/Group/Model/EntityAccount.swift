@@ -318,6 +318,9 @@ final class CurrentAccountManager: ObservableObject {
             return false
         }
 
+        // Invalider le cache des transactions car on change de compte
+        ListTransactionsManager.shared.invalidateCache()
+
         currentAccountID = account.uuid.uuidString
         return true
     }

@@ -29,6 +29,10 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
     @Published var listTransactions = [EntityTransaction]()
 
     var ascending = false
+
+    // Cache pour éviter les rechargements inutiles
+    private var lastAccountID: UUID?
+    private var lastAscending: Bool?
     
     var modelContext: ModelContext? {
         DataContext.shared.context
@@ -69,16 +73,27 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
     }
     
     // MARK: getAllData
-    func loadAllTransactions( ascending: Bool = true) -> [EntityTransaction] {
+    func loadAllTransactions(ascending: Bool = true, forceReload: Bool = false) -> [EntityTransaction] {
 
         let currentAccount = CurrentAccountManager.shared.getAccount()
         guard let currentAccount = currentAccount else {
             return []
         }
-        self.ascending = ascending
-        
-        // Création du prédicat pour filtrer les transactions par compte
+
         let currentAccountID = currentAccount.uuid
+
+        // Vérifier si on peut utiliser le cache (même compte, même tri, données déjà chargées)
+        if !forceReload,
+           lastAccountID == currentAccountID,
+           lastAscending == ascending,
+           !listTransactions.isEmpty {
+            // Retourner les données en cache sans déclencher de mise à jour @Published
+            return listTransactions
+        }
+
+        self.ascending = ascending
+
+        // Création du prédicat pour filtrer les transactions par compte
         let predicate = #Predicate<EntityTransaction> { $0.account.uuid == currentAccountID }
         let sort = [
             SortDescriptor(\EntityTransaction.datePointage, order: ascending ? .forward : .reverse),
@@ -88,16 +103,25 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
         // Création du FetchDescriptor avec les tri par datePointage et dateOperation
         let fetchDescriptor = FetchDescriptor<EntityTransaction>(
             predicate: predicate,
-            sortBy: sort )
+            sortBy: sort)
 
         do {
             // Récupération des entités depuis le contexte
-            listTransactions = try modelContext?.fetch(fetchDescriptor) ?? []
-            print("date   sepa")
-            for listTransaction in listTransactions {
-                print(listTransaction.datePointage, "    ", listTransaction.status?.name)
+            let fetchedTransactions = try modelContext?.fetch(fetchDescriptor) ?? []
+
+            // Mettre à jour le cache
+            lastAccountID = currentAccountID
+            lastAscending = ascending
+
+            // Seulement mettre à jour @Published si le contenu a changé
+            if fetchedTransactions.map({ $0.uuid }) != listTransactions.map({ $0.uuid }) {
+                listTransactions = fetchedTransactions
+                print("date   sepa")
+                // for listTransaction in listTransactions {
+                // print(listTransaction.datePointage, " ", listTransaction.status?.name)
+                // }
+                print("fin date")
             }
-            print("fin date")
 
         } catch {
             printTag("Erreur lors de la récupération des données avec SwiftData : \(error)", flag: true)
@@ -109,6 +133,12 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
             adjustDate(for: currentAccount)
         }
         return listTransactions
+    }
+
+    /// Invalide le cache et force un rechargement au prochain appel
+    func invalidateCache() {
+        lastAccountID = nil
+        lastAscending = nil
     }
 
     func addSousTransaction(transaction: EntityTransaction, sousTransaction: EntitySousOperation ) -> EntityTransaction {
@@ -181,6 +211,7 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
             printTag("Container invalide.", flag: true)
             return
         }
+        invalidateCache()  // Invalider le cache car les données changent
         modelContext.undoManager = undoManager
         modelContext.undoManager?.beginUndoGrouping()
         modelContext.undoManager?.setActionName(String(localized: "Delete Person"))
@@ -217,7 +248,7 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
     }
     
     func save() throws {
-        
+        invalidateCache()  // Invalider le cache car les données changent
         do {
             try modelContext?.save()
         } catch {

@@ -104,6 +104,7 @@ extension TransactionTableViewModern {
 
         guard let targetAccount = CurrentAccountManager.shared.getAccount() else {
             AppLogger.transactions.error("Aucun compte cible pour l'opération de duplication")
+            ToastManager.shared.show("Erreur: aucun compte cible", icon: "xmark.circle.fill", type: .error)
             return
         }
 
@@ -130,11 +131,14 @@ extension TransactionTableViewModern {
         try? ListTransactionsManager.shared.save()
         handleDataChange()
 
+        let message = selected.count == 1 ? "Transaction dupliquée" : "\(selected.count) transactions dupliquées"
+        ToastManager.shared.show(message, icon: "doc.on.doc.fill", type: .success)
         AppLogger.transactions.info("Dupliqué \(selected.count) transaction(s)")
     }
 
     func deleteTransactions(_ uuids: Set<UUID>) {
         let selected = transactions.filter { uuids.contains($0.uuid) }
+        let count = selected.count
 
         for transaction in selected {
             ListTransactionsManager.shared.delete(entity: transaction)
@@ -144,26 +148,42 @@ extension TransactionTableViewModern {
         selectedTransactions.removeAll()
         handleDataChange()
 
-        AppLogger.transactions.info("Supprimé \(selected.count) transaction(s)")
+        let message = count == 1 ? "Transaction supprimée" : "\(count) transactions supprimées"
+        ToastManager.shared.show(message, icon: "trash.fill", type: .success)
+        AppLogger.transactions.info("Supprimé \(count) transaction(s)")
     }
 
     func copySelected() {
         clipboardTransactions = transactions.filter { selectedTransactions.contains($0.uuid) }
         isCutOperation = false
+
+        let message = clipboardTransactions.count == 1 ? "Transaction copiée" : "\(clipboardTransactions.count) transactions copiées"
+        ToastManager.shared.show(message, icon: "doc.on.doc.fill", type: .info)
         AppLogger.ui.info("Copié \(clipboardTransactions.count) transaction(s)")
     }
 
     func cutSelected() {
         clipboardTransactions = transactions.filter { selectedTransactions.contains($0.uuid) }
         isCutOperation = true
+
+        let message = clipboardTransactions.count == 1 ? "Transaction coupée" : "\(clipboardTransactions.count) transactions coupées"
+        ToastManager.shared.show(message, icon: "scissors", type: .info)
         AppLogger.ui.info("Coupé \(clipboardTransactions.count) transaction(s)")
     }
 
     func pasteTransactions() {
-        guard let targetAccount = CurrentAccountManager.shared.getAccount() else {
-            AppLogger.transactions.error("Aucun compte cible pour l'opération de collage")
+        guard !clipboardTransactions.isEmpty else {
+            ToastManager.shared.show("Presse-papiers vide", icon: "exclamationmark.triangle.fill", type: .warning)
             return
         }
+
+        guard let targetAccount = CurrentAccountManager.shared.getAccount() else {
+            AppLogger.transactions.error("Aucun compte cible pour l'opération de collage")
+            ToastManager.shared.show("Erreur: aucun compte cible", icon: "xmark.circle.fill", type: .error)
+            return
+        }
+
+        let pastedCount = clipboardTransactions.count
 
         for transaction in clipboardTransactions {
             let status = StatusManager.shared.find(name: transaction.status!.name)
@@ -200,7 +220,9 @@ extension TransactionTableViewModern {
         isCutOperation = false
         handleDataChange()
 
-        AppLogger.transactions.info("Collé \(clipboardTransactions.count) transaction(s)")
+        let message = pastedCount == 1 ? "Transaction collée" : "\(pastedCount) transactions collées"
+        ToastManager.shared.show(message, icon: "doc.on.clipboard.fill", type: .success)
+        AppLogger.transactions.info("Collé \(pastedCount) transaction(s)")
     }
 
     // MARK: - Disclosure State Management

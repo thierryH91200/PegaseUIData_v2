@@ -20,12 +20,21 @@ struct BankStatementView: View {
     var body: some View {
         BankStatementListView()
             .environmentObject(dataManager)
-        
             .padding()
-            .onAppear {
-                isVisible = false
+            .task {
+                await performFalseTask()
             }
+
+//            .onAppear {
+//                isVisible = false
+//            }
     }
+    private func performFalseTask() async {
+        // Exécuter une tâche asynchrone (par exemple, un délai)
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconde de délai
+        isVisible = false
+    }
+
 }
 
 struct BankStatementListView: View {

@@ -54,14 +54,6 @@ struct TransactionListContainer: View {
             #endif
 
             Divider()
-            
-//            TransactionTableView(
-//                filteredTransactions: filteredTransactions,
-//                dashboard: $dashboard,
-//                isVisible: $dashboard.isVisible,
-//                selectedTransactions: $selectedTransactions
-//            )
-
 
             TransactionTableViewModern(
                 filteredTransactions: filteredTransactions,
@@ -110,9 +102,11 @@ struct TransactionListContainer: View {
     }
 
     private func updateSummary() {
-        dashboard.executed = calculateExecuted()
-        dashboard.engaged = dashboard.executed + calculateEngaged()
-        dashboard.planned = dashboard.engaged + self.calculatePlanned()
+        let initAccount = InitAccountManager.shared.getAllData()
+
+        dashboard.executed = calculateExecuted() + (initAccount?.realise ?? 0.0)
+        dashboard.engaged = dashboard.executed + calculateEngaged() + (initAccount?.engage ?? 0.0)
+        dashboard.planned = dashboard.engaged + self.calculatePlanned() + (initAccount?.prevu ?? 0.0)
     }
 
     @MainActor

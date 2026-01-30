@@ -33,6 +33,7 @@ struct TreasuryCurve: View {
     
     @State private var lower: Double = 2
     @State private var upper: Double = 10
+    @State private var selectedTransactions: Set<UUID> = []
 
     @AppStorage("enableSoundFeedback") private var enableSoundFeedback: Bool = true
 
@@ -76,7 +77,7 @@ struct TreasuryCurve: View {
                         Text("Selected period : \(dateFromOffset(selectedStart)) → \(dateFromOffset(selectedEnd))")
                             .font(.callout)
                             .foregroundColor(.secondary)
-                        
+
                         RangeSlider(
                             lowerValue: $selectedStart,
                             upperValue: $selectedEnd,
@@ -92,7 +93,7 @@ struct TreasuryCurve: View {
                             },
                             thumbSize: 24,
                             trackHeight: 6
-                    )
+                        )
                         .frame(height: 50)
                         .onAppear {
                             dashboard.isVisible = true
@@ -105,7 +106,6 @@ struct TreasuryCurve: View {
                             }
                             updateChart()
                         }
-
                         .onChange(of: selectedStart) { _, _ in applyFilter() }
                         .onChange(of: selectedEnd) { _, _ in applyFilter() }
 
@@ -113,13 +113,23 @@ struct TreasuryCurve: View {
                             .font(.footnote)
                             .foregroundColor(.secondary)
                             .padding(.top, 4)
-                        TransactionListContainer(
-                            dashboard: $dashboard)
-                        .frame(height: 600)
                     }
                     .padding(.top, 4)
                     .padding(.horizontal)
                 }
+
+                // Dashboard - affiché AU-DESSUS de la table
+                SummaryView(dashboard: $dashboard)
+                    .frame(height: 120)
+                    .padding(.vertical, 8)
+
+                // Liste des transactions
+                TransactionTableViewModern(
+                    filteredTransactions: filteredTransactions,
+                    dashboard: $dashboard,
+                    selectedTransactions: $selectedTransactions
+                )
+                .frame(height: 500)
             }
         }
     }

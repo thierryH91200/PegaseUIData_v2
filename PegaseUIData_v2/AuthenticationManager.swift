@@ -24,8 +24,27 @@ public final class AuthenticationManager: ObservableObject {
     /// Timer for automatic lock after inactivity
     private var inactivityTimer: Timer?
 
+    /// Keys for UserDefaults storage
+    private static let inactivityTimeoutKey = "inactivityTimeout"
+    private static let inactivityTimeoutSetKey = "inactivityTimeoutHasBeenSet"
+
     /// Inactivity timeout in seconds (default: 5 minutes)
-    public var inactivityTimeout: TimeInterval = 300
+    /// Persisted in UserDefaults
+    /// Value of 0 means "Never" (no automatic lock)
+    public var inactivityTimeout: TimeInterval {
+        get {
+            // Vérifier si la valeur a déjà été définie par l'utilisateur
+            if UserDefaults.standard.bool(forKey: Self.inactivityTimeoutSetKey) {
+                return UserDefaults.standard.double(forKey: Self.inactivityTimeoutKey)
+            }
+            // Valeur par défaut : 5 minutes
+            return 300
+        }
+        set {
+            UserDefaults.standard.set(true, forKey: Self.inactivityTimeoutSetKey)
+            UserDefaults.standard.set(newValue, forKey: Self.inactivityTimeoutKey)
+        }
+    }
 
     /// Publishers to track user activity
     private var cancellables = Set<AnyCancellable>()
@@ -168,6 +187,9 @@ public final class AuthenticationManager: ObservableObject {
         guard isUnlocked else { return }
 
         stopInactivityTimer()
+
+        // Si timeout est 0 (Jamais), ne pas démarrer le timer
+        guard inactivityTimeout > 0 else { return }
 
         inactivityTimer = Timer.scheduledTimer(withTimeInterval: inactivityTimeout, repeats: false) { [weak self] _ in
             DispatchQueue.main.async {
