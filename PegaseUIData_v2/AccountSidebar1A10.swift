@@ -27,7 +27,7 @@ struct Sidebar1A: View {
                 )
             }
         }
-        .navigationTitle("Account")
+        .navigationTitle(String(localized:"Account", table: "Account"))
         .listStyle(SidebarListStyle())
         .id(selectedAccountID)
         .frame(maxHeight: 500) // Ajustement de la hauteur

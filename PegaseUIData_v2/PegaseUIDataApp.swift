@@ -49,14 +49,7 @@ struct DatabaseManagerApp: App {
         }
         .commands {
             CommandGroup(after: .appSettings) {
-                Button("Verrouiller l'application") {
-                    authManager.lock()
-                }
-                .keyboardShortcut("L", modifiers: [.command, .shift])
-            }
-
-            CommandGroup(after: .appSettings) {
-                Button("Verrouiller l'application") {
+                Button("Lock the application") {
                     authManager.lock()
                 }
                 .keyboardShortcut("L", modifiers: [.command, .shift])

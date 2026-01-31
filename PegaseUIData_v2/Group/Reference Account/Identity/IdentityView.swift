@@ -41,15 +41,15 @@ struct IdentityView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Identity")
+            Text("Identity", tableName: "IdentityView")
                 .font(.title)
                 .padding(.bottom, 10)
                 .accessibilityLabel("Identity title")
 
             if let account = currentAccountManager.getAccount() {
-                Text("Current Account: \(account.name)")
+                Text("Current Account: \(account.name)", tableName: "IdentityView")
             } else {
-                Text("No account selected.")
+                Text("No account selected.", tableName: "IdentityView")
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -128,71 +128,71 @@ struct SectionInfoView: View {
         
     var body: some View {
         HStack {
-            Text("Name")
+            Text("Name", tableName: "IdentityView")
                 .frame(width: 100, alignment: .leading)
-            TextField("Name", text: $identityInfo.name)
+            TextField(String(localized: "Name", table: "IdentityView"), text: $identityInfo.name)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
 
             Spacer()
-            Text("Surname")
+            Text("Surname", tableName: "IdentityView")
                 .frame(width: 100, alignment: .leading)
-            TextField("Surname", text: $identityInfo.surName)
+            TextField(String(localized: "Surname", table: "IdentityView"), text: $identityInfo.surName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
-        
+
         HStack {
-            Text("Address")
+            Text("Address", tableName: "IdentityView")
                 .frame(width: 100, alignment: .leading)
-            TextField("Address", text: $identityInfo.adress)
+            TextField(String(localized: "Address", table: "IdentityView"), text: $identityInfo.adress)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
-        
+
         HStack {
-            Text("Complement")
+            Text("Complement", tableName: "IdentityView")
                 .frame(width: 100, alignment: .leading)
-            TextField("Complement", text: $identityInfo.complement)
+            TextField(String(localized: "Complement", table: "IdentityView"), text: $identityInfo.complement)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
-        
+
         HStack {
-            Text("CP")
+            Text("CP", tableName: "IdentityView")
                 .frame(width: 100, alignment: .leading)
-            TextField("Postal Code", text: $identityInfo.cp)
+            TextField(String(localized: "Postal Code", table: "IdentityView"), text: $identityInfo.cp)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .frame(width: 80)
 
             Spacer()
-            Text("Town")
+            Text("Town", tableName: "IdentityView")
                 .frame(width: 100, alignment: .leading)
-            TextField("Town", text: $identityInfo.town)
+            TextField(String(localized: "Town", table: "IdentityView"), text: $identityInfo.town)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
-        
+
         HStack {
-            Text("Country")
+            Text("Country", tableName: "IdentityView")
                 .frame(width: 100, alignment: .leading)
-            TextField("Country", text: $identityInfo.country)
+            TextField(String(localized: "Country", table: "IdentityView"), text: $identityInfo.country)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
-        
+
         HStack {
-            Text("Phone")
+            Text("Phone", tableName: "IdentityView")
                 .frame(width: 100, alignment: .leading)
-            TextField("Phone", text: $identityInfo.phone)
+            TextField(String(localized: "Phone", table: "IdentityView"), text: $identityInfo.phone)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .frame(width: 150)
 
             Spacer()
-            Text("Mobile")
+            Text("Mobile", tableName: "IdentityView")
                 .frame(width: 100, alignment: .leading)
-            TextField("Mobile", text: $identityInfo.mobile)
+            TextField(String(localized: "Mobile", table: "IdentityView"), text: $identityInfo.mobile)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .frame(width: 150)
         }
         HStack {
-            Text("Email")
+            Text("Email", tableName: "IdentityView")
                 .frame(width: 100, alignment: .leading)
-            TextField("Email", text: $identityInfo.email)
+            TextField(String(localized: "Email", table: "IdentityView"), text: $identityInfo.email)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
         .onChange(of: identityInfo) {old, _ in saveChanges() }

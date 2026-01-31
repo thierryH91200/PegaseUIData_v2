@@ -41,7 +41,7 @@ struct CheckView: View {
         VStack(spacing: 10) {
             // Affiche le compte actuel
             if let account = currentAccountManager.getAccount() {
-                Text("Account: \(account.name)")
+                Text("Account: \(account.name)", tableName: "SettingsView")
                     .font(.headline)
             }
             
@@ -80,27 +80,27 @@ struct CheckView: View {
                     isPresented = true
                     isModeCreate = true
                 }) {
-                    Label("Add", systemImage: "plus")
+                    Label(String(localized: "Add", table: "SettingsView"), systemImage: "plus")
                         .padding()
                         .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
-                
+
                 Button(action: {
                     isPresented = true
                     isModeCreate = false
                 }) {
-                    Label("Edit", systemImage: "pencil")
+                    Label(String(localized: "Edit", table: "SettingsView"), systemImage: "pencil")
                         .actionButtonStyle(isEnabled: selectedItemID != nil, activeColor: .green)
                 }
                 .disabled(selectedItemID == nil)
-                
+
                 Button( action: {
                     delete()
                     setupDataManager()
                 }) {
-                    Label("Delete", systemImage: "trash")
+                    Label(String(localized: "Delete", table: "SettingsView"), systemImage: "trash")
                         .actionButtonStyle(isEnabled: selectedItemID != nil, activeColor: .red)
                 }
                 .buttonStyle(.bordered)
@@ -109,16 +109,16 @@ struct CheckView: View {
                     if let manager = undoManager, manager.canUndo {
                         selectedItemID = nil
                         lastDeletedID = nil
-                        
+
                         manager.undo()
-                        
+
                         DispatchQueue.main.async {
                             refreshData()
                         }
                     }
                 }) {
-                    Label("Undo", systemImage: "arrow.uturn.backward")
-                        .frame(minWidth: 100) // Largeur minimale utile
+                    Label(String(localized: "Undo", table: "SettingsView"), systemImage: "arrow.uturn.backward")
+                        .frame(minWidth: 100)
                         .actionButtonStyle(isEnabled: canUndo == true, activeColor: .green)
                 }
                 .buttonStyle(.plain)
@@ -134,8 +134,8 @@ struct CheckView: View {
                         }
                     }
                 }) {
-                    Label("Redo", systemImage: "arrow.uturn.forward")
-                        .frame(minWidth: 100) // Largeur minimale utile
+                    Label(String(localized: "Redo", table: "SettingsView"), systemImage: "arrow.uturn.forward")
+                        .frame(minWidth: 100)
                         .actionButtonStyle(isEnabled: canRedo == true, activeColor: .orange)
                 }
                 .buttonStyle(.plain)
@@ -204,36 +204,36 @@ struct CheckBookTable: View {
     @Binding var selection: EntityCheckBook.ID?
     
     var body: some View {
-        
+
         Table(checkBooks, selection: $selection) {
-            
-            TableColumn( "Name", value: \EntityCheckBook.name)
-            
-            TableColumn( "Number of Checks") { (item: EntityCheckBook) in
+
+            TableColumn(String(localized: "Name", table: "SettingsView"), value: \EntityCheckBook.name)
+
+            TableColumn(String(localized: "Number of Checks", table: "SettingsView")) { (item: EntityCheckBook) in
                 Text(String(item.nbCheques))
             }
-            
-            TableColumn( "First Number") { (item: EntityCheckBook) in
+
+            TableColumn(String(localized: "First Number", table: "SettingsView")) { (item: EntityCheckBook) in
                 Text(String(item.numPremier))
             }
-            
-            TableColumn( "Next Number") { (item: EntityCheckBook) in
+
+            TableColumn(String(localized: "Next Number", table: "SettingsView")) { (item: EntityCheckBook) in
                 Text(String(item.numSuivant))
             }
-            
-            TableColumn( "Prefix") { (item: EntityCheckBook) in
+
+            TableColumn(String(localized: "Prefix", table: "SettingsView")) { (item: EntityCheckBook) in
                 Text(item.prefix)
             }
-            
-            TableColumn("Name") { item in
+
+            TableColumn(String(localized: "Name", table: "SettingsView")) { item in
                 Text(item.account?.identity?.name ?? "")
             }
-            
-            TableColumn("Surname") { (item: EntityCheckBook) in
+
+            TableColumn(String(localized: "Surname", table: "SettingsView")) { (item: EntityCheckBook) in
                 Text(item.account?.identity?.surName ?? "")
             }
-            
-            TableColumn("Number") { item in
+
+            TableColumn(String(localized: "Number", table: "SettingsView")) { item in
                 Text(item.account?.initAccount?.codeAccount ?? "")
             }
         }
@@ -266,40 +266,40 @@ struct CheckBookFormView: View {
             
             // Contenu principal
             VStack(spacing: 20) {
-                Text(isModeCreate ? "Add CheckBook" : "Edit CheckBook")
+                Text(isModeCreate ? String(localized: "Add CheckBook", table: "SettingsView") : String(localized: "Edit CheckBook", table: "SettingsView"))
                     .font(.headline)
-                    .padding(.top, 10) // Ajoute un peu d'espace après le bandeau
-                
+                    .padding(.top, 10)
+
                 HStack {
-                    Text("Name")
+                    Text("Name", tableName: "SettingsView")
                         .frame(width: 100, alignment: .leading)
                     TextField("", text: $name)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
-                
+
                 HStack {
-                    Text("Number of Checks")
+                    Text("Number of Checks", tableName: "SettingsView")
                         .frame(width: 100, alignment: .leading)
                     TextField("", value: $nbCheques, formatter: NumberFormatter())
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
-                
+
                 HStack {
-                    Text("First Number")
+                    Text("First Number", tableName: "SettingsView")
                         .frame(width: 100, alignment: .leading)
                     TextField("", value: $numPremier, formatter: NumberFormatter())
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
-                
+
                 HStack {
-                    Text("Next Number")
+                    Text("Next Number", tableName: "SettingsView")
                         .frame(width: 100, alignment: .leading)
                     TextField("", value: $numSuivant, formatter: NumberFormatter())
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
-                
+
                 HStack {
-                    Text("Prefix")
+                    Text("Prefix", tableName: "SettingsView")
                         .frame(width: 100, alignment: .leading)
                     TextField("", text: $prefix)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -307,16 +307,16 @@ struct CheckBookFormView: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle(checkBook == nil ? "New checkBook" : "Edit CheckBook")
+            .navigationTitle(checkBook == nil ? String(localized: "New checkBook", table: "SettingsView") : String(localized: "Edit CheckBook", table: "SettingsView"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button(String(localized: "Cancel", table: "SettingsView")) {
                         isPresented = false
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(String(localized: "Save", table: "SettingsView")) {
                         isPresented = false
                         save()
                         dismiss()

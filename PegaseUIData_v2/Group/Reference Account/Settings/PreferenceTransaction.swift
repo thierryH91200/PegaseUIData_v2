@@ -70,21 +70,21 @@ struct PreferenceTransactionView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            Text("Default values ​​for transactions for this account.")
+            Text("Default values ​​for transactions for this account.", tableName: "SettingsView")
                 .font(.headline)
                 .padding(.top)
-            
+
             // Sélection des préférences
             HStack(spacing: 30) {
                 VStack(alignment: .leading) {
-                    FormField(label: String(localized:"Status")) {
+                    FormField(label: String(localized: "Status", table: "SettingsView")) {
                         StatusPickerView(
                             statuses: entityStatus,
                             selectedStatus: $selectedStatus
                         )
                     }
 
-                    FormField(label: String(localized:"Mode")) {
+                    FormField(label: String(localized: "Mode", table: "SettingsView")) {
                         PaymentModePickerView(
                             paymentModes: entityPaymentMode,
                             selectedMode: $selectedMode
@@ -92,9 +92,9 @@ struct PreferenceTransactionView: View {
                     }
 
                 }
-                
+
                 VStack(alignment: .leading) {
-                    Picker("Rubric", selection: $selectedRubricID) {
+                    Picker(String(localized: "Rubric", table: "SettingsView"), selection: $selectedRubricID) {
                         ForEach(entityRubric, id: \.self) {
                             Text($0.name).tag($0.persistentModelID as PersistentIdentifier?)
                         }
@@ -112,9 +112,8 @@ struct PreferenceTransactionView: View {
                             selectedCategoryID = nil
                         }
                     }
-                    
-                    Picker("Category", selection: $selectedCategoryID) {
-//                        Text("No category").tag(nil as PersistentIdentifier?)
+
+                    Picker(String(localized: "Category", table: "SettingsView"), selection: $selectedCategoryID) {
                         ForEach(entityCategorie, id: \.self) {
                             Text($0.name).tag($0.persistentModelID as PersistentIdentifier?)
                         }
@@ -123,10 +122,10 @@ struct PreferenceTransactionView: View {
                 }
             }
             .frame(width: 600)
-            
+
             // Sélection du signe par une icône
             HStack {
-                Text("Default sign")
+                Text("Default sign", tableName: "SettingsView")
                 ZStack {
                     Rectangle()
                         .fill(isExpanded ? Color.red : Color.green)
@@ -147,12 +146,12 @@ struct PreferenceTransactionView: View {
                 HStack {
                     Image(systemName: "creditcard.fill")
                         .foregroundColor(.blue)
-                    Text("Group credit card transactions")
+                    Text("Group credit card transactions", tableName: "SettingsView")
                 }
             }
             .toggleStyle(.switch)
             .padding(.horizontal)
-            .help("Activate this option if you have a deferred debit card to group your credit card transactions by month.")
+            .help(String(localized: "Activate this option if you have a deferred debit card to group your credit card transactions by month.", table: "SettingsView"))
 
             Spacer()
         }

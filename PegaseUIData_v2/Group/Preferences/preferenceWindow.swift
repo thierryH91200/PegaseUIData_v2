@@ -23,7 +23,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         let hostingController = NSHostingController(rootView: preferencesView)
 
         let window = NSWindow(contentViewController: hostingController)
-        window.title = "Preferences"
+        window.title = String(localized: "Preferences", table: "PreferencesView")
         window.setContentSize(NSSize(width: 400, height: 300))
         window.styleMask = [.titled, .closable, .miniaturizable]
         window.isReleasedWhenClosed = false // Garde la fenêtre en mémoire après la fermeture
@@ -62,16 +62,16 @@ struct PreferencesView: View {
         TabView {
             GeneralSettingsView()
                 .tabItem {
-                    Label("General", systemImage: "gear")
+                    Label(String(localized: "General", table: "PreferencesView"), systemImage: "gear")
                 }
-            
+
             EyesSettingsView()
                 .tabItem {
-                    Label("Eyes", systemImage: "eye")
+                    Label(String(localized: "Eyes", table: "PreferencesView"), systemImage: "eye")
                 }
             SecuritySettingsView(authManager: authManager)
                 .tabItem {
-                    Label("Authorization", systemImage: "touchid")
+                    Label(String(localized: "Authorization", table: "PreferencesView"), systemImage: "touchid")
             }
         }
         .padding()
@@ -93,39 +93,39 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Example data")) {
-                Button("Reset preloaded data") {
+            Section(header: Text("Example data", tableName: "PreferencesView")) {
+                Button(String(localized: "Reset preloaded data", table: "PreferencesView")) {
                     showAlert = true
                 }
             }
         }
-        .alert("Reset data?", isPresented: $showAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Reset", role: .destructive) {
+        .alert(String(localized: "Reset data?", table: "PreferencesView"), isPresented: $showAlert) {
+            Button(String(localized: "Cancel", table: "PreferencesView"), role: .cancel) {}
+            Button(String(localized: "Reset", table: "PreferencesView"), role: .destructive) {
                 resetPreloadedData()
             }
         } message: {
-            Text("This operation will delete all data and reload the sample data.")
+            Text("This operation will delete all data and reload the sample data.", tableName: "PreferencesView")
         }
         .padding()
 
         VStack(alignment: .leading) {
-            Toggle("Launch at login", isOn: $launchAtLogin)
-            Toggle("Show in menu bar (hide from Dock)", isOn: $showInMenuBar)
+            Toggle(String(localized: "Launch at login", table: "PreferencesView"), isOn: $launchAtLogin)
+            Toggle(String(localized: "Show in menu bar (hide from Dock)", table: "PreferencesView"), isOn: $showInMenuBar)
             if !notificationsEnabled {
-                Text("🔕 Notifications are disabled. Enable them in System Settings.")
+                Text("Notifications are disabled. Enable them in System Settings.", tableName: "PreferencesView")
                     .foregroundColor(.red)
                 Button {
                     if let url = URL(string: "x-apple.systempreferences:com.apple.preference.notifications") {
                         NSWorkspace.shared.open(url)
                     }
                 } label: {
-                    Label("Open System Settings", systemImage: "gearshape")
+                    Label(String(localized: "Open System Settings", table: "PreferencesView"), systemImage: "gearshape")
                 }
                 .buttonStyle(.borderedProminent)
             }
             if justGrantedNotifications {
-                Text("✅ Notifications have been successfully enabled.")
+                Text("Notifications have been successfully enabled.", tableName: "PreferencesView")
                     .foregroundColor(.green)
             }
             Spacer()
@@ -192,23 +192,23 @@ struct EyesSettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             HStack {
-                Text("Foreground color:")
+                Text("Foreground color:", tableName: "PreferencesView")
                     .frame(width: 150, alignment: .leading)
                 ColorPicker("", selection: foregroundColor)
                     .labelsHidden()
             }
             HStack {
-                Text("Background color:")
+                Text("Background color:", tableName: "PreferencesView")
                     .frame(width: 150, alignment: .leading)
                 ColorPicker("", selection: backgroundColor)
                     .labelsHidden()
             }
             HStack {
-                Text("Alpha value:")
+                Text("Alpha value:", tableName: "PreferencesView")
                     .frame(width: 150, alignment: .leading)
                 Slider(value: $alphaValue, in: 0...1)
             }
-            
+
             Spacer()
         }
         .padding()

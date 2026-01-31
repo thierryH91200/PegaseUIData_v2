@@ -230,7 +230,7 @@ struct LockScreenView: View {
             Text("PegaseUIData")
                 .font(.largeTitle.bold())
             
-            Text("Vos données financières sont protégées")
+            Text("Your financial data is protected")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
             

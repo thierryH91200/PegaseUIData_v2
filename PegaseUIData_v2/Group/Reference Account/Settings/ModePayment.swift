@@ -39,7 +39,7 @@ struct ModePaymentView: View {
             
             // Affiche le nom du compte courant s'il existe
             if let account = currentAccountManager.getAccount()  {
-                Text("Account: \(account.name)")
+                Text("Account: \(account.name)", tableName: "SettingsView")
                     .font(.headline)
             }
             
@@ -102,40 +102,40 @@ struct ModePaymentView: View {
                 Button(action: {
                     isPresented = true
                     isModeCreate = true
-                    
+
                 }) {
-                    Label("Add", systemImage: "plus")
+                    Label(String(localized: "Add", table: "SettingsView"), systemImage: "plus")
                         .padding()
                         .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
-                
+
                 // Boutons d'action (Ajouter, Modifier, Supprimer)
                 Button(action: {
                     isPresented = true
                     isModeCreate = false
                 }) {
-                    Label("Edit", systemImage: "pencil")
+                    Label(String(localized: "Edit", table: "SettingsView"), systemImage: "pencil")
                         .actionButtonStyle(
                             isEnabled: selectedItem != nil,
                             activeColor: .green)
                 }
                 .disabled(selectedItem == nil) // Désactive si aucune ligne n'est sélectionnée
-                
+
                 Button(action: {
                     delete()
                     setupDataManager()
                 })
                 {
-                    Label("Delete", systemImage: "trash")
+                    Label(String(localized: "Delete", table: "SettingsView"), systemImage: "trash")
                         .actionButtonStyle(
                             isEnabled: selectedItem != nil,
                             activeColor: .red)
                 }
                 .disabled(selectedItem == nil)
                 // Désactive si aucune ligne n'est sélectionnée
-                
+
                 Button(action: {
                     if let manager = undoManager, manager.canUndo {
                         selectedItem = nil
@@ -146,14 +146,14 @@ struct ModePaymentView: View {
                         }
                     }
                 }) {
-                    Label("Undo", systemImage: "arrow.uturn.backward")
+                    Label(String(localized: "Undo", table: "SettingsView"), systemImage: "arrow.uturn.backward")
                         .actionButtonStyle(
                             isEnabled: canUndo == false,
                             activeColor: .green)
                 }
                 .disabled(canUndo == false)
                 .buttonStyle(.plain)
-                
+
             }
             .padding()
             Spacer()
@@ -197,29 +197,29 @@ struct ModePaymentView: View {
 }
 
 struct ModePaiementTable: View {
-    
+
     var modePayments: [EntityPaymentMode]
     @Binding var selection: EntityPaymentMode.ID?
-    
+
     var body: some View {
-        
+
         VStack(spacing: 10) {
             Table(modePayments, selection: $selection) {
-                TableColumn("Name", value: \EntityPaymentMode.name)
-                TableColumn("Color") { item in
+                TableColumn(String(localized: "Name", table: "SettingsView"), value: \EntityPaymentMode.name)
+                TableColumn(String(localized: "Color", table: "SettingsView")) { item in
                     Rectangle()
                         .fill(Color(item.color))
                         .frame(width: 40, height: 20)
                 }
-                TableColumn("Account", value: \EntityPaymentMode.account.name)
-                TableColumn("Surname") { paymentMode in
-                    Text(paymentMode.account.identity?.surName ?? "Unknown")
+                TableColumn(String(localized: "Account", table: "SettingsView"), value: \EntityPaymentMode.account.name)
+                TableColumn(String(localized: "Surname", table: "SettingsView")) { paymentMode in
+                    Text(paymentMode.account.identity?.surName ?? String(localized: "Unknown", table: "SettingsView"))
                 }
-                TableColumn("First name")  { paymentMode in
-                    Text(paymentMode.account.identity?.name ?? "Unknown")
+                TableColumn(String(localized: "First name", table: "SettingsView"))  { paymentMode in
+                    Text(paymentMode.account.identity?.name ?? String(localized: "Unknown", table: "SettingsView"))
                 }
-                TableColumn("Number") { paymentMode in
-                    Text(paymentMode.account.initAccount?.codeAccount ?? "Unknown")
+                TableColumn(String(localized: "Number", table: "SettingsView")) { paymentMode in
+                    Text(paymentMode.account.initAccount?.codeAccount ?? String(localized: "Unknown", table: "SettingsView"))
                 }
             }
         }
@@ -248,26 +248,26 @@ struct ModePaiementFormView: View {
             
             // Contenu principal
             VStack(spacing: 20) {
-                
-                Text(isModeCtreate ? "Add Payment Mode" : "Edit Payment Mode")
+
+                Text(isModeCtreate ? String(localized: "Add Payment Mode", table: "SettingsView") : String(localized: "Edit Payment Mode", table: "SettingsView"))
                     .font(.headline)
                     .padding(.top, 10) // Ajoute un peu d'espace après le bandeau
-                
-                TextField("Name", text: $name)
+
+                TextField(String(localized: "Name", table: "SettingsView"), text: $name)
                     .textFieldStyle(.roundedBorder)
-                
-                ColorPicker("Choose the color", selection: $selectedColor)
+
+                ColorPicker(String(localized: "Choose the color", table: "SettingsView"), selection: $selectedColor)
             }
             .padding()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button(String(localized: "Cancel", table: "SettingsView")) {
                         isPresented = false
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(String(localized: "Save", table: "SettingsView")) {
                         isPresented = false
                         save()
                         dismiss()

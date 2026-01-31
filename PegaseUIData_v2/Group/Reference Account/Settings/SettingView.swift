@@ -96,29 +96,29 @@ struct SettingTab: View {
     var body: some View {
         
         TabView {
-            
+
             RubricView()
                 .environmentObject(rubricDataManager)
                 .tabItem {
-                    Label ("Rubric", systemImage: "house" )
+                    Label(String(localized: "Rubric", table: "SettingsView"), systemImage: "house")
                 }
 
             ModePaymentView()
                 .environmentObject(modePaiementDataManager)
                 .tabItem {
-                    Label("Payment method", systemImage: "eurosign.bank.building")
+                    Label(String(localized: "Payment method", table: "SettingsView"), systemImage: "eurosign.bank.building")
                 }
-            
+
             PreferenceTransactionView()
                 .environmentObject(preferenceDataManager)
                 .tabItem {
-                    Label("Transaction", systemImage: "person")
+                    Label(String(localized: "Transaction", table: "SettingsView"), systemImage: "person")
                 }
-            
+
             CheckView()
                 .environmentObject(chequeViewManager)
                 .tabItem {
-                    Label("Check", systemImage: "person")
+                    Label(String(localized: "Check", table: "SettingsView"), systemImage: "person")
                 }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

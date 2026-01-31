@@ -15,13 +15,13 @@ struct SecuritySettingsView: View {
 
     // Options de timeout disponibles
     private let timeoutOptions: [(label: String, value: TimeInterval)] = [
-        ("1 minute", 60),
-        ("2 minutes", 120),
-        ("5 minutes", 300),
-        ("10 minutes", 600),
-        ("15 minutes", 900),
-        ("30 minutes", 1800),
-        ("Jamais", 0)
+        (String(localized: "1 minute", table: "PreferencesView"), 60),
+        (String(localized: "2 minutes", table: "PreferencesView"), 120),
+        (String(localized: "5 minutes", table: "PreferencesView"), 300),
+        (String(localized: "10 minutes", table: "PreferencesView"), 600),
+        (String(localized: "15 minutes", table: "PreferencesView"), 900),
+        (String(localized: "30 minutes", table: "PreferencesView"), 1800),
+        (String(localized: "Never", table: "PreferencesView"), 0)
     ]
 
     init(authManager: AuthenticationManager) {
@@ -32,7 +32,7 @@ struct SecuritySettingsView: View {
     var body: some View {
         Form {
             Section(header: Text("Sécurité")) {
-                Picker("Verrouillage automatique après:", selection: $selectedTimeout) {
+                Picker("Automatic locking after:", selection: $selectedTimeout) {
                     ForEach(timeoutOptions, id: \.value) { option in
                         Text(option.label).tag(option.value)
                     }

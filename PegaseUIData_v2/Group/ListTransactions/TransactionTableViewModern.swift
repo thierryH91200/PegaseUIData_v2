@@ -78,7 +78,7 @@ struct TransactionTableViewModern: View {
             // Barre de statut avec statistiques
             statusBarSection
         }
-        .navigationTitle("Account : \(compteCurrent?.name ?? "No account")")
+        .navigationTitle("Account: \(compteCurrent?.name ?? "No account")")
         .sheet(isPresented: $showTransactionDetail) {
             transactionDetailPopover
         }
@@ -109,6 +109,7 @@ struct TransactionTableViewModern: View {
         }
         .onChange(of: currentAccountManager.currentAccountID) { _, _ in
             handleDataChange()
+            loadDisclosureState()
         }
         .onChange(of: transactions.count) { _, _ in
             updateGroupedData()
@@ -295,7 +296,7 @@ struct TransactionTableViewModern: View {
                 .foregroundColor(.secondary)
 
             if !selectedTransactions.isEmpty {
-                Text("✓ \(selectedTransactions.count) sélectionnée(s)")
+                Text("✓ \(selectedTransactions.count) selected")
                     .font(.caption)
                     .foregroundColor(.blue)
             }
@@ -408,7 +409,7 @@ struct TransactionTableViewModern: View {
             }
         }
 
-        Menu("Change Bank statement") {
+        Menu("Change the bank statement") {
             Button("New bank statement") {
                 showBankStatementPopover = true
             }

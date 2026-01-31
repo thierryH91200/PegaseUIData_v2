@@ -82,7 +82,7 @@ struct TransactionFormViewModel: View {
                 }
             }
             GridRow {
-                FormField(label: String(localized:"Account")) {
+                FormField(label: String(localized:"Account", table:"Account'")) {
                     Text(selectedAccount?.name ?? "")
                 }
             }

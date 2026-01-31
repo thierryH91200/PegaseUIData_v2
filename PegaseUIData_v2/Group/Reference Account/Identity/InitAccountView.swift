@@ -51,9 +51,9 @@ struct InitAccountView: View {
                         .foregroundColor(.blue)
                     
                     VStack(alignment: .leading) {
-                        Text("Initial report")
+                        Text("Initial report", tableName: "InitAccountView")
                             .font(.headline)
-                        
+
                         HStack(spacing: 40) {
                             ReportView( initAccount: initAccount)
                         }
@@ -64,7 +64,7 @@ struct InitAccountView: View {
             // Références Bancaires
             if let initAccount = dataManager.initAccount {
                 VStack(alignment: .leading) {
-                    Text("Bank references")
+                    Text("Bank references", tableName: "InitAccountView")
                         .font(.headline)
                     BankReferenceView(initAccount: initAccount)
                 }
@@ -158,13 +158,13 @@ struct ReportView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Planned")
+            Text("Planned", tableName: "InitAccountView")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            TextField("Enter planned value", text: Binding(
-                get: { String(initAccount.prevu) }, // Convertir en String pour l'affichage
+            TextField(String(localized: "Enter planned value", table: "InitAccountView"), text: Binding(
+                get: { String(initAccount.prevu) },
                 set: { newValue in
-                    if let value = Double(newValue) { // Convertir en Double pour le stockage
+                    if let value = Double(newValue) {
                         initAccount.prevu = value
                     }
                 }
@@ -175,15 +175,15 @@ struct ReportView: View {
                 saveChanges()
             }
         }
-        
+
         VStack(alignment: .leading) {
-            Text("In progress")
+            Text("In progress", tableName: "InitAccountView")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            TextField("Enter Engaged value", text: Binding(
-                get: { String(initAccount.engage) }, // Convertir en String pour l'affichage
+            TextField(String(localized: "Enter Engaged value", table: "InitAccountView"), text: Binding(
+                get: { String(initAccount.engage) },
                 set: { newValue in
-                    if let value = Double(newValue) { // Convertir en Double pour le stockage
+                    if let value = Double(newValue) {
                         initAccount.engage = value
                     }
                 }
@@ -194,15 +194,15 @@ struct ReportView: View {
                 saveChanges()
             }
         }
-        
+
         VStack(alignment: .leading) {
-            Text("Executed")
+            Text("Executed", tableName: "InitAccountView")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            TextField("Enter Executed value", text: Binding(
-                get: { String(initAccount.realise) }, // Convertir en String pour l'affichage
+            TextField(String(localized: "Enter Executed value", table: "InitAccountView"), text: Binding(
+                get: { String(initAccount.realise) },
                 set: { newValue in
-                    if let value = Double(newValue) { // Convertir en Double pour le stockage
+                    if let value = Double(newValue) {
                         initAccount.realise = value
                     }
                 }
@@ -233,45 +233,45 @@ struct BankReferenceView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Bank")
+                Text("Bank", tableName: "InitAccountView")
                     .frame(width: 100, alignment: .leading)
-                TextField("Bank", text: $initAccount.codeBank)
+                TextField(String(localized: "Bank", table: "InitAccountView"), text: $initAccount.codeBank)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .frame(maxWidth: 200)
             }
-            
+
             HStack {
-                Text("Indicative")
+                Text("Indicative", tableName: "InitAccountView")
                     .frame(width: 100, alignment: .leading)
-                TextField("Indicative", text: $initAccount.codeGuichet)
+                TextField(String(localized: "Indicative", table: "InitAccountView"), text: $initAccount.codeGuichet)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                Text("Account")
+                Text("Account", tableName: "InitAccountView")
                     .frame(width: 100, alignment: .leading)
-                TextField("Account", text: $initAccount.codeAccount)
+                TextField(String(localized: "Account", table: "InitAccountView"), text: $initAccount.codeAccount)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                Text("Key")
+                Text("Key", tableName: "InitAccountView")
                     .frame(width: 100, alignment: .leading)
-                TextField("Key", text: $initAccount.cleRib)
+                TextField(String(localized: "Key", table: "InitAccountView"), text: $initAccount.cleRib)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
             }
-            
+
             HStack {
-                Text("IBAN")
+                Text("IBAN", tableName: "InitAccountView")
                     .frame(width: 100, alignment: .leading)
-                TextField("IBAN", text: Binding(
+                TextField(String(localized: "IBAN", table: "InitAccountView"), text: Binding(
                     get: { formattedIBAN(initAccount.iban) },
                     set: { newValue in
-                        initAccount.iban = newValue.replacingOccurrences(of: " ", with: "") // Nettoyer pour stocker sans espaces
+                        initAccount.iban = newValue.replacingOccurrences(of: " ", with: "")
                     }
                 ))
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .frame(maxWidth: .infinity)
             }
-            
+
             HStack {
-                Text("BIC")
+                Text("BIC", tableName: "InitAccountView")
                     .frame(width: 100, alignment: .leading)
-                TextField("BIC", text: $initAccount.bic)
+                TextField(String(localized: "BIC", table: "InitAccountView"), text: $initAccount.bic)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .frame(maxWidth: .infinity)
             }

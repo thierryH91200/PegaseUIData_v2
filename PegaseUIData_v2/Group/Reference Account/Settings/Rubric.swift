@@ -46,7 +46,7 @@ struct RubricView: View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
                 if let account = currentAccountManager.getAccount() {
-                    Text("Account: \(account.name)")
+                    Text("Account: \(account.name)", tableName: "SettingsView")
                         .font(.headline)
                 }
 
@@ -99,15 +99,15 @@ struct RubricView: View {
                             isPresentedCategory = true
                         }
                     }) {
-                        let label = selectedRubric != nil ? String(localized:"Add Rubric") : String(localized:"Add Category")
+                        let label = selectedRubric != nil ? String(localized: "Add Rubric", table: "SettingsView") : String(localized: "Add Category", table: "SettingsView")
                         Label(label, systemImage: "plus")
                             .padding()
                             .background(Color.blue)
                             .foregroundColor(.white)
                             .cornerRadius(8)
-                            .fixedSize() // Ajuste la taille au contenu
+                            .fixedSize()
                     }
-                    
+
                     Button(action: {
                         isModeCreate = false
                         if selectedRubric != nil {
@@ -118,32 +118,32 @@ struct RubricView: View {
                         }
 
                     }) {
-                        let label = selectedRubric != nil ? String(localized:"Edit Rubric") : String(localized:"Edit Category")
+                        let label = selectedRubric != nil ? String(localized: "Edit Rubric", table: "SettingsView") : String(localized: "Edit Category", table: "SettingsView")
                         Label(label, systemImage: "pencil")
                             .padding()
-                            .background((selectedRubric == nil && selectedCategory == nil) ? Color.gray : Color.green) // Fond gris si désactivé
-                            .opacity((selectedRubric == nil && selectedCategory == nil) ? 0.6 : 1) // Opacité réduite si désactivé
+                            .background((selectedRubric == nil && selectedCategory == nil) ? Color.gray : Color.green)
+                            .opacity((selectedRubric == nil && selectedCategory == nil) ? 0.6 : 1)
                             .foregroundColor(.white)
                             .cornerRadius(8)
-                            .fixedSize() // Ajuste automatiquement la taille au contenu
+                            .fixedSize()
                     }
-                    .disabled(selectedRubric == nil && selectedCategory == nil) // Désactive si aucune ligne n'est sélectionnée
-                    
+                    .disabled(selectedRubric == nil && selectedCategory == nil)
+
                     Button(action: {
                         removeCategorySelectedItem()
                         refreshData()
                     })
                     {
-                        let label = selectedRubric != nil ? String(localized:"Delete Rubric") : String(localized:"Delete Category")
+                        let label = selectedRubric != nil ? String(localized: "Delete Rubric", table: "SettingsView") : String(localized: "Delete Category", table: "SettingsView")
                         Label(label, systemImage: "trash")
                             .padding()
-                            .background((selectedRubric == nil && selectedCategory == nil) ? Color.gray : Color.red) // Fond gris si désactivé
-                            .opacity((selectedRubric == nil && selectedCategory == nil) ? 0.6 : 1) // Opacité réduite si désactivé
+                            .background((selectedRubric == nil && selectedCategory == nil) ? Color.gray : Color.red)
+                            .opacity((selectedRubric == nil && selectedCategory == nil) ? 0.6 : 1)
                             .foregroundColor(.white)
                             .cornerRadius(8)
-                            .fixedSize() // Ajuste automatiquement la taille au contenu
+                            .fixedSize()
                     }
-                    .disabled(selectedRubric == nil && selectedCategory == nil) // Désactive si aucune ligne n'est sélectionnée
+                    .disabled(selectedRubric == nil && selectedCategory == nil)
                 }
                 .padding()
                 Spacer()
@@ -229,20 +229,20 @@ struct RubricView: View {
                     isPresentedRubric = true
                     isModeCreate = true
                 }) {
-                    Label("Add the rubric", systemImage: "plus")
+                    Label(String(localized: "Add the rubric", table: "SettingsView"), systemImage: "plus")
                 }
-                
+
                 Button(action: {
                     isPresentedRubric = true
                     isModeCreate = false
                 }) {
-                    Label("Edit the rubric", systemImage: "pencil")
+                    Label(String(localized: "Edit the rubric", table: "SettingsView"), systemImage: "pencil")
                 }
-                
+
                 Button(action: {
                     removeRubric(rubrique)
                 }) {
-                    Label("Delete the rubric", systemImage: "trash")
+                    Label(String(localized: "Delete the rubric", table: "SettingsView"), systemImage: "trash")
                         .foregroundColor(.red)
                 }
             }
@@ -271,20 +271,20 @@ struct RubricView: View {
                 isPresentedRubric = true
                 isModeCreate = true
             }) {
-                Label("Add the category", systemImage: "plus")
+                Label(String(localized: "Add the category", table: "SettingsView"), systemImage: "plus")
             }
-            
+
             Button(action: {
                 isPresentedCategory = true
                 isModeCreate = false
             }) {
-                Label("Edit the category", systemImage: "pencil")
+                Label(String(localized: "Edit the category", table: "SettingsView"), systemImage: "pencil")
             }
-            
+
             Button(action: {
                 removeCategory(category)
             }) {
-                Label("Remove the category", systemImage: "trash")
+                Label(String(localized: "Remove the category", table: "SettingsView"), systemImage: "trash")
                     .foregroundColor(.red)
             }
         }
@@ -310,27 +310,27 @@ struct RubricFormView: View {
             
             // Contenu principal
             VStack(spacing: 20) {
-                
-                Text(isMode ? "Add the rubric" : "Edit Rubric")
+
+                Text(isMode ? String(localized: "Add the rubric", table: "SettingsView") : String(localized: "Edit Rubric", table: "SettingsView"))
                     .font(.headline)
-                    .padding(.top, 10) // Ajoute un peu d'espace après le bandeau
-                
-                TextField("Name", text: $name)
+                    .padding(.top, 10)
+
+                TextField(String(localized: "Name", table: "SettingsView"), text: $name)
                     .textFieldStyle(.roundedBorder)
-                
-                ColorPicker("Choose the color", selection: $selectedColor)
+
+                ColorPicker(String(localized: "Choose the color", table: "SettingsView"), selection: $selectedColor)
                     .frame(height: 50)
             }
             .padding()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button(String(localized: "Cancel", table: "SettingsView")) {
                         isPresented = false
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(String(localized: "Save", table: "SettingsView")) {
                         isPresented = false
                         save()
                         dismiss()
@@ -392,31 +392,31 @@ struct CategoryFormView: View {
             
             // Contenu principal
             VStack(spacing: 20) {
-                
-                Text(isModeCreate ? "Add the category" : "Edit the category")
+
+                Text(isModeCreate ? String(localized: "Add the category", table: "SettingsView") : String(localized: "Edit the category", table: "SettingsView"))
                     .font(.headline)
-                    .padding(.top, 10) // Ajoute un peu d'espace après le bandeau
-                
-                TextField("Name", text: $name)
+                    .padding(.top, 10)
+
+                TextField(String(localized: "Name", table: "SettingsView"), text: $name)
                     .textFieldStyle(.roundedBorder)
-                
-                TextField("Objectif", text: $objectif)
+
+                TextField(String(localized: "Objectif", table: "SettingsView"), text: $objectif)
                     .textFieldStyle(.roundedBorder)
             }
             .padding()
             Rectangle()
                 .fill(isModeCreate ? Color.blue : Color.green)
                 .frame(height: 10)
-            
+
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
+                        Button(String(localized: "Cancel", table: "SettingsView")) {
                             isPresented = false
                             dismiss()
                         }
                     }
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Save") {
+                        Button(String(localized: "Save", table: "SettingsView")) {
                             isPresented = false
                             save()
                             dismiss()

@@ -9,7 +9,6 @@ import SwiftUI
 import SwiftData
 import Combine
 
-
 final class BankDataManager: ObservableObject {
     @Published var banqueInfo: EntityBanqueInfo? {
         didSet {
@@ -41,17 +40,17 @@ struct BankView: View {
     var body: some View {
         VStack(spacing: 30) {
             if let account = CurrentAccountManager.shared.getAccount() {
-                Text("Account: \(account.name)")
+                Text("Account: \(account.name)", tableName: "BankView")
                     .font(.headline)
             }
 
             if let banqueInfo = dataManager.banqueInfo {
                 // Utilisez un Binding pour mettre à jour les données en direct
-                SectionView(title: "Bank", banqueInfo: banqueInfo)
-                SectionView(title: "Contact", banqueInfo: banqueInfo)
+                SectionView(sectionType: .bank, title: String(localized: "Bank", table: "BankView"), banqueInfo: banqueInfo)
+                SectionView(sectionType: .contact, title: String(localized: "Contact", table: "BankView"), banqueInfo: banqueInfo)
                 Spacer()
             } else {
-                Text("No bank information available")
+                Text("No bank information available", tableName: "BankView")
             }
         }
         .padding()
@@ -116,6 +115,13 @@ struct BankView: View {
 }
 
 struct SectionView: View {
+
+    enum SectionType {
+        case bank
+        case contact
+    }
+
+    let sectionType: SectionType
     let title: String
     @Bindable var banqueInfo: EntityBanqueInfo
 
@@ -125,16 +131,17 @@ struct SectionView: View {
                 .font(.headline)
                 .padding(.bottom, 5)
 
-            if title == "Bank" {
-                FieldView(label: String(localized :"Bank"), text: $banqueInfo.nomBanque)
-                FieldView(label: String(localized :"Address"), text: $banqueInfo.adresse)
-                FieldView(label: String(localized :"Complement"), text: $banqueInfo.complement)
-                FieldView(label: String(localized :"CP"), text: $banqueInfo.cp)
-                FieldView(label: String(localized :"Town"), text: $banqueInfo.town)
-            } else if title == "Contact" {
-                FieldView(label: String(localized :"Name"), text: $banqueInfo.name)
-                FieldView(label: String(localized :"Function"), text: $banqueInfo.fonction)
-                FieldView(label: String(localized :"Phone"), text: $banqueInfo.phone)
+            switch sectionType {
+            case .bank:
+                FieldView(label: String(localized: "Bank", table: "BankView"), text: $banqueInfo.nomBanque)
+                FieldView(label: String(localized: "Address", table: "BankView"), text: $banqueInfo.adresse)
+                FieldView(label: String(localized: "Complement", table: "BankView"), text: $banqueInfo.complement)
+                FieldView(label: String(localized: "CP", table: "BankView"), text: $banqueInfo.cp)
+                FieldView(label: String(localized: "Town", table: "BankView"), text: $banqueInfo.town)
+            case .contact:
+                FieldView(label: String(localized: "Name", table: "BankView"), text: $banqueInfo.name)
+                FieldView(label: String(localized: "Function", table: "BankView"), text: $banqueInfo.fonction)
+                FieldView(label: String(localized: "Phone", table: "BankView"), text: $banqueInfo.phone)
             }
         }
         .padding()
