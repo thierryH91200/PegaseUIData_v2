@@ -87,8 +87,9 @@ struct TransactionTableViewModern: View {
         }
         .frame(minWidth: 1000, minHeight: 600)
         .onAppear {
-            updateGroupedData()
-            updateDashboard()
+            handleDataChange()
+//            updateGroupedData()
+//            updateDashboard()
             loadDisclosureState()
         }
         .popover(isPresented: $showPointingDate, arrowEdge: .trailing) {
@@ -107,13 +108,24 @@ struct TransactionTableViewModern: View {
             _ = ListTransactionsManager.shared.getAllData()
             updateDashboard()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .transactionsNeedRefresh)) { _ in
+            // Rafraîchissement forcé quand on revient d'une autre vue (ex: TreasuryCurveView)
+            handleDataChange()
+        }
         .onChange(of: currentAccountManager.currentAccountID) { _, _ in
             handleDataChange()
             loadDisclosureState()
         }
-        .onChange(of: transactions.count) { _, _ in
-            updateGroupedData()
-            updateDashboard()
+        .onChange(of: transactions.count) { oldCount, newCount in
+            // Si le count diminue significativement, c'est probablement un filtrage non désiré
+            // (ex: TreasuryCurve4 qui modifie listTransactions avec des données filtrées)
+            // Forcer le rechargement complet dans ce cas
+            if newCount < oldCount && oldCount > 0 {
+                handleDataChange()
+            } else {
+                updateGroupedData()
+                updateDashboard()
+            }
         }
         .onChange(of: selectedTransactions) { _, newSelection in
             updateTransactionManager(with: newSelection)
@@ -212,7 +224,7 @@ struct TransactionTableViewModern: View {
             Divider().frame(width: 2)
             Text("Relevé/Chèque").bold().frame(width: ColumnWidths.releve + ColumnWidths.cheque, alignment: .leading)
             Divider().frame(width: 2)
-            Text("Statut").bold().frame(width: ColumnWidths.statut, alignment: .leading)
+            Text("Status").bold().frame(width: ColumnWidths.statut, alignment: .leading)
             Divider().frame(width: 2)
             Text("Payment method").bold().frame(width: ColumnWidths.modePaiement, alignment: .leading)
             Divider().frame(width: 2)
@@ -304,9 +316,9 @@ struct TransactionTableViewModern: View {
             Spacer()
 
             HStack(spacing: 8) {
-                Text("Banque : \(formatCurrency(dashboard.executed))")
+                Text("Bank : \(formatCurrency(dashboard.executed))")
                     .foregroundColor(.green)
-                Text("Réel : \(formatCurrency(dashboard.engaged))")
+                Text("Real : \(formatCurrency(dashboard.engaged))")
                     .foregroundColor(.orange)
                 Text("Final : \(formatCurrency(dashboard.planned))")
                     .foregroundColor(.blue)
@@ -503,8 +515,10 @@ struct TransactionTableViewModern: View {
         let calendar = Calendar.current
         let groupCB = shouldGroupCarteBancaire  // Vérifie la préférence
 
+        // IMPORTANT: Utiliser datePointage de manière cohérente pour l'année ET le mois
+        // Cela évite les incohérences quand dateOperation et datePointage sont dans des mois différents
         let grouped = Dictionary(grouping: transactions) { transaction in
-            calendar.component(.year, from: transaction.dateOperation)
+            calendar.component(.year, from: transaction.datePointage)
         }
 
         groupedData = grouped.keys.sorted(by: >).flatMap { year in
@@ -709,7 +723,10 @@ struct TransactionTableViewModern: View {
     }
 
     func handleDataChange() {
-        _ = ListTransactionsManager.shared.getAllData()
+        // Forcer le rechargement pour s'assurer que les données sont à jour
+        // Cela évite les problèmes de cache quand on revient d'une autre vue
+        // ou quand TreasuryCurve4 a modifié listTransactions avec des données filtrées
+        _ = ListTransactionsManager.shared.loadAllTransactions(forceReload: true)
         updateGroupedData()
         updateDashboard()
     }

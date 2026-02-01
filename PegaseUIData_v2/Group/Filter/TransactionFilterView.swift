@@ -60,7 +60,7 @@ struct TransactionFilterView: View {
     private var headerView: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Transaction filtering")
+                Text("Transaction filtering", tableName : "Filter")
                     .font(.headline)
 
                 if let predicate = viewModel.currentPredicate {
@@ -68,7 +68,7 @@ struct TransactionFilterView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else {
-                    Text("No filter applied")
+                    Text("No filter applied", tableName : "Filter")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -78,11 +78,11 @@ struct TransactionFilterView: View {
 
             // Stats
             VStack(alignment: .trailing, spacing: 4) {
-                Text("\(viewModel.filteredTransactions.count) results")
+                Text("\(viewModel.filteredTransactions.count) results", tableName : "Filter")
                     .font(.headline)
 
                 if viewModel.isFiltered {
-                    Text("sur \(viewModel.totalCount) total")
+                    Text("sur \(viewModel.totalCount) total", tableName : "Filter")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -131,7 +131,7 @@ struct TransactionFilterView: View {
                 .foregroundColor(.secondary)
 
             if viewModel.isFiltered {
-                Text("Try adjusting the filter criteria")
+                Text("Try adjusting the filter criteria", tableName : "Filter")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -147,11 +147,11 @@ struct Header: View {
         HStack(spacing: 12) {
             // Date
             VStack(alignment: .leading, spacing: 0) {
-                Text("Date Operation")
+                Text("Date Operation", tableName : "Filter")
                     .font(.caption2)
                     .foregroundColor(.primary)
 
-                Text("Date Pointage")
+                Text("Date Pointage", tableName : "Filter")
                     .font(.caption2)
                     .foregroundColor(.primary)
             }
@@ -162,11 +162,11 @@ struct Header: View {
                 .opacity(0.8)              // un peu plus visible
             // Details
             VStack(alignment: .leading, spacing: 0) {
-                Text("Status")
+                Text("Status", tableName : "Filter")
                     .font(.caption)
                     .foregroundColor(.primary)
 
-                Text("Check Number")
+                Text("Check Number", tableName : "Filter")
                     .font(.caption2)
                     .foregroundColor(.primary)
             }
@@ -177,10 +177,10 @@ struct Header: View {
                 .opacity(0.8)              // un peu plus visible
 
             VStack(alignment: .leading, spacing: 0) {
-                Text("Payment Mode")
+                Text("Payment Mode", tableName : "Filter")
                     .font(.caption)
                     .foregroundColor(.primary)
-                Text("Bank Statement")
+                Text("Bank Statement", tableName : "Filter")
                     .font(.caption2)
                     .foregroundColor(.primary)
             }
@@ -191,10 +191,10 @@ struct Header: View {
                 .opacity(0.8)              // un peu plus visible
 
             VStack(alignment: .leading, spacing: 0) {
-                Text("Rubric")
+                Text("Rubric", tableName : "Filter")
                     .font(.caption)
                     .foregroundColor(.primary)
-                Text("Category")
+                Text("Category", tableName : "Filter")
                     .font(.caption2)
                     .foregroundColor(.primary)
             }
@@ -205,10 +205,10 @@ struct Header: View {
                 .opacity(0.8)              // un peu plus visible
 
             VStack(alignment: .leading, spacing: 0) {
-                Text("Comment")
+                Text("Comment", tableName : "Filter")
                     .font(.caption)
                     .foregroundColor(.primary)
-                Text("Amount")
+                Text("Amount", tableName : "Filter")
                     .font(.caption2)
                     .foregroundColor(.primary)
             }

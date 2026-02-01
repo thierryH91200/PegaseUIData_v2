@@ -42,6 +42,14 @@ struct TreasuryCurveView: View {
                 upperValue = days
             }
         }
+        .onDisappear {
+            // Invalider le cache pour forcer un rechargement quand on retourne à une autre vue
+            ListTransactionsManager.shared.invalidateCache()
+            // Forcer le rechargement complet des transactions
+            _ = ListTransactionsManager.shared.loadAllTransactions(forceReload: true)
+            // Notifier les autres vues qu'elles doivent rafraîchir leurs données
+            NotificationCenter.default.post(name: .transactionsNeedRefresh, object: nil)
+        }
 
     }
     

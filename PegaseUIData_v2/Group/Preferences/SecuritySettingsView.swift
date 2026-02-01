@@ -31,8 +31,8 @@ struct SecuritySettingsView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Sécurité")) {
-                Picker("Automatic locking after:", selection: $selectedTimeout) {
+            Section(header: Text("Security", tableName: "PreferencesView")) {
+                Picker(String(localized: "Automatic locking after:", table: "PreferencesView"), selection: $selectedTimeout) {
                     ForEach(timeoutOptions, id: \.value) { option in
                         Text(option.label).tag(option.value)
                     }
@@ -45,16 +45,16 @@ struct SecuritySettingsView: View {
                     }
                 }
 
-                Text("The application will automatically lock after the selected period of inactivity.")
+                Text("The application will automatically lock after the selected period of inactivity.", tableName: "PreferencesView")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
 
-            Section(header: Text("Actions")) {
+            Section(header: Text("Actions", tableName: "PreferencesView")) {
                 Button(action: {
                     authManager.lock()
                 }) {
-                    Label("Lock now", systemImage: "lock.fill")
+                    Label(String(localized: "Lock now", table: "PreferencesView"), systemImage: "lock.fill")
                 }
                 .keyboardShortcut("L", modifiers: [.command, .shift])
             }

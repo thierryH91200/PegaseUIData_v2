@@ -18,13 +18,16 @@ extension Notification.Name {
     static let exportTransactionCSV = Notification.Name("exportTransactionCSV")
     static let exportTransactionOFX = Notification.Name("exportTransactionOFX")
     static let exportReleve      = Notification.Name("exportReleve")
-        
+
     static let loadDemoRequested = Notification.Name("loadDemoRequested")
     static let resetDatabaseRequested = Notification.Name("resetDatabaseRequested")
 
     static let transactionsImported = Notification.Name("transactionsImported")
     static let transactionsAddEdit = Notification.Name("transactionsAddEdit")
     static let transactionsEdited = Notification.Name("transactionsEdited")
+
+    // Notification pour forcer le rafraîchissement des transactions
+    static let transactionsNeedRefresh = Notification.Name("transactionsNeedRefresh")
 
 }
 
