@@ -46,6 +46,11 @@ struct ContentView100: View {
 
     @State private var dashboard: DashboardState = DashboardState()
 
+    @State private var contentSize: CGSize = .zero
+    var isCompactContent: Bool {
+        contentSize.width < 600
+    }
+
     var body: some View {
         HStack {
             NavigationSplitView {
@@ -53,12 +58,23 @@ struct ContentView100: View {
                     .navigationSplitViewColumnWidth(min: 256, ideal: 256, max: 400)
             }
             content: {
-                DetailContainer(
-                    selection2: $selection2,
-                    selectedTransaction: $selectedTransaction,
-                    isCreationMode: $isCreationMode,
-                    dashboard: $dashboard
-                )
+                GeometryReader { geo in
+                    DetailContainer(
+                        selection2: $selection2,
+                        selectedTransaction: $selectedTransaction,
+                        isCreationMode: $isCreationMode,
+                        dashboard: $dashboard
+                    )
+                    .onAppear {
+                        contentSize = geo.size
+                    }
+                    .onChange(of: geo.size) { oldSize, newSize in
+                        contentSize = newSize
+                    }
+                }
+                .onChange(of: isCompactContent) { pld, compact in
+//                    dashboard.isVisible = !compact   // exemple métier
+                }
                 .navigationSplitViewColumnWidth(min: 150, ideal: 800)
             }
             detail: {
@@ -70,6 +86,8 @@ struct ContentView100: View {
             .environmentObject(currentAccountManager)
             .navigationSplitViewStyle(.automatic)
         }
+        // Example: adapt business logic / layout based on content width
+        // contentSize.width < 600 => compact mode
         .onReceive(NotificationCenter.default.publisher(for: .importTransaction)) { _ in
             showCSVTransactionImporter = true
         }

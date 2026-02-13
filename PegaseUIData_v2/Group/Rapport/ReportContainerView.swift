@@ -68,7 +68,7 @@ struct ReportContainerView<Content: View>: View {
 
     private func performFalseTask() async {
         try? await Task.sleep(nanoseconds: UIConstants.standardDelay)
-        dashboard.isVisible = false
+        dashboard.isVisible = true
     }
 
     @MainActor

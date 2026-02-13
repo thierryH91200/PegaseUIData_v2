@@ -331,7 +331,7 @@ final class CurrentAccountManager: ObservableObject {
         // 👉 Ici tu mets ce qui est lent
         // ex: requêtes SwiftData, calculs, cache
 
-        _ = ListTransactionsManager.shared.prefetchTransactions(
+        _ = await ListTransactionsManager.shared.prefetchTransactions(
             for: account
         )
     }

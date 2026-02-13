@@ -279,6 +279,8 @@ final class TransactionService: TransactionServiceProtocol, ObservableObject {
 // MARK: - Transaction Query Builder
 
 /// Fluent API for building transaction queries
+///
+@MainActor
 struct TransactionQuery {
     private var predicate: Predicate<EntityTransaction>?
     private var sortDescriptors: [SortDescriptor<EntityTransaction>] = []
@@ -286,7 +288,7 @@ struct TransactionQuery {
     private var dateRange: (start: Date, end: Date)?
     private let service: TransactionService
 
-    init(service: TransactionService = .shared) {
+    init(service: TransactionService ) {
         self.service = service
     }
 
