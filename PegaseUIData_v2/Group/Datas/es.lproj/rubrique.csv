@@ -1,0 +1,63 @@
+rubro;categoría;tipo;objetivo;color
+Alimentación;Alimentación;0;100;red
+Alimentación;Otros;0;100;red
+
+Animales;Cuidados;0;20;blue
+
+Seguros;Hogar;0;20;red
+Seguros;Escolar;0;10;red
+
+Banco;Créditos;0;0;brown
+Banco;Ahorros;0;0;brown
+Banco;Intereses;0;0;brown
+Banco;Otros;0;0;brown
+
+Varios;Accesorios;0;0;gray
+Varios;Zapatos;0;0;gray
+Varios;Peluquero;0;0;gray
+Varios;Varios;0;0;gray
+Varios;Donaciones;0;0;gray
+Varios;Estética;0;0;gray
+Varios;Transportes;0;45;gray
+Varios;Ropa;0;50;gray
+
+Impuestos;Impuesto predial;0;120;green
+Impuestos;Impuesto sobre la renta;0;110;green
+Impuestos;Impuesto de vivienda;0;90;green
+Impuestos;Otros;0;0;green
+
+Ocio;Regalo;0;0;orange
+Ocio;Entretenimiento;0;0;orange
+Ocio;Libros;0;0;orange
+Ocio;Música;0;10;orange
+Ocio;Restaurantes;0;20;orange
+Ocio;Espectáculos;0;0;orange
+Ocio;Deportes;0;30;orange
+Ocio;Vacaciones;0;100;orange
+Ocio;Otros;0;0;orange
+
+Hogar;Bricolaje;0;0;darkGray
+Hogar;Agua;0;50;darkGray
+Hogar;Electricidad;0;120;darkGray
+Hogar;Efectivo;0;0;darkGray
+Hogar;Gas;0;0;darkGray
+Hogar;Internet;0;45;darkGray
+Hogar;Alquiler;0;500;darkGray
+Hogar;Teléfono;0;25;darkGray
+Hogar;Otros;0;25;darkGray
+
+Ingresos;Salario;0;3000;purple
+
+Salud;Dentista;0;0;green
+Salud;Médico;0;0;green
+Salud;Gafas;0;0;green
+Salud;Farmacia;0;0;green
+Salud;Mutua CPAM;0;0;green
+Salud;Otros;0;0;green
+
+Coche;Combustible;0;50.0;green
+Coche;Mantenimiento;0;0;green
+Coche;Aparcamiento;0;0;green
+Coche;Peaje;0;0;green
+Coche;Compra del vehículo;0;180.;green
+Coche;Otros;0;180.;green

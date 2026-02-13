@@ -1,0 +1,65 @@
+rubrica;categoria;tipo;obiettivo;colore
+Alimentazione;Alimentazione;0;100;red
+Alimentazione;Altro;0;100;red
+
+Animali;Cure;0;20;blue
+
+Assicurazioni;Casa;0;20;red
+Assicurazioni;Scolastica;0;10;red
+
+Banca;Crediti;0;0;brown
+Banca;Risparmi;0;0;brown
+Banca;Interessi;0;0;brown
+Banca;Altro;0;0;brown
+
+Varie;Accessori;0;0;gray
+Varie;Scarpe;0;0;gray
+Varie;Parrucchiere;0;0;gray
+Varie;Varie;0;0;gray
+Varie;Donazioni;0;0;gray
+Varie;Estetica;0;0;gray
+Varie;Trasporti;0;45;gray
+Varie;Abbigliamento;0;50;gray
+
+Tasse;Tassa fondiaria;0;120;green
+Tasse;Imposta sul reddito;0;110;green
+Tasse;Tassa di abitazione;0;90;green
+Tasse;Altro;0;0;green
+
+Tempo libero;Regalo;0;0;orange
+Tempo libero;Intrattenimento;0;0;orange
+Tempo libero;Libri;0;0;orange
+Tempo libero;Musica;0;10;orange
+Tempo libero;Ristoranti;0;20;orange
+Tempo libero;Spettacoli;0;0;orange
+Tempo libero;Sport;0;30;orange
+Tempo libero;Vacanze;0;100;orange
+Tempo libero;Altro;0;0;orange
+
+Casa;Fai da te;0;0;darkGray
+Casa;Acqua;0;50;darkGray
+Casa;Elettricità;0;120;darkGray
+Casa;Contanti;0;0;darkGray
+Casa;Gas;0;0;darkGray
+Casa;Internet;0;45;darkGray
+Casa;Affitto;0;500;darkGray
+Casa;Telefono;0;25;darkGray
+Casa;Altro;0;25;darkGray
+
+Redditi;Stipendio;0;3000;purple
+
+Salute;Dentista;0;0;green
+Salute;Medico;0;0;green
+Salute;Occhiali;0;0;green
+Salute;Farmacia;0;0;green
+Salute;Mutua CPAM;0;0;green
+Salute;Altro;0;0;green
+
+Auto;Carburante;0;50.0;green
+Auto;Manutenzione;0;0;green
+Auto;Parcheggio;0;0;green
+Auto;Pedaggio;0;0;green
+Auto;Acquisto veicolo;0;180.;green
+Auto;Altro;0;180.;green
+
+
