@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		036704E42F3F12740084C14F /* _config.yml in Resources */ = {isa = PBXBuildFile; fileRef = 036704E22F3F12740084C14F /* _config.yml */; };
+		036704E52F3F12740084C14F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 036704E02F3F12740084C14F /* README.md */; };
+		036704E62F3F12740084C14F /* .gitattributes in Resources */ = {isa = PBXBuildFile; fileRef = 036704E32F3F12740084C14F /* .gitattributes */; };
+		036704E72F3F12740084C14F /* README_fr 1.2.md in Resources */ = {isa = PBXBuildFile; fileRef = 036704E12F3F12740084C14F /* README_fr 1.2.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		036702B12F3F11420084C14F /* PegaseUIData_v2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PegaseUIData_v2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		036704E02F3F12740084C14F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		036704E12F3F12740084C14F /* README_fr 1.2.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README_fr 1.2.md"; sourceTree = "<group>"; };
+		036704E22F3F12740084C14F /* _config.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = _config.yml; sourceTree = "<group>"; };
+		036704E32F3F12740084C14F /* .gitattributes */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitattributes; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +43,10 @@
 		036702A82F3F11420084C14F = {
 			isa = PBXGroup;
 			children = (
+				036704E02F3F12740084C14F /* README.md */,
+				036704E12F3F12740084C14F /* README_fr 1.2.md */,
+				036704E22F3F12740084C14F /* _config.yml */,
+				036704E32F3F12740084C14F /* .gitattributes */,
 				036702B32F3F11420084C14F /* PegaseUIData_v2 */,
 				036702B22F3F11420084C14F /* Products */,
 			);
@@ -82,6 +97,7 @@
 				TargetAttributes = {
 					036702B02F3F11420084C14F = {
 						CreatedOnToolsVersion = 26.3;
+						LastSwiftMigration = 2630;
 					};
 				};
 			};
@@ -109,6 +125,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				036704E42F3F12740084C14F /* _config.yml in Resources */,
+				036704E52F3F12740084C14F /* README.md in Resources */,
+				036704E62F3F12740084C14F /* .gitattributes in Resources */,
+				036704E72F3F12740084C14F /* README_fr 1.2.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,6 +270,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -272,6 +293,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -282,6 +304,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;

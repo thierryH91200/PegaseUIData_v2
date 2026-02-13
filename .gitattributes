@@ -1,0 +1,30 @@
+# Forcer l’identification des fichiers Swift
+*.swift linguist-language=Swift
+
+# Swift gitattributes
+*.pbxproj merge=union
+*.swift   text diff=swift
+
+# Exclure le Makefile des statistiques de langage
+Makefile linguist-detectable=false
+
+# Ignorer le fichier .gitattributes lui-même (utile pour ne pas le compter)
+.gitattributes linguist-detectable=false
+
+# Marquer certains dossiers comme vendored (ignorés dans les stats de langage)
+Pods/** linguist-vendored
+fastlane/** linguist-vendored
+Generated/** linguist-vendored
+Assets/** linguist-vendored
+
+# Exclure d’autres types de fichiers générés ou assets non pertinents
+*.html linguist-vendored
+*.htm linguist-vendored
+*.js linguist-vendored
+*.css linguist-vendored
+*.json linguist-vendored
+*.yml linguist-vendored
+
+# (Optionnel) Pour masquer les fichiers générés dans les diffs GitHub
+*.svg linguist-generated=true
+*.plist linguist-generated=true
