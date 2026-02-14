@@ -192,6 +192,10 @@ struct TransactionListContainer: View {
                 NotificationCenter.default.post(name: .pasteSelectedTransactions, object: nil)
                 AppLogger.ui.debug("Paste shortcut triggered")
                 return nil
+            case "a":
+                NotificationCenter.default.post(name: .selectAllTransactions, object: nil)
+                AppLogger.ui.debug("Select All shortcut triggered")
+                return nil
             default:
                 return event
             }

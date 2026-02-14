@@ -61,6 +61,13 @@ struct TransactionTableViewModern: View {
     @State private var isCalculatingDashboard = false
     @State private var dashboardTask: Task<Void, Never>?
 
+    // État pour la sheet de progression de suppression
+    @State var showDeleteProgress = false
+    @State var deleteProgress: Double = 0
+    @State var deleteTotalCount: Int = 0
+    @State var deleteCurrentCount: Int = 0
+    @State var pendingDeletions: [EntityTransaction] = []
+
     
     
     var compteCurrent: EntityAccount? {
@@ -85,6 +92,14 @@ struct TransactionTableViewModern: View {
         .navigationTitle("Account: \(compteCurrent?.name ?? "No account")")
         .sheet(isPresented: $showTransactionDetail) {
             transactionDetailPopover
+        }
+        .sheet(isPresented: $showDeleteProgress) {
+            DeleteProgressSheet(
+                totalCount: deleteTotalCount,
+                currentCount: $deleteCurrentCount,
+                progress: $deleteProgress,
+                onStart: { performBatchDeletion() }
+            )
         }
         .popover(isPresented: $showBankStatementPopover, arrowEdge: .trailing) {
             bankStatementPopoverContent
@@ -149,6 +164,9 @@ struct TransactionTableViewModern: View {
         .onReceive(NotificationCenter.default.publisher(for: .pasteSelectedTransactions)) { _ in
             pasteTransactions()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .selectAllTransactions)) { _ in
+            selectAllTransactions()
+        }
         .withToastContainer()
     }
     
@@ -210,10 +228,12 @@ struct TransactionTableViewModern: View {
             }
             .listStyle(.inset(alternatesRowBackgrounds: true))
             .contextMenu(forSelectionType: UUID.self) { uuids in
-                if uuids.isEmpty {
+                if uuids.isEmpty && selectedTransactions.isEmpty {
                     Button("New Transaction") { createNewTransaction() }
                 } else {
-                    transactionContextMenu(for: uuids)
+                    // Utiliser selectedTransactions (source complète) au lieu de uuids
+                    // car uuids ne contient que les éléments rendus par la List lazy
+                    transactionContextMenu(for: selectedTransactions.isEmpty ? uuids : selectedTransactions)
                 }
             }
         }

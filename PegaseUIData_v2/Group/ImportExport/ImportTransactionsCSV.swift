@@ -82,6 +82,8 @@ struct ImportTransactionFileView: View {
 
     // Import
     @State private var isImporting: Bool = false
+    @State private var importProgress: Double = 0
+    @State private var importCurrentCount: Int = 0
 
     let transactionAttributes = [
         String(localized: "Pointage Date"),
@@ -147,7 +149,11 @@ struct ImportTransactionFileView: View {
                 }
 
             case .importing:
-                CSVImportingView(totalRows: fileRowCount)
+                CSVImportingView(
+                    totalRows: fileRowCount,
+                    currentCount: $importCurrentCount,
+                    progress: $importProgress
+                )
             }
 
             Divider()
@@ -250,15 +256,17 @@ struct ImportTransactionFileView: View {
             currentStep = .importing
             isImporting = true
         }
+        importProgress = 0
+        importCurrentCount = 0
 
         Task { @MainActor in
-            importCSVTransactions()
+            await importCSVTransactions()
             isImporting = false
             dismiss()
         }
     }
 
-    private func importCSVTransactions() {
+    private func importCSVTransactions() async {
         guard !csvData.isEmpty else { return }
 
         guard let account = CurrentAccountManager.shared.getAccount() else {
@@ -271,39 +279,86 @@ struct ImportTransactionFileView: View {
             return
         }
 
-        let count = csvData.count
-        AppLogger.importExport.info("Importing \(count) CSV transactions")
+        let dataRows = Array(csvData.dropFirst())
+        let total = dataRows.count
+        AppLogger.importExport.info("Importing \(total) CSV transactions")
 
         let entityPreference = PreferenceManager.shared.getAllData()
 
-        for row in csvData.dropFirst() {
+        // ── Optimisation 1 : Pré-charger les caches de lookup ──
+        let categoryIndex = columnMapping[String(localized: "Category")]
+        let paymentModeIndex = columnMapping[String(localized: "Payment method")]
+        let statusIndex = columnMapping[String(localized: "Status")]
 
-            let dateOperation = getDate(from: row, index: columnMapping[String(localized: "Operation Date")]) ?? Date().noon
-            let datePointage  = getDate(from: row, index: columnMapping[String(localized: "Pointage Date")])  ?? dateOperation
+        // Extraire les noms uniques du CSV
+        var uniqueCategories = Set<String>()
+        var uniquePaymentModes = Set<String>()
+        var uniqueStatuses = Set<String>()
+
+        for row in dataRows {
+            let cat = getString(from: row, index: categoryIndex)
+            if !cat.isEmpty { uniqueCategories.insert(cat) }
+
+            let pm = getString(from: row, index: paymentModeIndex)
+            if !pm.isEmpty { uniquePaymentModes.insert(pm) }
+
+            let st = getString(from: row, index: statusIndex)
+            if !st.isEmpty { uniqueStatuses.insert(st) }
+        }
+
+        // Construire les dictionnaires de cache (1 requête par nom unique au lieu de 1 par ligne)
+        var categoryCache: [String: EntityCategory] = [:]
+        for name in uniqueCategories {
+            categoryCache[name] = CategoryManager.shared.find(name: name)
+        }
+
+        var paymentModeCache: [String: EntityPaymentMode] = [:]
+        for name in uniquePaymentModes {
+            paymentModeCache[name] = PaymentModeManager.shared.find(account: account, name: name)
+        }
+
+        var statusCache: [String: EntityStatus] = [:]
+        for name in uniqueStatuses {
+            statusCache[name] = StatusManager.shared.find(name: name)
+        }
+
+        // ── Optimisation 2 : DateFormatter réutilisé ──
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd-MM-yyyy"
+
+        let defaultCategory = entityPreference?.category
+        let defaultPaymentMode = entityPreference?.paymentMode
+        let defaultStatus = entityPreference?.status
+        let batchSize = 100
+        let nowNoon = Date().noon
+
+        // ── Boucle d'import optimisée ──
+        for (index, row) in dataRows.enumerated() {
+
+            let dateOperation = getDate(from: row, index: columnMapping[String(localized: "Operation Date")], formatter: dateFormatter) ?? nowNoon
+            let datePointage  = getDate(from: row, index: columnMapping[String(localized: "Pointage Date")], formatter: dateFormatter) ?? dateOperation
 
             let libelle = getString(from: row, index: columnMapping[String(localized: "Comment")])
 
-            let bankStatement = 0.0
+            let category = getString(from: row, index: categoryIndex)
+            let entityCategory = categoryCache[category] ?? defaultCategory
 
-            let category = getString(from: row, index: columnMapping[String(localized: "Category")])
-            let entityCategory = CategoryManager.shared.find(name: category) ?? entityPreference?.category
+            let paymentMode = getString(from: row, index: paymentModeIndex)
+            let entityModePaiement = paymentModeCache[paymentMode] ?? defaultPaymentMode
 
-            let paymentMode = getString(from: row, index: columnMapping[String(localized: "Payment method")])
-            let entityModePaiement = PaymentModeManager.shared.find(account: account, name: paymentMode) ?? entityPreference?.paymentMode
-
-            let status = getString(from: row, index: columnMapping[String(localized: "Status")])
-            let entityStatus = StatusManager.shared.find(name: status) ?? entityPreference?.status
+            let status = getString(from: row, index: statusIndex)
+            let entityStatus = statusCache[status] ?? defaultStatus
 
             let amount = getDouble(from: row, index: columnMapping[String(localized: "Amount")])
 
             var transaction = EntityTransaction(account: account)
-            transaction.createAt  = Date().noon
-            transaction.updatedAt = Date().noon
+            transaction.createAt  = nowNoon
+            transaction.updatedAt = nowNoon
             transaction.dateOperation = dateOperation.noon
             transaction.datePointage  = datePointage.noon
             transaction.paymentMode   = entityModePaiement
             transaction.status        = entityStatus
-            transaction.bankStatement = bankStatement
+            transaction.bankStatement = 0.0
             transaction.checkNumber   = "0"
 
             let sousTransaction = EntitySousOperation()
@@ -312,6 +367,13 @@ struct ImportTransactionFileView: View {
             sousTransaction.category = entityCategory
 
             transaction = ListTransactionsManager.shared.addSousTransaction(transaction: transaction, sousTransaction: sousTransaction)
+
+            // ── Optimisation 3 : Progression UI ──
+            if (index + 1) % batchSize == 0 || index == total - 1 {
+                importCurrentCount = index + 1
+                importProgress = Double(index + 1) / Double(total)
+                await Task.yield()
+            }
         }
 
         do {
@@ -348,10 +410,8 @@ struct ImportTransactionFileView: View {
         return Double(value) ?? 0.0
     }
 
-    private func getDate(from row: [String], index: Int?) -> Date? {
+    private func getDate(from row: [String], index: Int?, formatter: DateFormatter) -> Date? {
         guard let index = index, index >= 0, index < row.count else { return nil }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd-MM-yyyy"
         return formatter.date(from: row[index].trimmingCharacters(in: .whitespaces))?.noon
     }
 }
@@ -682,16 +742,39 @@ struct CSVColumnMappingView: View {
 
 struct CSVImportingView: View {
     let totalRows: Int
+    @Binding var currentCount: Int
+    @Binding var progress: Double
 
     var body: some View {
         VStack(spacing: UIConstants.largeSpacing) {
             Spacer()
 
-            ProgressView {
-                Text("Importing \(totalRows) transactions...")
-                    .font(.headline)
+            HStack(spacing: 12) {
+                Image(systemName: "tray.and.arrow.down.fill")
+                    .font(.title)
+                    .foregroundColor(.accentColor)
+                Text("Import en cours")
+                    .font(.title2.bold())
             }
-            .progressViewStyle(.circular)
+
+            VStack(spacing: 12) {
+                ProgressView(value: progress) {
+                    Text("\(currentCount) / \(totalRows)")
+                        .font(.headline)
+                        .monospacedDigit()
+                } currentValueLabel: {
+                    Text("\(Int(progress * 100))%")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .monospacedDigit()
+                }
+                .progressViewStyle(.linear)
+                .padding(.horizontal, 60)
+            }
+
+            Text("Veuillez patienter pendant l'import des transactions...")
+                .font(.callout)
+                .foregroundColor(.secondary)
 
             Spacer()
         }

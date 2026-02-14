@@ -255,6 +255,58 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
         modelContext.undoManager?.endUndoGrouping()
     }
     
+    /// Suppression batch optimisée : un seul undo grouping et une seule invalidation de cache
+    @MainActor
+    func delete(entities: [EntityTransaction]) {
+        guard let modelContext else {
+            printTag("Container invalide.", flag: true)
+            return
+        }
+        guard !entities.isEmpty else { return }
+        invalidateCache()
+        modelContext.undoManager = undoManager
+        modelContext.undoManager?.beginUndoGrouping()
+        modelContext.undoManager?.setActionName(
+            entities.count == 1
+                ? String(localized: "Delete Transaction")
+                : String(localized: "Delete \(entities.count) Transactions")
+        )
+        for entity in entities {
+            modelContext.delete(entity)
+        }
+        modelContext.undoManager?.endUndoGrouping()
+    }
+
+    /// Suppression batch avec progression — supprime par lots et yield entre chaque lot pour laisser l'UI se rafraîchir
+    @MainActor
+    func deleteBatched(
+        entities: [EntityTransaction],
+        batchSize: Int = 100,
+        onProgress: @escaping (Int, Int) -> Void
+    ) async {
+        guard let modelContext else {
+            printTag("Container invalide.", flag: true)
+            return
+        }
+        guard !entities.isEmpty else { return }
+        let total = entities.count
+        invalidateCache()
+        modelContext.undoManager = undoManager
+        modelContext.undoManager?.beginUndoGrouping()
+        modelContext.undoManager?.setActionName(
+            String(localized: "Delete \(total) Transactions")
+        )
+        for (index, entity) in entities.enumerated() {
+            modelContext.delete(entity)
+
+            if (index + 1) % batchSize == 0 || index == total - 1 {
+                onProgress(index + 1, total)
+                await Task.yield()
+            }
+        }
+        modelContext.undoManager?.endUndoGrouping()
+    }
+    
     func printTransactions() {
         for entity in listTransactions {
             print(entity.datePointage)
@@ -351,16 +403,16 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
 }
 
 //class ListTransactionsViewModel: ObservableObject {
-//    
+//
 //    @Published var account: EntityAccount
 //    @Published var listTransactions: [EntityTransaction]
 //    private let manager: ListTransactionsManager
-//    
+//
 //    init(account: EntityAccount, manager: ListTransactionsManager) {
 //        self.account = account
 //        self.manager = manager
 //        self.listTransactions = []
-//        
+//
 //        loadInitialData()
 //    }
 //

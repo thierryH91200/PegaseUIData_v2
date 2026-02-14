@@ -190,7 +190,6 @@ struct GradientText: View {
 }
 
 // MARK: - Date Extensions
-
 extension Date {
     /// Formats the date for display (short format, no time)
     func formatted() -> String {
@@ -212,6 +211,9 @@ extension Notification.Name {
 
     /// Posted when user pastes transactions (Cmd+V)
     static let pasteSelectedTransactions = Notification.Name("pasteSelectedTransactions")
+
+    /// Posted when user selects all transactions (Cmd+A)
+    static let selectAllTransactions = Notification.Name("selectAllTransactions")
 
     /// Posted when transaction selection changes
     static let transactionsSelectionChanged = Notification.Name("transactionsSelectionChanged")

@@ -198,7 +198,7 @@ struct SchedulerFormView: View {
                 Text(String(localized: "Mode", table: "Scheduler")).frame(width: 100, alignment: .leading)
                 Picker("", selection: $selectedMode) {
                     ForEach(entityPaymentMode, id: \.self) {
-                        Text($0.name).tag($0)
+                        Text($0.name).tag($0 as EntityPaymentMode?)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())

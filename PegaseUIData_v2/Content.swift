@@ -119,7 +119,6 @@ struct ContentView100: View {
 }
 
 // MARK: - Sidebar Container
-
 struct SidebarContainer: View {
     @Binding var selection1: UUID?
     @Binding var selection2: String?

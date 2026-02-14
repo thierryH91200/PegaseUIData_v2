@@ -159,25 +159,119 @@ extension TransactionTableViewModern {
     }
 
     func deleteTransactions(_ uuids: Set<UUID>) {
-        let selected = transactions.filter { uuids.contains($0.uuid) }
+        // Collecter les entités depuis groupedData (source fiable avec toutes les transactions)
+        var allTransactions: [EntityTransaction] = []
+        for group in groupedData {
+            collectTransactions(from: group, into: &allTransactions)
+        }
+        let selected = allTransactions.filter { uuids.contains($0.uuid) }
         let count = selected.count
+        guard count > 0 else { return }
 
-        for transaction in selected {
-            ListTransactionsManager.shared.delete(entity: transaction)
+        if count < 50 {
+            // Suppression immédiate pour les petits lots
+            ListTransactionsManager.shared.delete(entities: selected)
+
+            do {
+                try ListTransactionsManager.shared.save()
+            } catch {
+                AppLogger.transactions.error("Save failed: \(error.localizedDescription)")
+                ToastManager.shared.show(error.localizedDescription, icon: "xmark.circle.fill", type: .error)
+            }
+            selectedTransactions.removeAll()
+            handleDataChange()
+
+            let message = count == 1 ? "Transaction supprimée" : "\(count) transactions supprimées"
+            ToastManager.shared.show(message, icon: "trash.fill", type: .success)
+            AppLogger.transactions.info("Delete \(count) transaction(s)")
+        } else {
+            // Pour les gros lots, afficher la sheet de progression
+            pendingDeletions = selected
+            deleteProgress = 0
+            deleteTotalCount = count
+            deleteCurrentCount = 0
+            showDeleteProgress = true
+        }
+    }
+
+    func performBatchDeletion() {
+        let entities = pendingDeletions
+        guard !entities.isEmpty else { return }
+
+        Task { @MainActor in
+            await ListTransactionsManager.shared.deleteBatched(
+                entities: entities,
+                batchSize: 100
+            ) { current, total in
+                deleteCurrentCount = current
+                deleteProgress = Double(current) / Double(total)
+            }
+
+            do {
+                try ListTransactionsManager.shared.save()
+            } catch {
+                AppLogger.transactions.error("Save failed: \(error.localizedDescription)")
+                ToastManager.shared.show(error.localizedDescription, icon: "xmark.circle.fill", type: .error)
+            }
+
+            selectedTransactions.removeAll()
+            handleDataChange()
+            pendingDeletions = []
+            showDeleteProgress = false
+
+            let message = "\(entities.count) transactions supprimées"
+            ToastManager.shared.show(message, icon: "trash.fill", type: .success)
+            AppLogger.transactions.info("Supprimé \(entities.count) transaction(s)")
+        }
+    }
+
+    func selectAllTransactions() {
+        // Ouvrir tous les DisclosureGroup pour que SwiftUI rende toutes les lignes
+        for group in groupedData {
+            let monthKey = "month_\(group.year)_\(group.month ?? 0)"
+            disclosureStates[monthKey] = true
+
+            // Ouvrir aussi les sous-groupes (Carte Bancaire, etc.)
+            if let subGroups = group.monthGroups {
+                for subGroup in subGroups where subGroup.isPaymentModeGroup {
+                    let cbKey = "cb_\(group.year)_\(group.month ?? 0)"
+                    disclosureStates[cbKey] = true
+                }
+            }
         }
 
-        do {
-            try ListTransactionsManager.shared.save()
-        } catch {
-            AppLogger.transactions.error("Save failed: \(error.localizedDescription)")
-            ToastManager.shared.show(error.localizedDescription, icon: "xmark.circle.fill", type: .error)
+        // Extraire tous les UUIDs depuis groupedData (qui contient toutes les transactions affichées)
+        var allUUIDs = Set<UUID>()
+        for group in groupedData {
+            collectUUIDs(from: group, into: &allUUIDs)
         }
-        selectedTransactions.removeAll()
-        handleDataChange()
+        selectedTransactions = allUUIDs
+    }
 
-        let message = count == 1 ? "Transaction supprimée" : "\(count) transactions supprimées"
-        ToastManager.shared.show(message, icon: "trash.fill", type: .success)
-        AppLogger.transactions.info("Supprimé \(count) transaction(s)")
+    /// Collecte récursivement les UUIDs des transactions depuis la hiérarchie de groupes
+    private func collectUUIDs(from group: TransactionYearGroup, into uuids: inout Set<UUID>) {
+        if let txns = group.transactions {
+            for txn in txns {
+                uuids.insert(txn.uuid)
+            }
+        }
+        if let children = group.monthGroups {
+            for child in children {
+                collectUUIDs(from: child, into: &uuids)
+            }
+        }
+    }
+
+    /// Collecte récursivement les EntityTransaction depuis la hiérarchie de groupes
+    private func collectTransactions(from group: TransactionYearGroup, into result: inout [EntityTransaction]) {
+        if let txns = group.transactions {
+            result.append(contentsOf: txns)
+        }
+        if let children = group.monthGroups {
+            for child in children {
+                collectTransactions(from: child, into: &result)
+            }
+        }
     }
 
     func copySelected() {
@@ -288,6 +382,57 @@ extension TransactionTableViewModern {
 
     func isExpanded(for key: String) -> Bool {
         return disclosureStates[key] ?? true
+    }
+}
+
+// MARK: - Delete Progress Sheet
+
+/// Sheet affichant la progression de la suppression batch
+struct DeleteProgressSheet: View {
+    let totalCount: Int
+    @Binding var currentCount: Int
+    @Binding var progress: Double
+    let onStart: () -> Void
+
+    var body: some View {
+        VStack(spacing: 24) {
+            HStack(spacing: 12) {
+                Image(systemName: "trash.fill")
+                    .font(.title)
+                    .foregroundColor(.red)
+                Text("Suppression en cours")
+                    .font(.title2.bold())
+            }
+            .padding(.top, 24)
+
+            VStack(spacing: 12) {
+                ProgressView(value: progress) {
+                    Text("\(currentCount) / \(totalCount)")
+                        .font(.headline)
+                        .monospacedDigit()
+                } currentValueLabel: {
+                    Text("\(Int(progress * 100))%")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .monospacedDigit()
+                }
+                .progressViewStyle(.linear)
+                .padding(.horizontal, 40)
+            }
+
+            Text("Veuillez patienter pendant la suppression des transactions...")
+                .font(.callout)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            Spacer()
+        }
+        .frame(width: 420, height: 200)
+        .interactiveDismissDisabled()
+        .onAppear {
+            onStart()
+        }
     }
 }
 
