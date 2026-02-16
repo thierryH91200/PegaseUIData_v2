@@ -317,7 +317,7 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
             for sub in subs {
                 print(sub.libelle ?? "Sans libellé")
                 print(sub.category?.name ?? "Cat def")
-                print(sub.category?.rubric!.name ?? "Rub def")
+                print(sub.category?.rubric?.name ?? "Rub def")
                 print(sub.amount)
             }
         }
@@ -326,8 +326,8 @@ final class ListTransactionsManager: ListManaging, ObservableObject {
     func adjustDate (for account: EntityAccount) {
         let currentAccount = account
 
-        guard listTransactions.isEmpty == false else {return}
-        let diffDate = (listTransactions.first?.datePointage.timeIntervalSinceNow)!
+        guard let firstTransaction = listTransactions.first else { return }
+        let diffDate = firstTransaction.datePointage.timeIntervalSinceNow
         for entity in listTransactions {
             entity.datePointage  = (entity.datePointage  - diffDate).noon
             entity.dateOperation = (entity.dateOperation - diffDate).noon

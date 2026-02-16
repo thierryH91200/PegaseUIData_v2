@@ -5,13 +5,6 @@
 //  Created by Thierry hentic on 06/05/2025.
 //
 
-//
-//  Untitled 4.swift
-//  PegaseUIData
-//
-//  Created by Thierry hentic on 17/04/2025.
-//
-
 import SwiftUI
 import SwiftData
 import DGCharts
@@ -101,8 +94,10 @@ struct DGLineChartRepresentable: NSViewRepresentable {
         let calendar = Calendar.current
 
         // Base temporelle cohérente avec updateChartData (minuit du premier/dernier datePointage)
-        let firstPointageStart = calendar.startOfDay(for: allTransactions.first!.datePointage)
-        let lastPointageStart  = calendar.startOfDay(for: allTransactions.last!.datePointage)
+        guard let firstTransaction = allTransactions.first,
+              let lastTransaction = allTransactions.last else { return }
+        let firstPointageStart = calendar.startOfDay(for: firstTransaction.datePointage)
+        let lastPointageStart  = calendar.startOfDay(for: lastTransaction.datePointage)
 
         self.firstDate = firstPointageStart.timeIntervalSince1970
         self.lastDate  = lastPointageStart.timeIntervalSince1970
@@ -193,8 +188,10 @@ struct DGLineChartRepresentable: NSViewRepresentable {
             let allTransactions = ListTransactionsManager.shared.getAllData()
             guard !allTransactions.isEmpty else { return }
 
-            let firstPointageStartAll = calendar.startOfDay(for: allTransactions.first!.datePointage)
-            let lastPointageStartAll  = calendar.startOfDay(for: allTransactions.last!.datePointage)
+            guard let firstTransactionAll = allTransactions.first,
+                  let lastTransactionAll = allTransactions.last else { return }
+            let firstPointageStartAll = calendar.startOfDay(for: firstTransactionAll.datePointage)
+            let lastPointageStartAll  = calendar.startOfDay(for: lastTransactionAll.datePointage)
             let maxIndexAll = calendar.dateComponents([.day], from: firstPointageStartAll, to: lastPointageStartAll).day ?? 0
 
             let selectedStartOffsetAll = max(0, Int(self.parent.viewModel.selectedStart))
@@ -474,9 +471,10 @@ struct DGLineChartRepresentable: NSViewRepresentable {
         let calendar = Calendar.current
         
         // Normalize firstDate to midnight using Calendar
-        firstDate = calendar.startOfDay(for: transactions.first!.datePointage).timeIntervalSince1970
+        guard let firstTx = transactions.first, let lastTx = transactions.last else { return }
+        firstDate = calendar.startOfDay(for: firstTx.datePointage).timeIntervalSince1970
         let minValue = Double(firstDate / hourSeconds)
-        let maxValue = Double(calendar.startOfDay(for: transactions.last!.datePointage).timeIntervalSince1970 / hourSeconds)
+        let maxValue = Double(calendar.startOfDay(for: lastTx.datePointage).timeIntervalSince1970 / hourSeconds)
 //        let minIndex = 0
         let maxIndex = Int((maxValue - minValue))
         

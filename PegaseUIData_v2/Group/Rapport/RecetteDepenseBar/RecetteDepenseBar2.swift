@@ -124,11 +124,17 @@ class RecetteDepenseBarViewModel: ObservableObject {
             dataSet2.colors = [#colorLiteral(red: 0.01680417731, green: 0.1983509958, blue: 1, alpha: 1)]
             dataSet2.valueFormatter = DefaultValueFormatter(formatter: formatterPrice)
         } else {
-            dataSet1 = (chartView.data!.dataSets[0] as! BarChartDataSet)
-            dataSet1.replaceEntries(entriesExpense)
-
-            dataSet2 = (chartView.data!.dataSets[1] as! BarChartDataSet)
-            dataSet2.replaceEntries(entriesIncome)
+            if let data = chartView.data,
+               data.dataSets.count > 1,
+               let ds1 = data.dataSets[0] as? BarChartDataSet,
+               let ds2 = data.dataSets[1] as? BarChartDataSet {
+                dataSet1 = ds1
+                dataSet1.replaceEntries(entriesExpense)
+                dataSet2 = ds2
+                dataSet2.replaceEntries(entriesIncome)
+            } else {
+                return
+            }
         }
         printTag("dataSet1 : \(dataSet1)")
         printTag("dataSet2 : \(dataSet2)")

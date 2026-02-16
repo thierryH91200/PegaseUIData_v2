@@ -255,7 +255,7 @@ struct SubOperationsSectionView: View {
                             isShowingDialog = true
                         }
                 }
-            }            
+            }
             .frame(height: 300)
             .background(
                 RoundedRectangle(cornerRadius: 8)
@@ -350,9 +350,8 @@ struct SubOperationRow: View {
             Divider()
         }
         .onAppear {
-            guard subOperation.transaction != nil else {
-                return        }
-            foregroundColor = colorManager.colorForTransaction(subOperation.transaction!)
+            guard let transaction = subOperation.transaction else { return }
+            foregroundColor = colorManager.colorForTransaction(transaction)
         }
     }
 }

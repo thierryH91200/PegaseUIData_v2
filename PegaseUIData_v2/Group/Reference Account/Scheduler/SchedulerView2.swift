@@ -290,22 +290,27 @@ struct SchedulerFormView: View {
             newItem?.paymentMode = selectedMode
             newItem?.category = selectedCategory
             
-            newItem?.account = CurrentAccountManager.shared.getAccount()!
-            
+            if let account = CurrentAccountManager.shared.getAccount() {
+                newItem?.account = account
+            }
+
             do {
                 try SchedulerManager.shared.save()
             } catch {
                 AppLogger.scheduler.error("Scheduler save failed: \(error.localizedDescription)")
                 ToastManager.shared.show(error.localizedDescription, icon: "xmark.circle.fill", type: .error)
             }
-            let allSchedulers = SchedulerManager.shared.getAllData()!
-            dataManager.schedulers = allSchedulers
-            if let last = allSchedulers.sorted(by: { $0.dateValeur < $1.dateValeur }).last {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    dataManager.selectScheduler(last)
+            if let allSchedulers = SchedulerManager.shared.getAllData() {
+                dataManager.schedulers = allSchedulers
+                if let last = allSchedulers.sorted(by: { $0.dateValeur < $1.dateValeur }).last {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        dataManager.selectScheduler(last)
+                    }
                 }
             }
-            NotificationManager.shared.scheduleReminder(for: newItem!)
+            if let item = newItem {
+                NotificationManager.shared.scheduleReminder(for: item)
+            }
             scheduler = nil
             newItem = nil
 

@@ -93,7 +93,7 @@ struct OperationDialogView: View {
                     AppLogger.ui.error("Dialog configuration failed: \(error.localizedDescription)")
                 }
             }
-            setStatut = Set(transactionManager.selectedTransactions.map { $0.status! })
+            setStatut = Set(transactionManager.selectedTransactions.compactMap { $0.status })
             
             setModePaiement = Set(
                 transactionManager.selectedTransactions
@@ -186,8 +186,8 @@ struct OperationDialogView: View {
         if transactionManager.isCreationMode {
             // Mode création : on crée une seule transaction
             let sousTransaction = formState.currentSousTransaction
-            guard let sousTransaction else { return }
-            var transaction = formState.currentTransaction!
+            guard let sousTransaction,
+                  var transaction = formState.currentTransaction else { return }
             
             transaction = ListTransactionsManager.shared.addSousTransaction(transaction: transaction, sousTransaction: sousTransaction)
 
@@ -201,7 +201,9 @@ struct OperationDialogView: View {
                 transaction.status = formState.selectedStatus
                 transaction.bankStatement = formState.bankStatement
                 transaction.checkNumber = String(formState.checkNumber)
-                transaction.account = formState.selectedAccount!
+                if let account = formState.selectedAccount {
+                    transaction.account = account
+                }
             }
         }
 

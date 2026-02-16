@@ -265,9 +265,9 @@ final class TransactionService: TransactionServiceProtocol, ObservableObject {
     // MARK: - Private Helpers
 
     private func adjustDatesForDemo(account: EntityAccount) {
-        guard !transactions.isEmpty else { return }
+        guard let firstTransaction = transactions.first else { return }
 
-        let diffDate = transactions.first!.datePointage.timeIntervalSinceNow
+        let diffDate = firstTransaction.datePointage.timeIntervalSinceNow
         for entity in transactions {
             entity.datePointage = (entity.datePointage - diffDate).noon
             entity.dateOperation = (entity.dateOperation - diffDate).noon

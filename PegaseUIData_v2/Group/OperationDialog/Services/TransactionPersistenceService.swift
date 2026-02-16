@@ -89,8 +89,8 @@ struct TransactionPersistenceService {
     ) throws {
         // Validate first
         let errors = TransactionFormValidator.validate(coreState)
-        guard errors.isEmpty else {
-            throw errors.first!
+        if let firstError = errors.first {
+            throw firstError
         }
 
         if isCreationMode {

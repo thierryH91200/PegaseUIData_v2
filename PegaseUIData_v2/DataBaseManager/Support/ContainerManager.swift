@@ -217,9 +217,9 @@ class ContainerManager: ObservableObject {
             await Task.yield()
             try await Task.sleep(nanoseconds: 20_000_000) // 20ms pour être large (optionnel)
             
-            let emptyContainer = try? ModelContainer(for: DummyModel.self)
+            guard let emptyContainer = try? ModelContainer(for: DummyModel.self) else { return }
             DataContext.shared.container = emptyContainer
-            DataContext.shared.context = ModelContext(emptyContainer!)
+            DataContext.shared.context = ModelContext(emptyContainer)
             DataContext.shared.undoManager = UndoManager()
         }
         showingSplashScreen = true

@@ -307,8 +307,8 @@ extension TransactionTableViewModern {
         let pastedCount = clipboardTransactions.count
 
         for transaction in clipboardTransactions {
-            let status = StatusManager.shared.find(name: transaction.status!.name)
-            let paymentMode = PaymentModeManager.shared.find(name: transaction.paymentMode!.name)
+            let status = transaction.status.flatMap { StatusManager.shared.find(name: $0.name) }
+            let paymentMode = transaction.paymentMode.flatMap { PaymentModeManager.shared.find(name: $0.name) }
 
             var newTransaction = EntityTransaction(account: targetAccount)
             newTransaction.dateOperation = transaction.dateOperation
@@ -320,7 +320,7 @@ extension TransactionTableViewModern {
 
             for item in transaction.sousOperations {
                 let sousOperation = EntitySousOperation()
-                let category = CategoryManager.shared.find(name: item.category!.name)
+                let category = item.category.flatMap { CategoryManager.shared.find(name: $0.name) }
                 sousOperation.libelle = item.libelle
                 sousOperation.amount = item.amount
                 sousOperation.category = category

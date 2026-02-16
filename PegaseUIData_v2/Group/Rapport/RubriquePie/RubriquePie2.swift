@@ -47,8 +47,10 @@ class RubriquePieViewModel: ObservableObject {
             for sousOperation in sousOperations {
                 
                 value = sousOperation.amount
-                rubrique = (sousOperation.category?.rubric!.name)!
-                color = (sousOperation.category?.rubric!.color)!
+                guard let rubricName = sousOperation.category?.rubric?.name,
+                      let rubricColor = sousOperation.category?.rubric?.color else { continue }
+                rubrique = rubricName
+                color = rubricColor
                 
                 if value < 0 {
                     dataArrayExpense.append( DataGraph( name: rubrique, value: value, color: color))
