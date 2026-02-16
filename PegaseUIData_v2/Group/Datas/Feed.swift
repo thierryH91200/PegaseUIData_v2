@@ -39,8 +39,42 @@ struct Children : Codable, Hashable, Identifiable {
     var nameView: String
     var name: String
     var icon: String
-    
+    var viewKind: String
+
     var id: UUID
+
+    /// Returns the DetailViewKind matching this child's `viewKind` key.
+    var detailViewKind: DetailViewKind? {
+        DetailViewKind(rawValue: viewKind)
+    }
+}
+
+// MARK: - DetailViewKind
+
+/// Stable identifiers for detail views, independent of locale.
+/// Each case maps to a specific view displayed in the content area.
+enum DetailViewKind: String, Hashable, CaseIterable {
+    // Suivi de trésorerie
+    case transactionList
+    case cashFlowCurve
+    case filter
+    case internetReconciliation
+    case bankStatement
+    case notes
+
+    // Rapports
+    case categoryBar1
+    case categoryBar2
+    case paymentMethod
+    case incomeExpenseBar
+    case incomeExpensePie
+    case rubricBar
+    case rubricPie
+
+    // Référence compte
+    case identity
+    case scheduler
+    case settings
 }
 
 protocol AnyDecoder {

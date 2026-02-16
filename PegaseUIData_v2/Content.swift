@@ -11,7 +11,7 @@ import AppKit
 import SwiftData
 import Combine
 
-struct ContentView100: View {
+struct MainContentView: View {
 
     @AppStorage("choixCouleur") var choixCouleur: String = "Unie"
 
@@ -31,8 +31,7 @@ struct ContentView100: View {
     var transactions: [EntityTransaction] = []
 
     @State private var selection1: UUID?
-    @State private var selection2: String? = String(localized:"Notes", table: "Menu")
-//    @State private var selection2: String? = String(localized:"List of transactions", table: "Menu")
+    @State private var selection2: DetailViewKind? = .notes
     @State private var isVisible: Bool = true
     @State private var isToggle: Bool = false
 
@@ -121,7 +120,7 @@ struct ContentView100: View {
 // MARK: - Sidebar Container
 struct SidebarContainer: View {
     @Binding var selection1: UUID?
-    @Binding var selection2: String?
+    @Binding var selection2: DetailViewKind?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -136,111 +135,85 @@ struct SidebarContainer: View {
 // MARK: - Detail Container
 
 struct DetailContainer: View {
-    @Binding var selection2: String?
+    @Binding var selection2: DetailViewKind?
     @Binding var selectedTransaction: EntityTransaction?
     @Binding var isCreationMode: Bool
     @Binding var dashboard: DashboardState
 
-    var detailViews: [String: (Binding<Bool>) -> AnyView] {
-        [
-            String(localized: "List of transactions", table: "Menu"): { _ in
-                AnyView(TransactionListContainer(dashboard: $dashboard))
-            },
-            String(localized: "Cash flow curve", table: "Menu"): { _ in
-                AnyView(TreasuryCurveView(dashboard: $dashboard))
-            },
-            String(localized: "Filter", table: "Menu"): { isVisible in
-                AnyView(HybridContentData100(isVisible: isVisible))
-            },
-            String(localized: "Internet rapprochement", table: "Menu"): { isVisible in
-                AnyView(InternetReconciliationView(isVisible: isVisible))
-            },
-            String(localized: "Bank statement", table: "Menu"): { isVisible in
-                AnyView(BankStatementView(dashboard: $dashboard, isVisible: isVisible))
-            },
-            String(localized: "Notes", table: "Menu"): { isVisible in
-                AnyView(NotesView(isVisible: isVisible))
-            },
-
-            // Rapport
-            String(localized: "Category Bar1", table: "Menu"): { _ in
-                AnyView(CategorieBar1View(dashboard: $dashboard))
-            },
-            String(localized: "Category Bar2", table: "Menu"): { _ in
-                AnyView(CategorieBar2View(dashboard: $dashboard))
-            },
-            String(localized: "Payment method", table: "Menu"): { _ in
-                AnyView(ModePaiementPieView(dashboard: $dashboard))
-            },
-            String(localized: "Recipe / Expense Bar", table: "Menu"): { _ in
-                AnyView(RecetteDepenseBarView(dashboard: $dashboard))
-            },
-            String(localized: "Recipe / Expense Pie", table: "Menu"): { _ in
-                AnyView(RecetteDepensePieView(dashboard: $dashboard))
-            },
-            String(localized: "Rubric Bar", table: "Menu"): { _ in
-                AnyView(RubriqueBarView(dashboard: $dashboard))
-            },
-            String(localized: "Rubric Pie", table: "Menu"): { _ in
-                AnyView(RubriquePieView(dashboard: $dashboard))
-            },
-
-            // Reglage
-            String(localized: "Identity", table: "Menu"): { isVisible in
-                AnyView(Identy(isVisible: isVisible))
-            },
-            String(localized: "Scheduler", table: "Menu"): { isVisible in
-                AnyView(SchedulerView(isVisible: isVisible))
-            },
-            String(localized: "Settings", table: "Menu"): { isVisible in
-                AnyView(SettingView(isVisible: isVisible))
-            }
-        ]
-    }
-
     var body: some View {
         VStack {
-            if let detailView = localizedDetailView(for: selection2) {
-                detailView($dashboard.isVisible)
-            } else {
-                Text("Content for Sidebar 2 \(selection2 ?? "")")
+            switch selection2 {
+            // Suivi de trésorerie
+            case .transactionList:
+                TransactionListContainer(dashboard: $dashboard)
+            case .cashFlowCurve:
+                TreasuryCurveView(dashboard: $dashboard)
+            case .filter:
+                HybridContentData100(isVisible: $dashboard.isVisible)
+            case .internetReconciliation:
+                InternetReconciliationView(isVisible: $dashboard.isVisible)
+            case .bankStatement:
+                BankStatementView(dashboard: $dashboard, isVisible: $dashboard.isVisible)
+            case .notes:
+                NotesView(isVisible: $dashboard.isVisible)
+
+            // Rapports
+            case .categoryBar1:
+                CategorieBar1View(dashboard: $dashboard)
+            case .categoryBar2:
+                CategorieBar2View(dashboard: $dashboard)
+            case .paymentMethod:
+                ModePaiementPieView(dashboard: $dashboard)
+            case .incomeExpenseBar:
+                RecetteDepenseBarView(dashboard: $dashboard)
+            case .incomeExpensePie:
+                RecetteDepensePieView(dashboard: $dashboard)
+            case .rubricBar:
+                RubriqueBarView(dashboard: $dashboard)
+            case .rubricPie:
+                RubriquePieView(dashboard: $dashboard)
+
+            // Référence compte
+            case .identity:
+                Identy(isVisible: $dashboard.isVisible)
+            case .scheduler:
+                SchedulerView(isVisible: $dashboard.isVisible)
+            case .settings:
+                SettingView(isVisible: $dashboard.isVisible)
+
+            case nil:
+                Text("Select an item")
             }
         }
-    }
-
-    func localizedDetailView(for selection: String?) -> ((Binding<Bool>) -> AnyView)? {
-        guard let selection = selection else { return nil }
-        return detailViews[selection]
     }
 }
 
 // MARK: - Sidebar 2
 
 struct Sidebar2A: View {
-    @Binding var selection2: String?
+    @Binding var selection2: DetailViewKind?
 
     var body: some View {
         let datas = (try? Bundle.main.decode([Datas].self, from: "Feeds.plist")) ?? []
-        let safeDatas: [Datas] = datas
-
-//        let datas = Bundle.main.decode([Datas].self, from: "Feeds.plist")
 
         List(selection: $selection2) {
-            ForEach(safeDatas) { section in
+            ForEach(datas) { section in
                 Section(section.name) {
                     ForEach(section.children) { child in
-                        Label {
-                            Text(child.name)
-                                .font(.system(size: 11))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                        } icon: {
-                            Image(systemName: child.icon)
-                                .font(.system(size: 13))
+                        if let kind = child.detailViewKind {
+                            Label {
+                                Text(child.name)
+                                    .font(.system(size: 11))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            } icon: {
+                                Image(systemName: child.icon)
+                                    .font(.system(size: 13))
+                            }
+                            .tag(kind)
+                            .frame(minHeight: 10, maxHeight: 14)
+                            .padding(.vertical, 0)
                         }
-                        .tag(child.name)
-                        .frame(minHeight: 10, maxHeight: 14)
-                        .padding(.vertical, 0)
                     }
                 }
             }

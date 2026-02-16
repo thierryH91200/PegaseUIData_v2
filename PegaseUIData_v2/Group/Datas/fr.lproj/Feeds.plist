@@ -18,6 +18,8 @@
 				<string>list.bullet</string>
 				<key>name</key>
 				<string>Liste des transactions</string>
+				<key>viewKind</key>
+				<string>transactionList</string>
 				<key>id</key>
 				<string>9AB34384-4EC0-4C09-A612-E404E6F869AA</string>
 			</dict>
@@ -28,6 +30,8 @@
 				<string>chart.xyaxis.line</string>
 				<key>name</key>
 				<string>Courbe de trésorerie</string>
+				<key>viewKind</key>
+				<string>cashFlowCurve</string>
 				<key>id</key>
 				<string>7505E942-D67B-4283-86FB-FFB4296A1C2E</string>
 			</dict>
@@ -38,6 +42,8 @@
 				<string>checkmark.seal.fill</string>
 				<key>name</key>
 				<string>Filtre</string>
+				<key>viewKind</key>
+				<string>filter</string>
 				<key>id</key>
 				<string>178EB508-A5C6-4392-8E45-EB6964F8C830</string>
 			</dict>
@@ -48,6 +54,8 @@
 				<string>checkmark.seal.fill</string>
 				<key>name</key>
 				<string>Rapprochement internet</string>
+				<key>viewKind</key>
+				<string>internetReconciliation</string>
 				<key>id</key>
 				<string>E18C4A6F-4534-4DB2-B189-97F9A529C015</string>
 			</dict>
@@ -58,6 +66,8 @@
 				<string>note.text</string>
 				<key>name</key>
 				<string>Relevé bancaire</string>
+				<key>viewKind</key>
+				<string>bankStatement</string>
 				<key>id</key>
 				<string>38E12B07-27D7-4476-B62A-64403027871A</string>
 			</dict>
@@ -68,6 +78,8 @@
 				<string>note</string>
 				<key>name</key>
 				<string>Notes</string>
+				<key>viewKind</key>
+				<string>notes</string>
 				<key>id</key>
 				<string>0CB862EF-3BE6-4FE5-807B-774EA5748F53</string>
 			</dict>
@@ -89,6 +101,8 @@
 				<string>chart.bar.xaxis</string>
 				<key>name</key>
 				<string>Categorie Bar1</string>
+				<key>viewKind</key>
+				<string>categoryBar1</string>
 				<key>id</key>
 				<string>6CA852C4-5D90-444C-A432-496D678519E6</string>
 			</dict>
@@ -99,6 +113,8 @@
 				<string>chart.bar.xaxis</string>
 				<key>name</key>
 				<string>Categorie Bar2</string>
+				<key>viewKind</key>
+				<string>categoryBar2</string>
 				<key>id</key>
 				<string>38E12B07-27D7-4476-B62A-64403027871A</string>
 			</dict>
@@ -109,6 +125,8 @@
 				<string>chart.pie</string>
 				<key>name</key>
 				<string>Mode de paiement</string>
+				<key>viewKind</key>
+				<string>paymentMethod</string>
 				<key>id</key>
 				<string>0CB862EF-3BE6-4FE5-807B-774EA5748F53</string>
 			</dict>
@@ -119,6 +137,8 @@
 				<string>chart.bar.xaxis</string>
 				<key>name</key>
 				<string>Recette Depense Bar</string>
+				<key>viewKind</key>
+				<string>incomeExpenseBar</string>
 				<key>id</key>
 				<string>702BEF56-353D-4426-A6ED-41B7B8ACAF61</string>
 			</dict>
@@ -129,6 +149,8 @@
 				<string>chart.pie</string>
 				<key>name</key>
 				<string>Recette Depense Pie</string>
+				<key>viewKind</key>
+				<string>incomeExpensePie</string>
 				<key>id</key>
 				<string>6B2CDDB7-807B-4C82-B7A8-778793B35951</string>
 			</dict>
@@ -139,6 +161,8 @@
 				<string>chart.bar.xaxis</string>
 				<key>name</key>
 				<string>Rubrique Bar</string>
+				<key>viewKind</key>
+				<string>rubricBar</string>
 				<key>id</key>
 				<string>558DDCB7-C230-4373-8943-9DBB8D0F4F9B</string>
 			</dict>
@@ -149,6 +173,8 @@
 				<string>chart.pie</string>
 				<key>name</key>
 				<string>Rubrique Pie</string>
+				<key>viewKind</key>
+				<string>rubricPie</string>
 				<key>id</key>
 				<string>6C99829D-71ED-4004-9C9F-15A9B1DE4715</string>
 			</dict>
@@ -170,6 +196,8 @@
 				<string>person</string>
 				<key>name</key>
 				<string>Identité</string>
+				<key>viewKind</key>
+				<string>identity</string>
 				<key>id</key>
 				<string>B7EA7423-F42A-4316-A0A4-FA4F6B00FE3B</string>
 			</dict>
@@ -180,6 +208,8 @@
 				<string>calendar</string>
 				<key>name</key>
 				<string>Echéancier</string>
+				<key>viewKind</key>
+				<string>scheduler</string>
 				<key>id</key>
 				<string>7900BB24-560A-46E5-872D-8FB684A97AAC</string>
 			</dict>
@@ -190,6 +220,8 @@
 				<string>bookmark</string>
 				<key>name</key>
 				<string>Paramètres</string>
+				<key>viewKind</key>
+				<string>settings</string>
 				<key>id</key>
 				<string>64B530A8-1033-4A87-A413-FDAC6AB0B1B5</string>
 			</dict>
