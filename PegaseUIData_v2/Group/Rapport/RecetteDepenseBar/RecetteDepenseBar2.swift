@@ -133,7 +133,7 @@ class RecetteDepenseBarViewModel: ObservableObject {
                 dataSet2 = ds2
                 dataSet2.replaceEntries(entriesIncome)
             } else {
-                return
+                return nil
             }
         }
         printTag("dataSet1 : \(dataSet1)")
@@ -211,3 +211,4 @@ class RecetteDepenseBarViewModel: ObservableObject {
         }
     }
 }
+
