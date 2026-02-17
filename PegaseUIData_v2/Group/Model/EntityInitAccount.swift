@@ -35,18 +35,18 @@ import Combine
     }
 }
 
-final class InitAccountManager {
-    
+final class InitAccountManager: ObservableObject {
+
     static let shared = InitAccountManager()
     private var initAccounts = [EntityInitAccount]()
-    private var initAccount : EntityInitAccount?
+    @Published var currentInitAccount: EntityInitAccount?
 
     // Contexte pour les modifications
     @MainActor
     var currentAccount: EntityAccount? {
         CurrentAccountManager.shared.getAccount()
     }
-    
+
     var modelContext: ModelContext? {
         DataContext.shared.context
     }
@@ -77,10 +77,13 @@ final class InitAccountManager {
         }
         
         if let firstEntity = initAccounts.first {
+            currentInitAccount = firstEntity
             return firstEntity
         } else {
             do {
-                return try create(numAccount: "", for: account)
+                let entity = try create(numAccount: "", for: account)
+                currentInitAccount = entity
+                return entity
             } catch {
                 printTag("Erreur lors de la création d'une entité : \(error)")
                 return nil
@@ -101,19 +104,27 @@ final class InitAccountManager {
     }
     
     @MainActor func delete(entityInitAccount: EntityInitAccount) {
-        
-        modelContext?.delete( entityInitAccount)
-        initAccount = nil
- 
-        initAccount = getAllData()      // Recharger depuis la base de données
+
+        modelContext?.delete(entityInitAccount)
+        currentInitAccount = nil
+
+        currentInitAccount = getAllData()      // Recharger depuis la base de donnees
     }
     
     func save () throws {
-        
+
         do {
             try modelContext?.save()
         } catch {
             throw EnumError.saveFailed
+        }
+    }
+
+    func saveChanges() {
+        do {
+            try modelContext?.save()
+        } catch {
+            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
         }
     }
 }

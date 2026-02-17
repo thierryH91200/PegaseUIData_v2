@@ -9,34 +9,12 @@ import SwiftUI
 import SwiftData
 import Combine
 
-final class BankDataManager: ObservableObject {
-    @Published var banqueInfo: EntityBanqueInfo? {
-        didSet {
-            // Sauvegarder les modifications dès qu'il y a un changement
-            saveChanges()
-        }
-    }
-    
-    var modelContext: ModelContext? {
-        DataContext.shared.context
-    }
-
-    func saveChanges() {
-       
-        do {
-            try modelContext?.save()
-        } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
-        }
-    }
-}
-
 struct BankView: View {
-    
+
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
-    @EnvironmentObject var dataManager: BankDataManager
-   
+    @EnvironmentObject var bankManager: BankManager
+
     var body: some View {
         VStack(spacing: 30) {
             if let account = CurrentAccountManager.shared.getAccount() {
@@ -44,8 +22,7 @@ struct BankView: View {
                     .font(.headline)
             }
 
-            if let banqueInfo = dataManager.banqueInfo {
-                // Utilisez un Binding pour mettre à jour les données en direct
+            if let banqueInfo = bankManager.currentBanqueInfo {
                 SectionView(sectionType: .bank, title: String(localized: "Bank", table: "BankView"), banqueInfo: banqueInfo)
                 SectionView(sectionType: .contact, title: String(localized: "Contact", table: "BankView"), banqueInfo: banqueInfo)
                 Spacer()
@@ -55,37 +32,34 @@ struct BankView: View {
         }
         .padding()
         .onAppear {
-            
 
-            // Créer un nouvel enregistrement si la base de données est vide
-            if dataManager.banqueInfo == nil {
+            // Creer un nouvel enregistrement si la base de donnees est vide
+            if bankManager.currentBanqueInfo == nil {
 
                 let banqueInfo = BankManager.shared.getAllData()
-                dataManager.banqueInfo = banqueInfo
 
                 if banqueInfo == nil {
-                    
                     let newbanqueInfo = EntityBanqueInfo()
-                    dataManager.banqueInfo = newbanqueInfo
+                    bankManager.currentBanqueInfo = newbanqueInfo
                     modelContext.insert(newbanqueInfo)
                 }
             }
         }
         .onDisappear {
             saveChanges()
-            dataManager.saveChanges()
-            dataManager.banqueInfo = nil
+            bankManager.saveChanges()
+            bankManager.currentBanqueInfo = nil
         }
 
         .onChange(of: currentAccountManager.currentAccountID) { old, newValue in
-    
+
             if !newValue.isEmpty {
                 let account = currentAccountManager.getAccount()
-                dataManager.banqueInfo = nil
+                bankManager.currentBanqueInfo = nil
                 loadOrCreate(for: account)
             }
         }
-        .onChange(of: dataManager.banqueInfo) { old , _ in
+        .onChange(of: bankManager.currentBanqueInfo) { old , _ in
             do {
                 try modelContext.save()
             } catch {
@@ -93,23 +67,23 @@ struct BankView: View {
             }
         }
     }
-    
+
     private func loadOrCreate(for account: EntityAccount?) {
         guard let account else { return }
 
-        dataManager.banqueInfo = BankManager.shared.getAllData() ?? {
+        bankManager.currentBanqueInfo = BankManager.shared.getAllData() ?? {
             let entity = EntityBanqueInfo()
             entity.account = account
             modelContext.insert(entity)
             return entity
         }()
     }
-    
+
     private func saveChanges() {
         do {
             try modelContext.save()
         } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
+            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
         }
     }
 }
@@ -150,7 +124,7 @@ struct SectionView: View {
 }
 
 struct FieldView: View {
-    
+
     @Environment(\.modelContext) var modelContext
 
     let label: String
@@ -168,14 +142,12 @@ struct FieldView: View {
                 }
         }
     }
-    
+
     private func saveChanges() {
         do {
             try modelContext.save()
         } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
+            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
         }
     }
 }
-
-

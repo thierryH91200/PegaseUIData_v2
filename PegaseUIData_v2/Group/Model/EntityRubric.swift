@@ -40,16 +40,16 @@ extension EntityRubric: CustomStringConvertible {
     }
 }
 
-final class RubricManager {
-    
+final class RubricManager: ObservableObject {
+
     static let shared = RubricManager()
-    
+
     @MainActor
     var currentAccount: EntityAccount {
         CurrentAccountManager.shared.getAccount() ?? EntityAccount()
     }
 
-    var entitiesRubric: [EntityRubric] = []
+    @Published var entitiesRubric: [EntityRubric] = []
     
     // Contexte pour les modifications
     var modelContext: ModelContext? {

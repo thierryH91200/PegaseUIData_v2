@@ -8,6 +8,8 @@
 
 import Foundation
 import SwiftData
+import Combine
+
 
 @Model
 final class EntityBanqueInfo : Identifiable{
@@ -42,16 +44,17 @@ protocol BankManaging {
     func create(account: EntityAccount?) throws -> EntityBanqueInfo
     func delete(entity: EntityBanqueInfo)
 
-    func getAllData() -> EntityBanqueInfo? 
+    func getAllData() -> EntityBanqueInfo?
     func save() throws
 }
 
 @MainActor
-final class BankManager : BankManaging {
-    
+final class BankManager : BankManaging, ObservableObject {
+
     static let shared = BankManager()
     var entitiesBank = [EntityBanqueInfo]()
-    
+    @Published var currentBanqueInfo: EntityBanqueInfo?
+
     var modelContext: ModelContext? {
         DataContext.shared.context
     }
@@ -60,6 +63,7 @@ final class BankManager : BankManaging {
     }
     func reset() {
         entitiesBank.removeAll()
+        currentBanqueInfo = nil
     }
     
     func create(account: EntityAccount?) throws -> EntityBanqueInfo {
@@ -107,7 +111,8 @@ final class BankManager : BankManaging {
             print("Erreur lors de la récupération des données : \(error.localizedDescription)")
             return nil
         }
-        return entitiesBank.first
+        currentBanqueInfo = entitiesBank.first
+        return currentBanqueInfo
     }
     
     func delete(entity: EntityBanqueInfo) {
@@ -115,7 +120,7 @@ final class BankManager : BankManaging {
     }
     
     func save() throws {
-        
+
         do {
             try modelContext?.save()
         } catch {
@@ -123,4 +128,11 @@ final class BankManager : BankManaging {
         }
     }
 
+    func saveChanges() {
+        do {
+            try modelContext?.save()
+        } catch {
+            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
+        }
+    }
 }

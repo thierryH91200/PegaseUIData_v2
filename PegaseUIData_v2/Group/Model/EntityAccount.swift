@@ -289,7 +289,6 @@ final class AccountManager: AccountManaging {
 
 }
 
-
 @MainActor
 final class CurrentAccountManager: ObservableObject {
 
@@ -299,7 +298,6 @@ final class CurrentAccountManager: ObservableObject {
     @Published private(set) var currentAccountID: String = ""
     @Published private(set) var currentAccount: EntityAccount?
     @Published var isSwitchingAccount: Bool = false
-
 
     private init() {}
 

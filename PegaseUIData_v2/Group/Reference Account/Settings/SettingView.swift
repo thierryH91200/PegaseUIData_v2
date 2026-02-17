@@ -33,63 +33,11 @@ enum TabSelection: Hashable {
     case checkBook
 }
 
-//struct SettingTab1: View {
-//    
-//    @StateObject private var chequeViewManager       = ChequeBookManager()
-//    @StateObject private var modePaiementDataManager = PaymentModeManager()
-//    @StateObject private var rubricDataManager       = RubricDataManager()
-//    @StateObject private var preferenceDataManager   = PreferenceDataManager()
-//    
-//    @State private var selectedTab: TabSelection = .rubric
-//    
-//    var body: some View {
-//        TabView(selection: $selectedTab) {
-//            
-//            RubricView()
-//                .environmentObject(rubricDataManager)
-//                .tabItem {
-//                    Label("Rubric", systemImage: "house")
-//                }
-//                .tag(TabSelection.rubric)
-//            
-////            ModePaiementView()
-////                .environmentObject(modePaiementDataManager)
-////                .tabItem {
-////                    Label("Modes de paiement", systemImage: "creditcard")
-////                }
-////                .tag(TabSelection.modePaiement)
-//            
-//            PreferenceTransactionView()
-//                .environmentObject(preferenceDataManager)
-//                .tabItem {
-//                    Label("Preferences", systemImage: "gear")
-//                }
-//                .tag(TabSelection.preference)
-//            
-//            CheckView()
-//                .environmentObject(chequeViewManager)
-//            
-//                .tabItem {
-//                    Label("Check", systemImage: "person")
-//                }
-//                .tag(TabSelection.checkBook)
-//        }
-//        .frame(maxWidth: .infinity, maxHeight: .infinity)
-//        .layoutPriority(1) // Priorité élevée pour occuper tout l’espace disponible
-//    }
-//}
-
-//enum TabSelection: Hashable {
-//    case rubric
-//    case modePaiement
-//    case preference
-//}
 
 struct SettingTab: View {
     
     @StateObject private var chequeViewManager       = ChequeBookManager()
     @StateObject private var modePaiementDataManager = PaymentModeManager()
-    @StateObject private var rubricDataManager       = RubricDataManager()
     @StateObject private var preferenceDataManager   = PreferenceDataManager()
     
     @State private var selectedTab: TabSelection = .rubric
@@ -98,7 +46,7 @@ struct SettingTab: View {
         TabView {
 
             RubricView()
-                .environmentObject(rubricDataManager)
+                .environmentObject(RubricManager.shared)
                 .tabItem {
                     Label(String(localized: "Rubric", table: "SettingsView"), systemImage: "house")
                 }

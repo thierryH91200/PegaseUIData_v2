@@ -78,16 +78,18 @@ final class IdentityManager: ObservableObject  {
     static let shared = IdentityManager()
     
     @Published var identities = [EntityIdentity]()
-    
+    @Published var currentIdentity: EntityIdentity?
+
     var modelContext: ModelContext? {
         DataContext.shared.context
     }
 
     init() {
     }
-    
+
     func reset() {
         identities.removeAll()
+        currentIdentity = nil
     }
 
     
@@ -126,7 +128,16 @@ final class IdentityManager: ObservableObject  {
             printTag("Erreur lors de la récupération des données : \(error.localizedDescription)")
             return nil
         }
-        return identities.first
+        currentIdentity = identities.first
+        return currentIdentity
+    }
+
+    func saveChanges() {
+        do {
+            try modelContext?.save()
+        } catch {
+            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
+        }
     }
 }
 

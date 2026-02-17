@@ -9,47 +9,23 @@ import SwiftUI
 import SwiftData
 import Combine
 
-final class InitAccountDataManager: ObservableObject {
-    @Published var initAccount: EntityInitAccount? {
-        didSet {
-            // Sauvegarder les modifications dès qu'il y a un changement
-            saveChanges()
-        }
-    }
-    
-    var modelContext: ModelContext? {
-        DataContext.shared.context
-    }
-
-    func saveChanges() {
-       
-        do {
-            try modelContext?.save()
-        } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
-        }
-    }
-}
-
 struct InitAccountView: View {
-    
-    @Environment(\.modelContext) var modelContext
-    @EnvironmentObject var dataManager: InitAccountDataManager
-    @EnvironmentObject var currentAccountManager: CurrentAccountManager
 
-//    @Query private var banqueInfos: [EntityInitAccount]
+    @Environment(\.modelContext) var modelContext
+    @EnvironmentObject var initAccountManager: InitAccountManager
+    @EnvironmentObject var currentAccountManager: CurrentAccountManager
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            
+
             // Logo et Rapport Initial
-            if let initAccount = dataManager.initAccount {
+            if let initAccount = initAccountManager.currentInitAccount {
                 HStack(alignment: .top) {
                     Image(systemName: "building.columns.fill")
                         .resizable()
                         .frame(width: 80, height: 80)
                         .foregroundColor(.blue)
-                    
+
                     VStack(alignment: .leading) {
                         Text("Initial report", tableName: "InitAccountView")
                             .font(.headline)
@@ -61,8 +37,8 @@ struct InitAccountView: View {
                 }
             }
 
-            // Références Bancaires
-            if let initAccount = dataManager.initAccount {
+            // References Bancaires
+            if let initAccount = initAccountManager.currentInitAccount {
                 VStack(alignment: .leading) {
                     Text("Bank references", tableName: "InitAccountView")
                         .font(.headline)
@@ -76,7 +52,7 @@ struct InitAccountView: View {
         .padding()
         .frame(width: 800, height: 600)
         .onAppear {
-            
+
             withAnimation {
                 initializeData()
             }
@@ -85,14 +61,14 @@ struct InitAccountView: View {
             resetAccount()
         }
         .onChange(of: currentAccountManager.currentAccountID) { old, newValue in
-            
+
             if !newValue.isEmpty {
                 let account = CurrentAccountManager.shared.getAccount()!
-                dataManager.initAccount = nil
+                initAccountManager.currentInitAccount = nil
                 loadOrCreateIdentity(for: account)
             }
         }
-        .onChange(of: dataManager.initAccount) { old , _ in
+        .onChange(of: initAccountManager.currentInitAccount) { old , _ in
             do {
                 try modelContext.save()
             } catch {
@@ -101,42 +77,41 @@ struct InitAccountView: View {
         }
 
     }
-    
+
     private func initializeData() {
         createAccountIfNeeded()
     }
 
     private func createAccountIfNeeded() {
-        if dataManager.initAccount == nil {
+        if initAccountManager.currentInitAccount == nil {
 
             let accountInitInfo = InitAccountManager.shared.getAllData()
-            dataManager.initAccount = accountInitInfo ?? {
+            initAccountManager.currentInitAccount = accountInitInfo ?? {
                 guard let account = CurrentAccountManager.shared.getAccount() else {
-                    print("⚠️ Erreur: aucun compte sélectionné pour l'initialisation")
+                    print("Erreur: aucun compte selectionne pour l'initialisation")
                     return nil
                 }
-                let newInitAccount = EntityInitAccount(account: account) // ✅ Sécurisé
+                let newInitAccount = EntityInitAccount(account: account)
                 modelContext.insert(newInitAccount)
                 return newInitAccount
             }()
         }
     }
-    
+
     private func resetAccount() {
         saveChanges()
-//        initAccountViewManager.saveChanges(using: modelContext)
-        dataManager.initAccount = nil
+        initAccountManager.currentInitAccount = nil
     }
-    
+
     private func loadOrCreateIdentity(for account: EntityAccount) {
-        
+
         if let existingInitAccount = InitAccountManager.shared.getAllData() {
-            dataManager.initAccount = existingInitAccount
+            initAccountManager.currentInitAccount = existingInitAccount
         } else {
             let entity = EntityInitAccount(account: account)
             entity.account = account
             modelContext.insert(entity)
-            dataManager.initAccount = entity
+            initAccountManager.currentInitAccount = entity
         }
     }
 
@@ -144,18 +119,18 @@ struct InitAccountView: View {
         do {
             try modelContext.save()
         } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
+            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
         }
     }
 }
 
 // Vue pour le rapport initial (Planned, Engaged, Executed)
 struct ReportView: View {
-    
+
     @Environment(\.modelContext) var modelContext
 
     @Bindable var initAccount: EntityInitAccount
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             Text("Planned", tableName: "InitAccountView")
@@ -218,18 +193,18 @@ struct ReportView: View {
         do {
             try modelContext.save()
         } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
+            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
         }
     }
 }
 
-// Vue pour les références bancaires
+// Vue pour les references bancaires
 struct BankReferenceView: View {
-    
+
     @Environment(\.modelContext) var modelContext
     @Bindable var initAccount: EntityInitAccount
 
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -280,22 +255,22 @@ struct BankReferenceView: View {
         }
         .padding()
     }
-    
+
     func formattedIBAN(_ iban: String) -> String {
-        let cleanedIBAN = iban.replacingOccurrences(of: " ", with: "") // Retirer les espaces existants
+        let cleanedIBAN = iban.replacingOccurrences(of: " ", with: "")
         let groups = stride(from: 0, to: cleanedIBAN.count, by: 4).map { index in
             let start = cleanedIBAN.index(cleanedIBAN.startIndex, offsetBy: index)
             let end = cleanedIBAN.index(start, offsetBy: 4, limitedBy: cleanedIBAN.endIndex) ?? cleanedIBAN.endIndex
             return String(cleanedIBAN[start..<end])
         }
-        return groups.joined(separator: " ") // Rejoindre les groupes avec des espaces
+        return groups.joined(separator: " ")
     }
-    
+
     private func saveChanges() {
         do {
             try modelContext.save()
         } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
+            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
         }
     }
 }

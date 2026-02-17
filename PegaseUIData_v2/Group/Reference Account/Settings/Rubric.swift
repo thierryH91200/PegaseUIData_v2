@@ -12,37 +12,19 @@ import Combine
 import OSLog
 
 
-final class RubricDataManager: ObservableObject {
-    @Published var rubrics: [EntityRubric] = []
-    
-    var modelContext: ModelContext? {
-        DataContext.shared.context
-    }
-
-    func saveChanges() {
-        do {
-            try modelContext?.save()
-        } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
-        }
-    }
-}
-
 struct RubricView: View {
-    
+
     @EnvironmentObject var currentAccountManager : CurrentAccountManager
-    @EnvironmentObject var dataManager : RubricDataManager
-    
-    @State private var rubriques: [EntityRubric] = []
-    
+    @EnvironmentObject var rubricManager : RubricManager
+
     @State private var expandedRubriques: [String: Bool] = [:]
     @State private var selectedCategory: EntityCategory?
     @State private var selectedRubric: EntityRubric?
-    
+
     @State private var isPresentedRubric = false
     @State private var isPresentedCategory = false
     @State private var isModeCreate = false
-    
+
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
@@ -58,28 +40,25 @@ struct RubricView: View {
                     }
                     .padding(10)
                 }
-                
+
                 .onChange(of: selectedCategory) { oldValue, newValue in
                 }
-                
+
                 .onChange(of: currentAccountManager.currentAccountID ) { old, newValue in
                     if newValue.isEmpty {
-                        dataManager.rubrics.removeAll()
+                        rubricManager.entitiesRubric.removeAll()
                         selectedCategory = nil
                         selectedRubric = nil
-                        
-                        rubriques = RubricManager.shared.getAllData()
-                        dataManager.rubrics = rubriques
+
+                        rubricManager.getAllData()
                     }
                 }
-                
+
                 .onAppear {
-                    rubriques = RubricManager.shared.getAllData()
-                    dataManager.rubrics = rubriques
+                    rubricManager.getAllData()
                 }
                 .onDisappear {
-                    dataManager.rubrics.removeAll()
-                    rubriques.removeAll()
+                    rubricManager.entitiesRubric.removeAll()
                     selectedCategory = nil
                     selectedRubric = nil
                 }
@@ -87,9 +66,9 @@ struct RubricView: View {
                 .background(Color.white)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .shadow(radius: 3)
-                
+
                 Spacer(minLength: 0)
-                
+
                 HStack {
                     Button(action: {
                         isModeCreate = true
@@ -153,7 +132,7 @@ struct RubricView: View {
             .padding()
             .position(x: geometry.size.width / 2, y: 0)
             .offset(y: 350) // Ajustez cette valeur selon vos besoins
-            
+
             .sheet(isPresented: $isPresentedRubric) {
                 RubricFormView(isPresented: $isPresentedRubric,
                                isMode: $isModeCreate,
@@ -176,26 +155,25 @@ struct RubricView: View {
             CategoryManager.shared.delete(entity: category)
         }
     }
-    
+
     func refreshData() {
-        rubriques = RubricManager.shared.getAllData()
-        dataManager.rubrics = rubriques
+        rubricManager.getAllData()
     }
-    
+
     private func removeRubric(_ rubric: EntityRubric) {
         RubricManager.shared.delete(entity: rubric)
         refreshData()
     }
-    
+
     private func removeCategory(_ category: EntityCategory) {
         CategoryManager.shared.delete(entity: category)
         refreshData()
     }
-    
-    // Fonction séparée pour générer la liste des rubriques
+
+    // Fonction separee pour generer la liste des rubriques
     @ViewBuilder
     private func rubricList() -> some View {
-        ForEach(rubriques, id: \.id) { rubrique in
+        ForEach(rubricManager.entitiesRubric, id: \.id) { rubrique in
             DisclosureGroup(
                 isExpanded: Binding(
                     get: { expandedRubriques[rubrique.name] ?? true },
@@ -219,7 +197,7 @@ struct RubricView: View {
                         .frame(width: 40, height: 10)
                 }
                 .padding(.vertical, 2)
-                .background(selectedRubric?.name == rubrique.name ? Color.blue.opacity(0.3) : Color.clear) // ✅ Sélection uniquement sur la rubrique
+                .background(selectedRubric?.name == rubrique.name ? Color.blue.opacity(0.3) : Color.clear)
                 .onTapGesture {
                     selectedRubric = rubrique
                     selectedCategory = nil
@@ -249,15 +227,15 @@ struct RubricView: View {
             }
         }
     }
-    
-    // Fonction pour afficher chaque catégorie avec une ligne HStack
+
+    // Fonction pour afficher chaque categorie avec une ligne HStack
     @ViewBuilder
     private func categoryRow(_ category: EntityCategory) -> some View {
         HStack {
             Text(category.name)
                 .font(.system(size: 12))
                 .frame(minWidth: 150, alignment: .leading)
-            Text("🎯 \(category.objectif.description)")
+            Text("\(category.objectif.description)")
                 .font(.system(size: 12))
         }
         .padding(.leading, 5)
@@ -267,7 +245,7 @@ struct RubricView: View {
             selectedRubric = nil
             selectedCategory = category
         }
-        .contextMenu {  // Ajout du menu contextuel
+        .contextMenu {
             Button(action: {
                 isPresentedRubric = true
                 isModeCreate = true
@@ -295,20 +273,20 @@ struct RubricView: View {
 struct RubricFormView: View {
 
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var dataManager : RubricDataManager
+    @EnvironmentObject var rubricManager : RubricManager
 
     @Binding var isPresented: Bool
     @Binding var isMode: Bool
     let rubric: EntityRubric?
     @State private var name: String = ""
     @State private var selectedColor: Color = .gray
-    
+
     var body: some View {
         VStack(spacing: 0) {
             Rectangle()
                 .fill(isMode ? Color.blue : Color.green)
                 .frame(height: 10)
-            
+
             // Contenu principal
             VStack(spacing: 20) {
 
@@ -340,11 +318,11 @@ struct RubricFormView: View {
             }
             // Bandeau du bas
             .frame(width: 300)
-            
+
             Rectangle()
                 .fill(isMode ? Color.blue : Color.green)
                 .frame(height: 10)
-            
+
                 .onAppear {
                     if let rubric = rubric {
                         name = rubric.name
@@ -353,9 +331,9 @@ struct RubricFormView: View {
                 }
         }
     }
-    
+
     private func save() {
-        
+
         let color = NSColor.fromSwiftUIColor(selectedColor)
 
         // Update existing rubric or create a new one
@@ -364,11 +342,7 @@ struct RubricFormView: View {
             existing.color = color
             // Keep existing account as-is
         } else {
-            
-            guard let created = RubricManager.shared.create(name: name, color: color) else { return }
-            
-            // Keep the data manager list in sync if available
-            dataManager.rubrics.append(created)
+            RubricManager.shared.create(name: name, color: color)
         }
     }
 }
@@ -376,7 +350,7 @@ struct RubricFormView: View {
 struct CategoryFormView: View {
 
     @Environment(\.dismiss) private var dismiss
-    
+
     @Binding var isPresented: Bool
     @Binding var isModeCreate: Bool
     let rubric: EntityRubric?
@@ -384,13 +358,13 @@ struct CategoryFormView: View {
     @State private var name: String = ""
     @State private var objectif: String = ""
     @State private var selectedColor: Color = .gray
-    
+
     var body: some View {
         VStack(spacing: 0) {
             Rectangle()
                 .fill(isModeCreate ? Color.blue : Color.green)
                 .frame(height: 10)
-            
+
             // Contenu principal
             VStack(spacing: 20) {
 
@@ -426,7 +400,7 @@ struct CategoryFormView: View {
                 }
             // Bandeau du bas
                 .frame(width: 200)
-            
+
                 .onAppear {
                     if let category = category {
                         name = category.name
@@ -435,7 +409,7 @@ struct CategoryFormView: View {
                 }
         }
     }
-    
+
     private func save() {
         if let existing = category {
             // Update existing category fields
@@ -451,9 +425,7 @@ struct CategoryFormView: View {
             _ = CategoryManager.shared.create(name: name, objectif: Double(objectif) ?? 0.0, rubric: rubric)
         } else {
             // No rubric available to attach the new category; nothing to do
-            // You may want to show an alert in the future.
             return
         }
     }
 }
-

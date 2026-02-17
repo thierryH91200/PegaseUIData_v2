@@ -9,36 +9,12 @@ import SwiftData
 import Combine
 
 
-final class IdentityDataManager: ObservableObject {
-    @Published var identity: EntityIdentity? {
-        didSet {
-            // Sauvegarder les modifications dès qu'il y a un changement
-            saveChanges()
-        }
-    }
-    
-    var modelContext: ModelContext? {
-        DataContext.shared.context
-    }
-
-    func saveChanges() {
-       
-        do {
-            try modelContext?.save()
-        } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
-        }
-    }
-}
-
 struct IdentityView: View {
-    
+
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var currentAccountManager: CurrentAccountManager
-    @EnvironmentObject var dataManager: IdentityDataManager
-    
-//    @Query private var identityInfo: [EntityIdentity]
-    
+    @EnvironmentObject var identityManager: IdentityManager
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Identity", tableName: "IdentityView")
@@ -53,9 +29,9 @@ struct IdentityView: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                
-                if dataManager.identity != nil {
-                    SectionInfoView(identityInfo: dataManager.identity!)
+
+                if identityManager.currentIdentity != nil {
+                    SectionInfoView(identityInfo: identityManager.currentIdentity!)
                 }
             }
         }
@@ -63,35 +39,32 @@ struct IdentityView: View {
         .frame(width: 600)
         .cornerRadius(10)
         .onAppear {
-                        
-            // Créer un nouvel enregistrement si la base de données est vide
-            if dataManager.identity == nil {
+
+            // Creer un nouvel enregistrement si la base de donnees est vide
+            if identityManager.currentIdentity == nil {
                 let identity = IdentityManager.shared.getAllData()
-                dataManager.identity = identity
 
                 if identity == nil {
-                    
                     let newIdentityInfo = EntityIdentity()
-                    dataManager.identity = newIdentityInfo
+                    identityManager.currentIdentity = newIdentityInfo
                     modelContext.insert(newIdentityInfo)
                 }
             }
         }
         .onDisappear {
             saveChanges()
-            dataManager.saveChanges()
-            dataManager.identity = nil
+            identityManager.saveChanges()
+            identityManager.currentIdentity = nil
         }
         .onChange(of: currentAccountManager.getAccount()) { old, newAccount in
-            
+
             if let account = newAccount {
-                dataManager.identity = nil
-                
+                identityManager.currentIdentity = nil
                 loadOrCreate(for: account)
             }
         }
 
-        .onChange(of: dataManager.identity) { old , _ in
+        .onChange(of: identityManager.currentIdentity) { old , _ in
             do {
                 try modelContext.save()
             } catch {
@@ -99,16 +72,16 @@ struct IdentityView: View {
             }
         }
     }
-    
+
     private func loadOrCreate(for account: EntityAccount) {
-        
+
         if let existingIdentity = IdentityManager.shared.getAllData() {
-            dataManager.identity = existingIdentity
+            identityManager.currentIdentity = existingIdentity
         } else {
             let entity = EntityIdentity()
             entity.account = account
             modelContext.insert(entity)
-            dataManager.identity = entity
+            identityManager.currentIdentity = entity
         }
     }
 
@@ -116,16 +89,16 @@ struct IdentityView: View {
         do {
             try modelContext.save()
         } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
+            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
         }
     }
 }
 
 struct SectionInfoView: View {
-    
+
     @Environment(\.modelContext) var modelContext
     @Bindable var identityInfo: EntityIdentity
-        
+
     var body: some View {
         HStack {
             Text("Name", tableName: "IdentityView")
@@ -198,14 +171,13 @@ struct SectionInfoView: View {
         .onChange(of: identityInfo) {old, _ in saveChanges() }
         Spacer()
     }
-    
+
     private func saveChanges() {
         do {
             try modelContext.save()
         } catch {
-            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
+            printTag("Erreur lors de la sauvegarde : \(error.localizedDescription)")
         }
     }
 
 }
-
