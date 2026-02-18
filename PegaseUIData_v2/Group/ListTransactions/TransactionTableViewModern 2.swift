@@ -380,6 +380,26 @@ extension TransactionTableViewModern {
         saveDisclosureState()
     }
 
+    func toggleAllDisclosures() {
+        allExpanded.toggle()
+        let newState = allExpanded
+        for existingKey in disclosureStates.keys {
+            disclosureStates[existingKey] = newState
+        }
+        // Mettre a jour les groupes qui n'ont pas encore d'etat
+        for group in groupedData {
+            let monthKey = "month_\(group.year)_\(group.month ?? 0)"
+            disclosureStates[monthKey] = newState
+            if let subGroups = group.monthGroups {
+                for subGroup in subGroups where subGroup.isPaymentModeGroup {
+                    let cbKey = "cb_\(group.year)_\(group.month ?? 0)"
+                    disclosureStates[cbKey] = newState
+                }
+            }
+        }
+        saveDisclosureState()
+    }
+
     func isExpanded(for key: String) -> Bool {
         return disclosureStates[key] ?? true
     }

@@ -342,7 +342,7 @@ struct RubricFormView: View {
             existing.color = color
             // Keep existing account as-is
         } else {
-            RubricManager.shared.create(name: name, color: color)
+            _ = RubricManager.shared.create(name: name, color: color)
         }
     }
 }

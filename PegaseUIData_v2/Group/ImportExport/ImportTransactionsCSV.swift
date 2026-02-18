@@ -753,7 +753,7 @@ struct CSVImportingView: View {
                 Image(systemName: "tray.and.arrow.down.fill")
                     .font(.title)
                     .foregroundColor(.accentColor)
-                Text("Import en cours")
+                Text("Import in progress")
                     .font(.title2.bold())
             }
 

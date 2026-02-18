@@ -40,6 +40,7 @@ struct TransactionTableViewModern: View {
     
     // État de disclosure pour mémoriser les groupes ouverts/fermés
     @State var disclosureStates: [String: Bool] = [:]
+    @State var allExpanded = true
     
     // État du presse-papiers
     @State var clipboardTransactions: [EntityTransaction] = []
@@ -332,11 +333,28 @@ struct TransactionTableViewModern: View {
     
     private var statusBarSection: some View {
         HStack(spacing: 16) {
-            // Left: count
-            Text("📊 \(countAllTransactions(groupedData)) transactions")
+            // Bouton expand/collapse all avec label
+            Button(action: {
+                toggleAllDisclosures()
+            }) {
+                Label(
+                    allExpanded ? "Collapse (⌥⌘E)" : "Expand (⌥⌘E)",
+                    systemImage: allExpanded ? "chevron.down.circle.fill" : "chevron.right.circle.fill"
+                )
                 .font(.title3.weight(.semibold))
                 .foregroundColor(.primary)
-            
+            }
+            .buttonStyle(.borderless)
+            .help(allExpanded ? "Collapse all groups (⌥⌘E)" : "Expand all groups (⌥⌘E)")
+            .keyboardShortcut("e", modifiers: [.option, .command])
+
+            Divider().frame(height: 16)
+
+            // Left: count
+            Text("\(countAllTransactions(groupedData)) transactions")
+                .font(.title3.weight(.semibold))
+                .foregroundColor(.primary)
+
             // Selection badge with strong accent
             if !selectedTransactions.isEmpty {
                 HStack(spacing: 8) {
@@ -361,8 +379,6 @@ struct TransactionTableViewModern: View {
             Spacer()
         }
         .animation(.spring(response: 0.25, dampingFraction: 0.85), value: selectedTransactions)
-        
-        
     }
 
     func selectionDidChange() -> String {
