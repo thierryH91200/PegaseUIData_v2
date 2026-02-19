@@ -59,12 +59,10 @@ protocol StatusManaging {
 
 //@Observable
 @MainActor
-final class StatusManager: StatusManaging {
-    
+final class StatusManager: StatusManaging, ObservableObject {
     
     static let shared = StatusManager()
     
-//    var status = [EntityStatus]()
     @Published private(set) var statusIDs: [UUID] = []
 
     var modelContext: ModelContext? {

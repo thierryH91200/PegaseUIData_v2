@@ -21,6 +21,7 @@ struct DatabaseManagerApp: App {
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var containerManager = ContainerManager()
+    @StateObject private var appContainer = AppContainer.shared
     @StateObject private var viewModel = CSVViewModel()
 
     init() {
@@ -37,6 +38,7 @@ struct DatabaseManagerApp: App {
                 ContentView()
                     .environmentObject(authManager)
                     .environmentObject(containerManager)
+                    .environmentObject(appContainer)
             } else {
                 LockScreenView(authManager: authManager)
                     .onAppear {

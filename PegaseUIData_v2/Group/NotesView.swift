@@ -9,13 +9,14 @@ import SwiftData
 import Combine
 
 struct NotesView: View {
-    
+
+    @EnvironmentObject var container: AppContainer
+
     @Binding var isVisible: Bool
-    @StateObject private var dataManager = BankStatementManager()
 
     var body: some View {
         NotesView10()
-            .environmentObject(dataManager)
+            .environmentObject(container.bankStatements)
 
             .padding()
             .task {

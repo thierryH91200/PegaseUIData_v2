@@ -48,10 +48,12 @@ struct Accueil: View {
 
 struct Account: View {
 
+    @EnvironmentObject var container: AppContainer
+
     var body: some View {
         VStack {
             InitAccountView()
-                .environmentObject(InitAccountManager.shared)
+                .environmentObject(container.initAccounts)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .layoutPriority(1)
         }
@@ -61,10 +63,12 @@ struct Account: View {
 
 struct Bank: View {
 
+    @EnvironmentObject var container: AppContainer
+
     var body: some View {
         VStack {
             BankView()
-                .environmentObject(BankManager.shared)
+                .environmentObject(container.banks)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .layoutPriority(1)
         }
@@ -74,10 +78,12 @@ struct Bank: View {
 
 struct Identite: View {
 
+    @EnvironmentObject var container: AppContainer
+
     var body: some View {
         VStack {
             IdentityView()
-                .environmentObject(IdentityManager.shared)
+                .environmentObject(container.identities)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .layoutPriority(1)
         }

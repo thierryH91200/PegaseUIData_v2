@@ -46,12 +46,8 @@ final class EntitySousOperation: Identifiable {
     }
 }
 
-// SubTransactionsManager.swift
-// PegaseUIData
 
-import SwiftUI
-
-final class SubTransactionsManager {
+final class SubTransactionsManager: ObservableObject {
     static let shared = SubTransactionsManager()
 
     var subOperation: EntitySousOperation?

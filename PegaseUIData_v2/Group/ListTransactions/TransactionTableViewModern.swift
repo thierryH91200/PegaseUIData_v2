@@ -122,8 +122,10 @@ struct TransactionTableViewModern: View {
             handleDataChange()
         }
         .onReceive(NotificationCenter.default.publisher(for: .transactionsEdited)) { _ in
-            // Édition seule : mise à jour des données sans reconstruire les groupes (pas de scroll)
+            // Édition : invalider le cache, recharger les données et recalculer les soldes
+            ListTransactionsManager.shared.invalidateCache()
             _ = ListTransactionsManager.shared.getAllData()
+            updateGroupedData()
             updateDashboard()
         }
         .onReceive(NotificationCenter.default.publisher(for: .transactionsNeedRefresh)) { _ in

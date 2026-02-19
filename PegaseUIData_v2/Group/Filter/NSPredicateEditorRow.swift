@@ -178,6 +178,22 @@ final class RowTemplateRelationshipLibelle: NSPredicateEditorRowTemplate {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    override var templateViews: [NSView] {
+        let views = super.templateViews
+
+        // Find the textfield (last view for the amount value) and make it wider + handle comma
+        if let textField = views.last as? NSTextField {
+            textField.frame.size.width = 200
+
+            // Set width constraint to ensure it stays wide
+            textField.translatesAutoresizingMaskIntoConstraints = false
+            textField.widthAnchor.constraint(greaterThanOrEqualToConstant: 200).isActive = true
+        }
+
+        return views
+    }
+
 
     override func predicate(withSubpredicates subpredicates: [NSPredicate]?) -> NSPredicate{
         
@@ -194,9 +210,10 @@ final class RowTemplateRelationshipLibelle: NSPredicateEditorRowTemplate {
 // MARK: - Montant
 // func init()
 // func init(leftExpressions: [NSExpression])
+// func templateViews — wider textfield + comma→dot
 // func predicate
 final class RowTemplateRelationshipMontant: NSPredicateEditorRowTemplate {
-    
+
     override init() {
         super.init()
     }
@@ -205,18 +222,42 @@ final class RowTemplateRelationshipMontant: NSPredicateEditorRowTemplate {
         let operators: [NSComparisonPredicate.Operator] = RowTemplateRelationshipMontant.numberOperators
         var operatorsNSNumber: [NSNumber] = []
         for o in operators { operatorsNSNumber.append( NSNumber(value: o.rawValue) ) }
-        
+
         super.init(leftExpressions: leftExpressions ,
                    rightExpressionAttributeType: .doubleAttributeType,
                    modifier: .direct,
                    operators: operatorsNSNumber,
                    options: 0)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
+    override var templateViews: [NSView] {
+        let views = super.templateViews
+
+        // Find the textfield (last view for the amount value) and make it wider + handle comma
+        if let textField = views.last as? NSTextField {
+            textField.frame.size.width = 200
+
+            // Use a NumberFormatter that accepts both comma and dot as decimal separator
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.locale = Locale.current
+            formatter.maximumFractionDigits = 2
+            formatter.minimumFractionDigits = 0
+            formatter.isLenient = true
+            textField.formatter = formatter
+
+            // Set width constraint to ensure it stays wide
+            textField.translatesAutoresizingMaskIntoConstraints = false
+            textField.widthAnchor.constraint(greaterThanOrEqualToConstant: 200).isActive = true
+        }
+
+        return views
+    }
+
     override func predicate(withSubpredicates subpredicates: [NSPredicate]?) -> NSPredicate {
 
         let predicate = super.predicate(withSubpredicates: subpredicates) as! NSComparisonPredicate
@@ -224,7 +265,14 @@ final class RowTemplateRelationshipMontant: NSPredicateEditorRowTemplate {
         let operatorName = findOperatorType(operatorType: operatorType)
 
         // Extraire la valeur numérique depuis rightExpression
-        guard let constantValue = predicate.rightExpression.constantValue as? Double else {
+        let constantValue: Double
+        if let value = predicate.rightExpression.constantValue as? Double {
+            constantValue = value
+        } else if let stringValue = predicate.rightExpression.constantValue as? String {
+            // Handle comma as decimal separator (French locale)
+            let normalized = stringValue.replacingOccurrences(of: ",", with: ".")
+            constantValue = Double(normalized) ?? 0.0
+        } else {
             print("⚠️ Amount: Impossible d'extraire constantValue")
             return NSPredicate(value: false)
         }

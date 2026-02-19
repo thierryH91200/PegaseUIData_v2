@@ -16,10 +16,7 @@ struct MainContentView: View {
     @AppStorage("choixCouleur") var choixCouleur: String = "Unie"
 
     @EnvironmentObject var containerManager: ContainerManager
-
-    @StateObject private var currentAccountManager = CurrentAccountManager.shared
-    @StateObject private var transactionManager = TransactionSelectionManager()
-    @StateObject private var colorManager = ColorManager()
+    @EnvironmentObject var container: AppContainer
 
     @State private var selectedTransaction: EntityTransaction?
     @State private var isCreationMode: Bool = true
@@ -81,8 +78,8 @@ struct MainContentView: View {
                     OperationDialog()
                 }
             }
-            .environmentObject(transactionManager)
-            .environmentObject(currentAccountManager)
+            .environmentObject(container.transactionSelection)
+            .environmentObject(container.currentAccount)
             .navigationSplitViewStyle(.automatic)
         }
         // Example: adapt business logic / layout based on content width
@@ -108,12 +105,12 @@ struct MainContentView: View {
         .toolbar {
             ContentToolbar(
                 viewModel: viewModel,
-                colorManager: colorManager,
+                colorManager: container.colors,
                 inspectorIsShown: $inspectorIsShown,
                 selectedColor: $selectedColor
             )
         }
-        .environmentObject(colorManager)
+        .environmentObject(container.colors)
     }
 }
 

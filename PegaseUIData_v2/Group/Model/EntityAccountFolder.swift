@@ -67,7 +67,7 @@ protocol AccountFoldeManaging {
     func saveIfNeeded()
 }
 
-final class AccountFolderManager: AccountFoldeManaging {
+final class AccountFolderManager: AccountFoldeManaging, ObservableObject {
     
     static let shared = AccountFolderManager()
     @Published var folderAccount = [EntityFolderAccount]()

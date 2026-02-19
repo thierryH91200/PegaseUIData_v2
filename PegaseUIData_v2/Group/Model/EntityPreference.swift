@@ -50,7 +50,7 @@ protocol PreferenceManaging {
 
 // MARK: preferenceManager
 @MainActor
-final class PreferenceManager: PreferenceManaging {
+final class PreferenceManager: PreferenceManaging, ObservableObject {
     
     static let shared = PreferenceManager()
     

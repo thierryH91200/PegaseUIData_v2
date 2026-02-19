@@ -27,21 +27,21 @@ struct SummaryView: View {
             balanceCard(
                 title: String(localized: "Final balance"),
                 amount: dashboard.planned,
-                color: .green
+                color: .purple
             )
 
             // Actual Balance (Engaged + Executed)
             balanceCard(
                 title: String(localized: "Actual balance"),
                 amount: dashboard.engaged,
-                color: .orange
+                color: .green
             )
 
             // Bank Balance (Executed only)
             balanceCard(
                 title: String(localized: "Bank balance"),
                 amount: dashboard.executed,
-                color: .blue
+                color: .red
             )
         }
         .frame(maxWidth: .infinity)

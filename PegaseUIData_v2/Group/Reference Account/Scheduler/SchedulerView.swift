@@ -11,16 +11,15 @@ import SwiftData
 
 
 struct SchedulerView: View {
-    
-    @StateObject private var dataManager = SchedulerManager()
-    
+
+    @EnvironmentObject var container: AppContainer
+
     @Binding var isVisible: Bool
-    
+
     var body: some View {
-        
-        
+
         Scheduler( selectedType: "")
-            .environmentObject(dataManager)
+            .environmentObject(container.schedulers)
             .padding()
             .onAppear {
                 isVisible = false

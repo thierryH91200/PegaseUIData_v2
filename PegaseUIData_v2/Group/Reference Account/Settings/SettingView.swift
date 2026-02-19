@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct SettingView: View {
-    
+
     @Binding var isVisible: Bool
-    
+
     var body: some View {
         SettingTab()
             .padding()
@@ -18,7 +18,7 @@ struct SettingView: View {
                 await performFalseTask()
             }
     }
-    
+
     private func performFalseTask() async {
         // Exécuter une tâche asynchrone (par exemple, un délai)
         try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconde de délai
@@ -35,24 +35,23 @@ enum TabSelection: Hashable {
 
 
 struct SettingTab: View {
-    
-    @StateObject private var chequeViewManager       = ChequeBookManager()
-    @StateObject private var modePaiementDataManager = PaymentModeManager()
-    @StateObject private var preferenceDataManager   = PreferenceDataManager()
-    
+
+    @EnvironmentObject var container: AppContainer
+    @StateObject private var preferenceDataManager = PreferenceDataManager()
+
     @State private var selectedTab: TabSelection = .rubric
     var body: some View {
-        
+
         TabView {
 
             RubricView()
-                .environmentObject(RubricManager.shared)
+                .environmentObject(container.rubrics)
                 .tabItem {
                     Label(String(localized: "Rubric", table: "SettingsView"), systemImage: "house")
                 }
 
             ModePaymentView()
-                .environmentObject(modePaiementDataManager)
+                .environmentObject(container.paymentModes)
                 .tabItem {
                     Label(String(localized: "Payment method", table: "SettingsView"), systemImage: "eurosign.bank.building")
                 }
@@ -64,7 +63,7 @@ struct SettingTab: View {
                 }
 
             CheckView()
-                .environmentObject(chequeViewManager)
+                .environmentObject(container.chequeBooks)
                 .tabItem {
                     Label(String(localized: "Check", table: "SettingsView"), systemImage: "person")
                 }

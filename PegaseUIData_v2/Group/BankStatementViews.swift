@@ -14,18 +14,19 @@ import OSLog
 
 
 struct BankStatementView: View {
-    
+
+    @EnvironmentObject var container: AppContainer
+
     @Binding var dashboard: DashboardState
     @State private var transactions: [EntityTransaction] = []
 
     @Binding var isVisible: Bool
-    @StateObject var dataManager = BankStatementManager()
-    
+
     var body: some View {
         BankStatementListView(
             transactions: transactions,
             dashboard: $dashboard)
-            .environmentObject(dataManager)
+            .environmentObject(container.bankStatements)
             .padding()
             .task {
                 await loadTransactions()
