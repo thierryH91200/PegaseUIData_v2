@@ -13,6 +13,8 @@
 		036704E72F3F12740084C14F /* README_fr 1.3.md in Resources */ = {isa = PBXBuildFile; fileRef = 036704E12F3F12740084C14F /* README_fr 1.3.md */; };
 		036707402F3F15CF0084C14F /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 0367073F2F3F15CF0084C14F /* DGCharts */; };
 		036707432F3F15E00084C14F /* SwiftDate in Frameworks */ = {isa = PBXBuildFile; productRef = 036707422F3F15E00084C14F /* SwiftDate */; };
+		03C05A5E2F477DDC00E53767 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 03C05A5D2F477DDC00E53767 /* Sparkle */; };
+		03C05A602F47806200E53767 /* appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 03C05A5F2F47805900E53767 /* appcast.xml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +23,7 @@
 		036704E12F3F12740084C14F /* README_fr 1.3.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README_fr 1.3.md"; sourceTree = "<group>"; };
 		036704E22F3F12740084C14F /* _config.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = _config.yml; sourceTree = "<group>"; };
 		036704E32F3F12740084C14F /* .gitattributes */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitattributes; sourceTree = "<group>"; };
+		03C05A5F2F47805900E53767 /* appcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = appcast.xml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -46,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				03C05A5E2F477DDC00E53767 /* Sparkle in Frameworks */,
 				036707432F3F15E00084C14F /* SwiftDate in Frameworks */,
 				036707402F3F15CF0084C14F /* DGCharts in Frameworks */,
 			);
@@ -57,6 +61,7 @@
 		036702A82F3F11420084C14F = {
 			isa = PBXGroup;
 			children = (
+				03C05A5F2F47805900E53767 /* appcast.xml */,
 				036705082F3F12BD0084C14F /* Docs */,
 				036704F22F3F12B40084C14F /* Doc */,
 				036704E02F3F12740084C14F /* README.md */,
@@ -100,6 +105,7 @@
 			packageProductDependencies = (
 				0367073F2F3F15CF0084C14F /* DGCharts */,
 				036707422F3F15E00084C14F /* SwiftDate */,
+				03C05A5D2F477DDC00E53767 /* Sparkle */,
 			);
 			productName = PegaseUIData_v2;
 			productReference = 036702B12F3F11420084C14F /* PegaseUIData_v2.app */;
@@ -136,6 +142,7 @@
 			packageReferences = (
 				0367073E2F3F15CF0084C14F /* XCRemoteSwiftPackageReference "Charts" */,
 				036707412F3F15E00084C14F /* XCRemoteSwiftPackageReference "SwiftDate" */,
+				03C05A5C2F477DDC00E53767 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 036702B22F3F11420084C14F /* Products */;
@@ -154,6 +161,7 @@
 			files = (
 				036704E42F3F12740084C14F /* _config.yml in Resources */,
 				036704E52F3F12740084C14F /* README.md in Resources */,
+				03C05A602F47806200E53767 /* appcast.xml in Resources */,
 				036704E62F3F12740084C14F /* .gitattributes in Resources */,
 				036704E72F3F12740084C14F /* README_fr 1.3.md in Resources */,
 			);
@@ -407,6 +415,14 @@
 				minimumVersion = 7.0.0;
 			};
 		};
+		03C05A5C2F477DDC00E53767 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -419,6 +435,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 036707412F3F15E00084C14F /* XCRemoteSwiftPackageReference "SwiftDate" */;
 			productName = SwiftDate;
+		};
+		03C05A5D2F477DDC00E53767 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 03C05A5C2F477DDC00E53767 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

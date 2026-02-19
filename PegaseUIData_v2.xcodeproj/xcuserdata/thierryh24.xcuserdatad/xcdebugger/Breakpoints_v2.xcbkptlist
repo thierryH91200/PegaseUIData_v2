@@ -3,4 +3,52 @@
    uuid = "C9C6D9F8-A94C-4553-AF01-2AB72F97E137"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "97090C0A-C7EA-43F1-9647-F542BCAA0420"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "PegaseUIData_v2/PegaseUIDataApp.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "59"
+            endingLineNumber = "59"
+            landmarkName = "body"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "97090C0A-C7EA-43F1-9647-F542BCAA0420 - ed0628043864d26e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 () -&gt; &lt;&lt;opaque return type of static SwiftUI.CommandsBuilder.buildBlock&lt;&#x3c4;_0_0, &#x3c4;_0_1, &#x3c4;_0_2, &#x3c4;_0_3, &#x3c4;_0_4, &#x3c4;_0_5 where &#x3c4;_0_0: SwiftUI.Commands, &#x3c4;_0_1: SwiftUI.Commands, &#x3c4;_0_2: SwiftUI.Commands, &#x3c4;_0_3: SwiftUI.Commands, &#x3c4;_0_4: SwiftUI.Commands, &#x3c4;_0_5: SwiftUI.Commands&gt;(&#x3c4;_0_0, &#x3c4;_0_1, &#x3c4;_0_2, &#x3c4;_0_3, &#x3c4;_0_4, &#x3c4;_0_5) -&gt; some&gt;&gt;.0 in PegaseUIData_v2.DatabaseManagerApp.body.getter : some"
+                  moduleName = "PegaseUIData_v2.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/thierryh24/Documents/pegase/Folder%20PegadeUIData/PegaseUIData_v2/PegaseUIData_v2/PegaseUIDataApp.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "59"
+                  endingLineNumber = "59">
+               </Location>
+               <Location
+                  uuid = "97090C0A-C7EA-43F1-9647-F542BCAA0420 - 7c941778c1701335"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; SwiftUI.Button&lt;SwiftUI.Text&gt; in closure #2 () -&gt; &lt;&lt;opaque return type of static SwiftUI.CommandsBuilder.buildBlock&lt;&#x3c4;_0_0, &#x3c4;_0_1, &#x3c4;_0_2, &#x3c4;_0_3, &#x3c4;_0_4, &#x3c4;_0_5 where &#x3c4;_0_0: SwiftUI.Commands, &#x3c4;_0_1: SwiftUI.Commands, &#x3c4;_0_2: SwiftUI.Commands, &#x3c4;_0_3: SwiftUI.Commands, &#x3c4;_0_4: SwiftUI.Commands, &#x3c4;_0_5: SwiftUI.Commands&gt;(&#x3c4;_0_0, &#x3c4;_0_1, &#x3c4;_0_2, &#x3c4;_0_3, &#x3c4;_0_4, &#x3c4;_0_5) -&gt; some&gt;&gt;.0 in PegaseUIData_v2.DatabaseManagerApp.body.getter : some"
+                  moduleName = "PegaseUIData_v2.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/thierryh24/Documents/pegase/Folder%20PegadeUIData/PegaseUIData_v2/PegaseUIData_v2/PegaseUIDataApp.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "60"
+                  endingLineNumber = "60">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

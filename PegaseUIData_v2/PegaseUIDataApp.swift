@@ -11,6 +11,7 @@ import Foundation
 import Combine
 import AppKit
 import UniformTypeIdentifiers
+import Sparkle
 
 // MARK: - App principale
 @main
@@ -23,6 +24,7 @@ struct DatabaseManagerApp: App {
     @StateObject private var containerManager = ContainerManager()
     @StateObject private var appContainer = AppContainer.shared
     @StateObject private var viewModel = CSVViewModel()
+    @StateObject private var sparkleUpdater = SparkleUpdater.shared
 
     init() {
         ColorTransformer.register()
@@ -39,6 +41,8 @@ struct DatabaseManagerApp: App {
                     .environmentObject(authManager)
                     .environmentObject(containerManager)
                     .environmentObject(appContainer)
+                    .environmentObject(sparkleUpdater)
+
             } else {
                 LockScreenView(authManager: authManager)
                     .onAppear {
@@ -52,6 +56,11 @@ struct DatabaseManagerApp: App {
             }
         }
         .commands {
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") {
+                    SparkleUpdater.shared.updaterController.checkForUpdates(nil)
+                }
+            }
             CommandGroup(after: .appSettings) {
                 Button("Lock the application") {
                     authManager.lock()

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import Sparkle
 
 
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -46,4 +47,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 }
+
+final class SparkleUpdater: ObservableObject {
+    static let shared = SparkleUpdater()
+
+    let updaterController: SPUStandardUpdaterController
+
+    private init() {
+        updaterController = SPUStandardUpdaterController(
+            startingUpdater: true,
+            updaterDelegate: nil,
+            userDriverDelegate: nil
+        )
+    }
+}
+
 

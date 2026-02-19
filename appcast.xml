@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+     xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>PegaseUIData Updates</title>
+
+    <item>
+      <title>Version 0.8</title>
+      <sparkle:version>2</sparkle:version>
+      <sparkle:shortVersionString>0.8</sparkle:shortVersionString>
+      <enclosure
+        url="https://github.com/thierryH91200/PegaseUIData_v2/releases/tag/0.8"
+        sparkle:edSignature="SIGNATURE_ICI"
+        length="123456"
+        type="application/octet-stream"/>
+    </item>
+
+  </channel>
+</rss>
