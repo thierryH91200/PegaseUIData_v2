@@ -56,11 +56,6 @@ struct DatabaseManagerApp: App {
             }
         }
         .commands {
-            CommandGroup(after: .appInfo) {
-                Button("Check for Updates…") {
-                    SparkleUpdater.shared.updaterController.checkForUpdates(nil)
-                }
-            }
             CommandGroup(after: .appSettings) {
                 Button("Lock the application") {
                     authManager.lock()
@@ -71,6 +66,11 @@ struct DatabaseManagerApp: App {
             CommandGroup(replacing: .appInfo) {
                 Button("About \(Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "l’app")") {
                     openWindow(id: "about")
+                }
+            }
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") {
+                    SparkleUpdater.shared.updaterController.checkForUpdates(nil)
                 }
             }
             CommandGroup(replacing: .appSettings) {

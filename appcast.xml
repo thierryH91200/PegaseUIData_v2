@@ -9,8 +9,8 @@
       <sparkle:version>2</sparkle:version>
       <sparkle:shortVersionString>0.8</sparkle:shortVersionString>
       <enclosure
-        url="https://github.com/thierryH91200/PegaseUIData_v2/releases/tag/0.8"
-        sparkle:edSignature="SIGNATURE_ICI"
+        url="https://github.com/thierryH91200/PegaseUIData_v2/releases/0.8/PegaseUIData_v2.zip"
+        sparkle:edSignature="AHDbwWNLGWGm0n9bvYGpMI9UY7fV52TkNYUoa9mC1l3f23dFU4/1uImu9eP8deqBeevrGXmLwHttP1kTWT7MDw=="
         length="15391072"
         type="application/octet-stream"/>
     </item>
