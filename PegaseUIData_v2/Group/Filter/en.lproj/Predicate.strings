@@ -8,13 +8,11 @@
  */
 
 // MARK: - Types Composés (Et/Ou/Non)
-
 "%[Any]@ of the following are true" = "%[Une]@ des conditions suivantes est vraie";
 "%[All]@ of the following are true" = "%[Toutes]@ les conditions sont vraies";
 "%[None]@ of the following are true" = "%[Aucune]@ des conditions suivantes n'est vraie";
 
 // MARK: - Date Operation
-
 "Date Operation" = "Date de l'opération";
 "%[Date Operation]@ %[is]@ %@" = "%1$[Date Operation]@ %2$[est]@ %3$@";
 "%[Date Operation]@ %[is not]@ %@" = "%1$[Date Operation]@ %2$[n'est pas]@ %3$@";
@@ -22,7 +20,6 @@
 "%[Date Operation]@ %[is greater than]@ %@" = "%1$[Date Operation]@ %2$[est postérieure à]@ %3$@";
 
 // MARK: - Date Pointage
-
 "Date Pointage" = "Date de pointage";
 "%[Date Pointage]@ %[is]@ %@" = "%1$[Date Pointage]@ %2$[est]@ %3$@";
 "%[Date Pointage]@ %[is not]@ %@" = "%1$[Date Pointage]@ %2$[n'est pas]@ %3$@";
@@ -30,7 +27,6 @@
 "%[Date Pointage]@ %[is greater than]@ %@" = "%1$[Date Pointage]@ %2$[est postérieure à]@ %3$@";
 
 // MARK: - Statut
-
 "Status" = "Statut";
 "%[Status]@ %[is]@ %@" = "%1$[Status]@ %2$[est]@ %3$@";
 "%[Status]@ %[is not]@ %@" = "%1$[Status]@ %2$[n'est pas]@ %3$@";
@@ -41,7 +37,6 @@
 "%[Mode]@ %[is not]@ %@" = "%1$[Mode]@ %2$[n'est pas]@ %3$@";
 
 // MARK: - Libellé
-
 "Libelle" = "Libellé";
 "%[Libelle]@ %[is]@ %@" = "%1$[Libelle]@ %2$[est]@ %3$@";
 "%[Libelle]@ %[is not]@ %@" = "%1$[Libelle]@ %2$[n'est pas]@ %3$@";
@@ -52,13 +47,12 @@
 "%[Libelle]@ %[like]@ %@" = "%1$[Libelle]@ %2$[ressemble à]@ %3$@";
 
 // MARK: - Rubrique
-"Rubric" = "Rubrique";
+"Rubric" = "Rubric";
 "%[Rubric]@ %[is]@ %@" = "%1$[Rubric]@ %2$[est]@ %3$@";
 "%[Rubric]@ %[is not]@ %@" = "%1$[Rubric]@ %2$[n'est pas]@ %3$@";
 
 // MARK: - Catégorie
-
-"Category" = "Catégorie";
+"Category" = "Category";
 "%[Category]@ %[is]@ %@" = "%1$[Category]@ %2$[est]@ %3$@";
 "%[Category]@ %[is not]@ %@" = "%1$[Category]@ %2$[n'est pas]@ %3$@";
 "%[Category]@ %[begins with]@ %@" = "%1$[Category]@ %2$[commence par]@ %3$@";
@@ -68,22 +62,20 @@
 "%[Category]@ %[like]@ %@" = "%1$[Category]@ %2$[ressemble à]@ %3$@";
 
 // MARK: - Montant
-
-"Amount" = "Montant";
-"%[Amount]@ %[is]@ %@" = "%1$[Montant]@ %2$[est égal à]@ %3$@";
-"%[Amount]@ %[is not]@ %@" = "%1$[Montant]@ %2$[n'est pas égal à]@ %3$@";
-"%[Amount]@ %[is less than]@ %@" = "%1$[Montant]@ %2$[est inférieur à]@ %3$@";
-"%[Amount]@ %[is less than or equal to]@ %@" = "%1$[Montant]@ %2$[est inférieur ou égal à]@ %3$@";
-"%[Amount]@ %[is greater than]@ %@" = "%1$[Montant]@ %2$[est supérieur à]@ %3$@";
-"%[Amount]@ %[is greater than or equal to]@ %@" = "%1$[Montant]@ %2$[est supérieur ou égal à]@ %3$@";
+"Amount" = "Amount";
+"%[Amount]@ %[is]@ %@" = "%1$[Amount]@ %2$[est égal à]@ %3$@";
+"%[Amount]@ %[is not]@ %@" = "%1$[Amount]@ %2$[n'est pas égal à]@ %3$@";
+"%[Amount]@ %[is less than]@ %@" = "%1$[Amount]@ %2$[est inférieur à]@ %3$@";
+"%[Amount]@ %[is less than or equal to]@ %@" = "%1$[Amount]@ %2$[est inférieur ou égal à]@ %3$@";
+"%[Amount]@ %[is greater than]@ %@" = "%1$[Amount]@ %2$[est supérieur à]@ %3$@";
+"%[Amount]@ %[is greater than or equal to]@ %@" = "%1$[Amount]@ %2$[est supérieur ou égal à]@ %3$@";
 
 // MARK: - Relevé bancaire
-
-"Bank Statement" = "Relevé bancaire";
-"%[Bank Statement]@ %[is]@ %@" = "%1$[Relevé bancaire]@ %2$[est égal à]@ %3$@";
-"%[Bank Statement]@ %[is not]@ %@" = "%1$[Relevé bancaire]@ %2$[n'est pas égal à]@ %3$@";
-"%[Bank Statement]@ %[is less than]@ %@" = "%1$[Relevé bancaire]@ %2$[est inférieur à]@ %3$@";
+"Bank Statement" = "Bank Statement";
+"%[Bank Statement]@ %[is]@ %@" = "%1$[Bank Statement]@ %2$[est égal à]@ %3$@";
+"%[Bank Statement]@ %[is not]@ %@" = "%1$[Bank Statement]@ %2$[n'est pas égal à]@ %3$@";
+"%[Bank Statement]@ %[is less than]@ %@" = "%1$[Bank Statement]@ %2$[est inférieur à]@ %3$@";
 "%[Bank Statement]@ %[is less than or equal to]@ %@" = "%1$[Relevé bancaire]@ %2$[est inférieur ou égal à]@ %3$@";
-"%[Bank Statement]@ %[is greater than]@ %@" = "%1$[Relevé bancaire]@ %2$[est supérieur à]@ %3$@";
-"%[Bank Statement]@ %[is greater than or equal to]@ %@" = "%1$[BRelevé bancaire]@ %2$[est supérieur ou égal à]@ %3$@";
+"%[Bank Statement]@ %[is greater than]@ %@" = "%1$[Bank Statement]@ %2$[est supérieur à]@ %3$@";
+"%[Bank Statement]@ %[is greater than or equal to]@ %@" = "%1$[Bank Statement]@ %2$[est supérieur ou égal à]@ %3$@";
 

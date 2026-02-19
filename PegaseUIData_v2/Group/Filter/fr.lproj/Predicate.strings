@@ -42,30 +42,30 @@
 
 // MARK: - Libellé
 
-"Libelle" = "Libellé";
-"%[Libelle]@ %[is]@ %@" = "%1$[Libelle]@ %2$[est]@ %3$@";
+"Comment" = "Comment";
+"%[Comment]@ %[is]@ %@" = "%1$[Libelle]@ %2$[est]@ %3$@";
 "%[Libelle]@ %[is not]@ %@" = "%1$[Libelle]@ %2$[n'est pas]@ %3$@";
-"%[Libelle]@ %[begins with]@ %@" = "%1$[Libelle]@ %2$[commence par]@ %3$@";
-"%[Libelle]@ %[ends with]@ %@" = "%1$[Libelle]@ %2$[se termine par]@ %3$@";
-"%[Libelle]@ %[contains]@ %@" = "%1$[Libelle]@ %2$[contient]@ %3$@";
-"%[Libelle]@ %[matches]@ %@" = "%1$[Libelle]@ %2$[correspond à]@ %3$@";
-"%[Libelle]@ %[like]@ %@" = "%1$[Libelle]@ %2$[ressemble à]@ %3$@";
+"%[Comment]@ %[begins with]@ %@" = "%1$[Libelle]@ %2$[commence par]@ %3$@";
+"%[Comment]@ %[ends with]@ %@" = "%1$[Libelle]@ %2$[se termine par]@ %3$@";
+"%[Comment]@ %[contains]@ %@" = "%1$[Libelle]@ %2$[contient]@ %3$@";
+"%[Comment]@ %[matches]@ %@" = "%1$[Libelle]@ %2$[correspond à]@ %3$@";
+"%[Comment]@ %[like]@ %@" = "%1$[Libelle]@ %2$[ressemble à]@ %3$@";
 
 // MARK: - Rubrique
 "Rubric" = "Rubrique";
-"%[Rubric]@ %[is]@ %@" = "%1$[Rubric]@ %2$[est]@ %3$@";
-"%[Rubric]@ %[is not]@ %@" = "%1$[Rubric]@ %2$[n'est pas]@ %3$@";
+"%[Rubric]@ %[is]@ %@" = "%1$[Rubrique]@ %2$[est]@ %3$@";
+"%[Rubric]@ %[is not]@ %@" = "%1$[Rubrique]@ %2$[n'est pas]@ %3$@";
 
 // MARK: - Catégorie
 
 "Category" = "Catégorie";
-"%[Category]@ %[is]@ %@" = "%1$[Category]@ %2$[est]@ %3$@";
-"%[Category]@ %[is not]@ %@" = "%1$[Category]@ %2$[n'est pas]@ %3$@";
-"%[Category]@ %[begins with]@ %@" = "%1$[Category]@ %2$[commence par]@ %3$@";
-"%[Category]@ %[ends with]@ %@" = "%1$[Category]@ %2$[se termine par]@ %3$@";
+"%[Category]@ %[is]@ %@" = "%1$[Catégorie]@ %2$[est]@ %3$@";
+"%[Category]@ %[is not]@ %@" = "%1$[Catégorie]@ %2$[n'est pas]@ %3$@";
+"%[Category]@ %[begins with]@ %@" = "%1$[Catégorie]@ %2$[commence par]@ %3$@";
+"%[Category]@ %[ends with]@ %@" = "%1$[Catégorie]@ %2$[se termine par]@ %3$@";
 "%[Category]@ %[contains]@ %@" = "%1$[Category]@ %2$[contient]@ %3$@";
-"%[Category]@ %[matches]@ %@" = "%1$[Category]@ %2$[correspond à]@ %3$@";
-"%[Category]@ %[like]@ %@" = "%1$[Category]@ %2$[ressemble à]@ %3$@";
+"%[Category]@ %[matches]@ %@" = "%1$[Catégorie]@ %2$[correspond à]@ %3$@";
+"%[Category]@ %[like]@ %@" = "%1$[Catégorie]@ %2$[ressemble à]@ %3$@";
 
 // MARK: - Montant
 
