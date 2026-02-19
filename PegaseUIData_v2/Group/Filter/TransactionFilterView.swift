@@ -181,7 +181,7 @@ struct Header: View {
                     .font(.caption)
                     .foregroundColor(.primary)
                 Text("Bank Statement", tableName : "Filter")
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundColor(.primary)
             }
             .frame(width: 100, alignment: .leading)
@@ -244,12 +244,12 @@ struct TransactionRowView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(transaction.dateOperationString)
                     .font(.caption)
-                    .foregroundColor(.secondary)
-                
+                    .foregroundColor(.primary)
+
                 Text(transaction.datePointageString)
                     .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+                    .foregroundColor(.primary)
+          }
             .frame(width: 87, alignment: .leading)
             Divider()
                 .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
@@ -260,13 +260,13 @@ struct TransactionRowView: View {
             VStack(alignment: .leading, spacing: 4) {
                 VStack {
                     Text(transaction.statusString)
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundColor(.primary)
                     
                     if !transaction.checkNumber.isEmpty {
                         Text("• \(transaction.checkNumber)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.primary)
                     }
                 }
             }
@@ -279,11 +279,11 @@ struct TransactionRowView: View {
             VStack {
                 Text(transaction.paymentModeString)
                     .font(.caption)
-                    .foregroundColor(.secondary)
-                Text(transaction.bankStatementString)
+                    .foregroundColor(.primary)
+             Text(transaction.bankStatementString)
                     .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+                    .foregroundColor(.primary)
+         }
             .frame(width: 100, alignment: .leading)
             Divider()
                 .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
@@ -293,11 +293,11 @@ struct TransactionRowView: View {
             VStack {
                 Text(transaction.sousOperations.first?.category?.rubric?.name ?? "")
                     .font(.caption)
-                    .foregroundColor(.secondary)
-                Text(transaction.sousOperations.first?.category?.name ?? "")
+                    .foregroundColor(.primary)
+              Text(transaction.sousOperations.first?.category?.name ?? "")
                     .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+                    .foregroundColor(.primary)
+          }
             .frame(width: 100, alignment: .leading)
             Divider()
                 .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
@@ -307,11 +307,11 @@ struct TransactionRowView: View {
             VStack {
                 Text(transaction.sousOperations.first?.libelle ?? "")
                     .font(.caption)
-                    .foregroundColor(.secondary)
-                Text(formatPrice(transaction.sousOperations.first?.amount ?? 0.0))
+                    .foregroundColor(.primary)
+              Text(formatPrice(transaction.sousOperations.first?.amount ?? 0.0))
                     .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+                    .foregroundColor(.primary)
+          }
             .frame(width: 200, alignment: .leading)
             Divider()
                 .frame(width: 2)          // épaisseur (verticale) pour un Divider horizontal
@@ -322,7 +322,7 @@ struct TransactionRowView: View {
             // Amount
             VStack {
                 Text(transaction.amountString)
-                    .font(.headline)
+                    .font(.caption)
                     .foregroundColor(transaction.amount >= 0 ? .green : .red)
             }
             .frame(width: 100, alignment: .leading)

@@ -69,12 +69,13 @@ struct TransactionTableViewModern: View {
     @State var deleteCurrentCount: Int = 0
     @State var pendingDeletions: [EntityTransaction] = []
 
-    
-    
+    // Affichage Recettes/Dépenses séparées (flip-flop via clic droit sur header)
+    @State private var splitAmountColumns = false
+
     var compteCurrent: EntityAccount? {
         CurrentAccountManager.shared.getAccount()
     }
-    
+
     // Vérifie si le regroupement CB est activé dans les préférences
     var shouldGroupCarteBancaire: Bool {
         return PreferenceManager.shared.getAllData()?.groupCarteBancaire ?? false
@@ -110,6 +111,7 @@ struct TransactionTableViewModern: View {
         .onAppear {
             handleDataChange()
             loadDisclosureState()
+            splitAmountColumns = PreferenceManager.shared.getAllData()?.splitAmountColumns ?? false
         }
         .popover(isPresented: $showPointingDate, arrowEdge: .trailing) {
             pointingDateContent
@@ -260,7 +262,27 @@ struct TransactionTableViewModern: View {
             Divider().frame(width: 2)
             Text("Payment method").bold().frame(width: ColumnWidths.modePaiement, alignment: .leading)
             Divider().frame(width: 2)
-            Text("Amount").bold().frame(width: ColumnWidths.montant, alignment: .trailing)
+            // Zone Montant / Recettes-Dépenses avec clic droit pour basculer
+            Group {
+                if splitAmountColumns {
+                    Text("Income").bold().frame(width: ColumnWidths.recettes, alignment: .trailing)
+                    Divider().frame(width: 2)
+                    Text("Expenses").bold().frame(width: ColumnWidths.depenses, alignment: .trailing)
+                } else {
+                    Text("Amount").bold().frame(width: ColumnWidths.montant, alignment: .trailing)
+                }
+            }
+            .contextMenu {
+                Button {
+                    splitAmountColumns.toggle()
+                    toggleSplitAmountColumns()
+                } label: {
+                    Label(
+                        splitAmountColumns ? "Single amount column" : "Split income / expenses",
+                        systemImage: splitAmountColumns ? "arrow.right.arrow.left" : "arrow.left.arrow.right"
+                    )
+                }
+            }
             Divider().frame(width: 2)
             Text("Solde").bold().frame(width: ColumnWidths.montant, alignment: .trailing)
             Spacer()
@@ -318,11 +340,27 @@ struct TransactionTableViewModern: View {
                 .frame(width: ColumnWidths.modePaiement, alignment: .leading)
                 .lineLimit(1)
             Divider().frame(width: 2)
-            Text(transaction.amountString)
-                .foregroundColor(amountColor(for: transaction.amount))
-                .fontWeight(.medium)
-                .monospacedDigit()
-                .frame(width: ColumnWidths.montant, alignment: .trailing)
+            if splitAmountColumns {
+                // Colonne Recettes (montant > 0)
+                Text(transaction.amount > 0 ? formatCurrency(transaction.amount) : "")
+                    .foregroundColor(.green)
+                    .fontWeight(.medium)
+                    .monospacedDigit()
+                    .frame(width: ColumnWidths.recettes, alignment: .trailing)
+                Divider().frame(width: 2)
+                // Colonne Dépenses (montant < 0)
+                Text(transaction.amount < 0 ? formatCurrency(transaction.amount) : "")
+                    .foregroundColor(.red)
+                    .fontWeight(.medium)
+                    .monospacedDigit()
+                    .frame(width: ColumnWidths.depenses, alignment: .trailing)
+            } else {
+                Text(transaction.amountString)
+                    .foregroundColor(amountColor(for: transaction.amount))
+                    .fontWeight(.medium)
+                    .monospacedDigit()
+                    .frame(width: ColumnWidths.montant, alignment: .trailing)
+            }
             Divider().frame(width: 2)
             Text(formatCurrency(transaction.solde ?? 0.0))
                 .foregroundColor(.blue)
@@ -331,6 +369,12 @@ struct TransactionTableViewModern: View {
                 .frame(width: ColumnWidths.montant, alignment: .trailing)
         }
         .foregroundColor(textColor(for: transaction))
+    }
+    
+    func toggleSplitAmountColumns() {
+        
+        let preference = PreferenceManager.shared.getAllData()
+        preference?.splitAmountColumns = splitAmountColumns
     }
     
     private var statusBarSection: some View {

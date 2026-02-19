@@ -19,6 +19,7 @@ import Combine
     var category    : EntityCategory?
     var paymentMode : EntityPaymentMode?
     var groupCarteBancaire: Bool = false  // Regrouper les transactions CB (carte débit différé)
+    var splitAmountColumns: Bool = false  // Afficher Recettes/Dépenses au lieu d'un seul Montant
 
     @Attribute(.unique) var uuid: UUID = UUID()
 
@@ -28,13 +29,15 @@ import Combine
                 category: EntityCategory? = nil,
                 paymentMode: EntityPaymentMode? = nil,
                 status: EntityStatus? = nil,
-                groupCarteBancaire: Bool = false) {
+                groupCarteBancaire: Bool = false,
+                splitAmountColumns: Bool = false) {
 
         self.category    = category
         self.paymentMode = paymentMode
         self.status      = status
         self.signe       = true
         self.groupCarteBancaire = groupCarteBancaire
+        self.splitAmountColumns = splitAmountColumns
 
         self.account     = account
     }

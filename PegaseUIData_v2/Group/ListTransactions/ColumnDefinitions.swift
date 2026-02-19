@@ -46,4 +46,10 @@ enum ColumnWidths {
 
     /// Width for total transaction amount column
     static let montant: CGFloat = 100
+
+    /// Width for income column (split mode)
+    static let recettes: CGFloat = 100
+
+    /// Width for expense column (split mode)
+    static let depenses: CGFloat = 100
 }

@@ -22,27 +22,28 @@ struct SummaryView: View {
 
     var body: some View {
         HStack(spacing: 0) {
+            
+            // Bank Balance (Executed only)
+            balanceCard(
+                title: String(localized: "Bank balance"),
+                amount: dashboard.executed,
+                color: .purple
+            )
 
             // Final Balance (Planned + Engaged + Executed)
             balanceCard(
                 title: String(localized: "Final balance"),
                 amount: dashboard.planned,
-                color: .purple
+                color: .green
             )
 
             // Actual Balance (Engaged + Executed)
             balanceCard(
                 title: String(localized: "Actual balance"),
                 amount: dashboard.engaged,
-                color: .green
-            )
-
-            // Bank Balance (Executed only)
-            balanceCard(
-                title: String(localized: "Bank balance"),
-                amount: dashboard.executed,
                 color: .red
             )
+
         }
         .frame(maxWidth: .infinity)
     }
