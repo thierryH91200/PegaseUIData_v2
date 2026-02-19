@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>SUFeedURL</key>
-	<string></string>
+	<string>https://github.com/thierryH91200/PegaseUIData_v2/blob/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>0YbOPyRFHzZsnHb6Y+1zUZmNKmFcRGbLXRNrTqSjomI=</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>

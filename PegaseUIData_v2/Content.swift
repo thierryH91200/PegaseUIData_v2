@@ -76,6 +76,8 @@ struct MainContentView: View {
             detail: {
                 if dashboard.isVisible {
                     OperationDialog()
+                        .frame(width: 250)
+                        .padding()
                 }
             }
             .environmentObject(container.transactionSelection)
